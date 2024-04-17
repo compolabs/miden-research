@@ -1,0 +1,8 @@
+[package]
+name = "masm-test"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+miden-processor = "0.9.1"
+miden-vm = "0.9.1"
