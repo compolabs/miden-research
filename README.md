@@ -6,5 +6,5 @@ This repository is dedicated to exploring and experimenting with writing account
 Getting started:
 ```
 cargo build
-cargo run
+cargo test -- --nocapture 
 ```
