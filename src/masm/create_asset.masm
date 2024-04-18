@@ -1,0 +1,13 @@
+use.miden::kernels::tx::prologue
+use.miden::asset
+
+begin 
+    # prepare the transaction
+    exec.prologue::prepare_transaction
+
+    # push asset amount onto stack
+    push.1000
+
+    # create fungible asset
+    exec.asset::create_fungible_asset
+end
