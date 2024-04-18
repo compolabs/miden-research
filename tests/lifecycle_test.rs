@@ -13,12 +13,18 @@ use miden_objects::{
     transaction::TransactionArgs,
     Felt, NoteError, Word, ONE, ZERO,
 };
-use miden_tx::TransactionExecutor;
+use miden_tx::{
+    DataStore, DataStoreError, TransactionExecutor, TransactionProver, TransactionVerifier,
+    TransactionVerifierError,
+};
+use mock::mock::account::DEFAULT_AUTH_SCRIPT;
+
+// use vm_processor::AdviceMap;
 
 use std::fs;
 
 mod utils;
-use utils::get_new_key_pair_with_advice_map;
+use utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 pub fn get_account_with_custom_account_code(
     account_id: AccountId,
@@ -112,31 +118,38 @@ fn test_lifecycle() {
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
 
-    /*
-       let data_store =
-           MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    // let store = DataStore::new();
 
-       let mut executor = TransactionExecutor::new(data_store.clone());
-       executor.load_account(target_account_id).unwrap();
+    let data_store =
+        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-       let block_ref = data_store.block_header.block_num();
-       let note_ids = data_store.notes.iter().map(|note| note.id()).collect::<Vec<_>>();
+    let mut executor = TransactionExecutor::new(data_store.clone());
+    executor.load_account(target_account_id).unwrap();
 
-       let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
+    let block_ref = data_store.block_header.block_num();
+    let note_ids = data_store
+        .notes
+        .iter()
+        .map(|note| note.id())
+        .collect::<Vec<_>>();
 
-       let tx_script_target = executor
-           .compile_tx_script(
-               tx_script_code.clone(),
-               vec![(target_pub_key, target_sk_pk_felt)],
-               vec![],
-           )
-           .unwrap();
-       let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
+    let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
 
-       // Execute the transaction and get the witness
-       let _executed_transaction = executor
-           .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
-           .unwrap();
+    let tx_script_target = executor
+        .compile_tx_script(
+            tx_script_code.clone(),
+            vec![(target_pub_key, target_sk_pk_felt)],
+            vec![],
+        )
+        .unwrap();
 
+    println!("tx_script_target: {:?}", tx_script_target);
+
+    /*        let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
+
+          // Execute the transaction and get the witness
+          let _executed_transaction = executor
+              .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
+              .unwrap();
     */
 }
