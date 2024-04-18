@@ -146,5 +146,5 @@ fn test_lifecycle() {
         .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
         .unwrap();
 
-    println!("{:?}", _executed_transaction)
+    println!("{:?}", _executed_transaction.output_notes());
 }
