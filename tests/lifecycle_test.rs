@@ -19,7 +19,7 @@ use miden_tx::{
 };
 use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
-// use vm_processor::AdviceMap;
+use miden_processor::AdviceMap;
 
 use std::fs;
 
@@ -114,12 +114,8 @@ fn test_lifecycle() {
     )
     .unwrap();
 
-    println!("Note: {:?}", note);
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-
-    // let store = DataStore::new();
-
     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
@@ -143,13 +139,12 @@ fn test_lifecycle() {
         )
         .unwrap();
 
-    println!("tx_script_target: {:?}", tx_script_target);
+    let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
 
-    /*        let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
+    // Execute the transaction and get the witness
+    let _executed_transaction = executor
+        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
+        .unwrap();
 
-          // Execute the transaction and get the witness
-          let _executed_transaction = executor
-              .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
-              .unwrap();
-    */
+    println!("{:?}", _executed_transaction)
 }

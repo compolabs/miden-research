@@ -8,8 +8,6 @@ miden-processor = "0.9.1"
 miden-prover = "0.9.1"
 miden-vm = "0.9.1"
 rand_chacha = "0.3.1"
-
-
 miden-lib =  { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-lib" } 
 miden-objects =  { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-objects" } 
 miden-tx ={ git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-tx" }  
