@@ -1,25 +1,33 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
 
-use miden_objects::{
-    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot}, assembly::{ModuleAst, ProgramAst}, assets::{Asset, AssetVault, FungibleAsset}, crypto::rand::{FeltRng, RpoRandomCoin}, notes::{Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript, NoteTag, NoteType}, transaction::TransactionArgs, Felt, NoteError, Word, ONE, ZERO};
-use miden_tx::TransactionExecutor;
 use miden_lib::transaction::TransactionKernel;
-// use mock::mock::account::DEFAULT_AUTH_SCRIPT;
+use miden_objects::{
+    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
+    assembly::{ModuleAst, ProgramAst},
+    assets::{Asset, AssetVault, FungibleAsset},
+    crypto::rand::{FeltRng, RpoRandomCoin},
+    notes::{
+        Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
+        NoteTag, NoteType,
+    },
+    transaction::TransactionArgs,
+    Felt, NoteError, Word, ONE, ZERO,
+};
+use miden_tx::TransactionExecutor;
 
 use std::fs;
 
 mod utils;
-use utils::{get_new_key_pair_with_advice_map};
+use utils::get_new_key_pair_with_advice_map;
 
 pub fn get_account_with_custom_account_code(
     account_id: AccountId,
     public_key: Word,
     assets: Option<Asset>,
 ) -> Account {
-
-    let filename = "./src/masm/test_account.masm"; 
+    let filename = "./src/masm/test_account.masm";
     let account_code_src = fs::read_to_string(filename).expect("Failed to read the assembly file");
-    
+
     let account_code_ast = ModuleAst::parse(&account_code_src).unwrap();
     let account_assembler = TransactionKernel::assembler();
 
@@ -35,7 +43,13 @@ pub fn get_account_with_custom_account_code(
         None => AssetVault::new(&[]).unwrap(),
     };
 
-    Account::new(account_id, account_vault, account_storage, account_code, Felt::new(1))
+    Account::new(
+        account_id,
+        account_vault,
+        account_storage,
+        account_code,
+        Felt::new(1),
+    )
 }
 
 fn create_note<R: FeltRng>(
@@ -44,20 +58,17 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-
-    let filename = "./src/masm/test_note_script.masm"; 
+    let filename = "./src/masm/test_note_script.masm";
     let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
-    
+
     let note_assembler = TransactionKernel::assembler();
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
 
-
-    
     // Here you can add the inputs to the note
 
     let inputs = NoteInputs::new(vec![ONE, ONE])?;
-    
+
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
     let serial_num = rng.draw_word();
     let aux = ZERO;
@@ -70,8 +81,6 @@ fn create_note<R: FeltRng>(
 
     Ok(Note::new(vault, metadata, recipient))
 }
-
-
 
 #[test]
 fn test_lifecycle() {
@@ -88,7 +97,7 @@ fn test_lifecycle() {
         AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account =
-    get_account_with_custom_account_code(target_account_id, target_pub_key, None);
+        get_account_with_custom_account_code(target_account_id, target_pub_key, None);
 
     // Create the note
     let note = create_note(
@@ -103,32 +112,31 @@ fn test_lifecycle() {
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
 
-/*     
-    let data_store =
-        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    /*
+       let data_store =
+           MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor = TransactionExecutor::new(data_store.clone());
-    executor.load_account(target_account_id).unwrap();
+       let mut executor = TransactionExecutor::new(data_store.clone());
+       executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store.block_header.block_num();
-    let note_ids = data_store.notes.iter().map(|note| note.id()).collect::<Vec<_>>();
+       let block_ref = data_store.block_header.block_num();
+       let note_ids = data_store.notes.iter().map(|note| note.id()).collect::<Vec<_>>();
 
-    let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
+       let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
 
-    let tx_script_target = executor
-        .compile_tx_script(
-            tx_script_code.clone(),
-            vec![(target_pub_key, target_sk_pk_felt)],
-            vec![],
-        )
-        .unwrap();
-    let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
+       let tx_script_target = executor
+           .compile_tx_script(
+               tx_script_code.clone(),
+               vec![(target_pub_key, target_sk_pk_felt)],
+               vec![],
+           )
+           .unwrap();
+       let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
 
-    // Execute the transaction and get the witness
-    let _executed_transaction = executor
-        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
-        .unwrap();
-    
- */
+       // Execute the transaction and get the witness
+       let _executed_transaction = executor
+           .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
+           .unwrap();
 
+    */
 }
