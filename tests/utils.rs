@@ -1,29 +1,21 @@
-use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
-    assembly::{ModuleAst, ProgramAst},
-    assets::{Asset, AssetVault, FungibleAsset},
+    accounts::{Account, AccountId},
+    assembly::ModuleAst,
+    // assets::{Asset, AssetVault, FungibleAsset},
     crypto::{dsa::rpo_falcon512::SecretKey, utils::Serializable},
-    notes::{
-        Note, NoteAssets, NoteId, NoteInputs, NoteMetadata, NoteRecipient, NoteScript, NoteType,
-    },
+    notes::{Note, NoteId},
     transaction::{
-        ChainMmr, ExecutedTransaction, InputNote, InputNotes, OutputNote, ProvenTransaction,
-        TransactionArgs, TransactionInputs,
+        ChainMmr, InputNote, InputNotes, OutputNote, TransactionArgs, TransactionInputs,
     },
-    BlockHeader, Felt, Word, ZERO,
+    BlockHeader,
+    Felt,
+    Word,
 };
-use miden_prover::ProvingOptions;
-use miden_tx::{
-    DataStore, DataStoreError, TransactionProver, TransactionVerifier, TransactionVerifierError,
-};
-use mock::{
-    constants::MIN_PROOF_SECURITY_LEVEL,
-    mock::{
-        account::{MockAccountType, DEFAULT_ACCOUNT_CODE},
-        notes::AssetPreservationStatus,
-        transaction::{mock_inputs, mock_inputs_with_existing},
-    },
+use miden_tx::{DataStore, DataStoreError};
+use mock::mock::{
+    account::MockAccountType,
+    notes::AssetPreservationStatus,
+    transaction::{mock_inputs, mock_inputs_with_existing},
 };
 use rand_chacha::{rand_core::SeedableRng, ChaCha20Rng};
 

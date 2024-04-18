@@ -1,4 +1,4 @@
-use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
+// use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
 
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
@@ -13,10 +13,7 @@ use miden_objects::{
     transaction::TransactionArgs,
     Felt, NoteError, Word, ONE, ZERO,
 };
-use miden_tx::{
-    DataStore, DataStoreError, TransactionExecutor, TransactionProver, TransactionVerifier,
-    TransactionVerifierError,
-};
+use miden_tx::TransactionExecutor;
 use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use miden_processor::AdviceMap;
