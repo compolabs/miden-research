@@ -176,8 +176,13 @@ checksum = "4ec2a862134d2a7d32d7983ddcdd1c4923530833c9f2ea1a44fc5fa473989058"
 name = "masm-test"
 version = "0.1.0"
 dependencies = [
+ "miden-lib",
+ "miden-objects",
  "miden-processor",
+ "miden-prover",
+ "miden-tx",
  "miden-vm",
+ "rand_chacha",
 ]
 
 [[package]]
@@ -239,6 +244,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "miden-lib"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "855aceec1ac4d01fc486a7c9c9cb348d05b3310c842580b25c5b79a65bd942e2"
+dependencies = [
+ "miden-assembly",
+ "miden-objects",
+ "miden-stdlib",
+]
+
+[[package]]
+name = "miden-objects"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f87a635484967ad871332d99791d7e1cada6857aa32cc4f72f1a8817c4016b4"
+dependencies = [
+ "miden-assembly",
+ "miden-core",
+ "miden-crypto",
+ "miden-processor",
+ "miden-verifier",
+]
+
+[[package]]
 name = "miden-processor"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -269,6 +298,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "60994609096a8cb1e32f1fcf1c8ed63bed9b24b32730658609bad841e8caeaf9"
 dependencies = [
  "miden-assembly",
+]
+
+[[package]]
+name = "miden-tx"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3c3264a1c775dd80dff46c527993259e0cddd8dd7ed0a9b66eb7f558eb734ddf"
+dependencies = [
+ "miden-lib",
+ "miden-objects",
+ "miden-processor",
+ "miden-prover",
+ "miden-verifier",
 ]
 
 [[package]]
