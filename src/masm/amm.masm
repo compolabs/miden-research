@@ -3,7 +3,7 @@
 
 # x * y = k
 # k = (x+dx) * (y+dy)
-# -dy = (dx * y) / (dx + x)
+# dy = (-dx * y) / (dx + x)
 # amountOutY = (amountInX * balY) / (amountInX + balX)
 
 proc.calculate_amount_y_out
@@ -47,6 +47,7 @@ proc.calculate_amount_y_out
   # [1.666e6]
   
 end
+
 
 # mimic token call
 proc.get_token_amounts
