@@ -1,0 +1,70 @@
+# Description:
+# This procedure computes the square root of a given number using the Newton-Raphson method.
+# The Newton-Raphson method is an iterative numerical technique used to approximate roots
+# of a real-valued function. For square roots, the method approximates sqrt(x) by iteratively
+# improving guesses based on the formula: y_next = y - (y^2 - x) / (2 * y).
+# This translates into y_next = (y + x/y) / 2 for our implementation.
+# https://math.mit.edu/~stevenj/18.335/newton-sqrt.pdf
+#
+# Constraints:
+# The input x must satisfy 0.03 < x < 179 and is expected to be on top of the stack,
+# scaled by 1e6 for precision (e.g., for x = 9, the stack starts with 9000000).
+#
+# Stack initial state:
+# [x_scaled]
+proc.sqrt
+  # 0.03 < x < 179
+  # Assume the input value x is on top of the stack, scaled by 1e6
+  # [9e6]
+
+  dup dup
+  # Duplicate x to prepare for the initial guess
+  # Stack state: [x, x, x]
+
+  mul.1000000
+  # Scale x by 1e6 to manage division scale correctly
+  # Stack state: [9e12, 9e6, 9e6]
+
+  div.2000000
+  # Divide by 2e6 to set the initial guess for y = x / 2
+  # Stack state: [4.5e6, 9e6, 9e6]
+
+  # The first guess for the square root is y = x / 2
+  # Stack state: [y, x, x]
+  # Begin the Newton-Raphson iteration to refine y
+
+  dup            # Duplicate y for use in calculations, maintaining original x
+  swap.2         # Move x to the top to prepare for division
+  swap           # Correct stack order for division
+
+  repeat.5       # Begin iteration, typically 5 times is sufficient for convergence
+    
+    div.1000     # Scale down before division to prevent overflow
+    u32div       # Unsigned 32-bit division x/y
+    mul.1000     # Scale back up post-division
+
+    add          # Compute y + (x/y), an intermediate step in the iteration
+    div.1000     # Scale down to balance the addition
+    dup.1        # Duplicate result for further manipulation
+    swap         # Swap to correct order for scaling
+
+    mul.1000     # Scale up for averaging
+    u32div.2000  # Divide by 2 (for averaging step in Newton-Raphson)
+    mul.1000     # Scale up the result to maintain overall consistency
+
+    dup          # Duplicate new y for next iteration
+    swap.2       # Reorder stack to maintain x at correct position
+    swap         # Ensure y is on top for next iteration
+  end
+
+  drop drop      # Clean up stack, removing intermediate values
+  swap           # Bring final y to top
+  drop           # Remove any remaining extraneous value
+
+  debug.stack
+
+end
+
+begin
+  exec.sqrt      # Execute the square root computation
+end

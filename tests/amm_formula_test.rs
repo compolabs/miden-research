@@ -1,5 +1,4 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
-use std::fs;
 
 #[test]
 fn test_amm() {
@@ -7,12 +6,11 @@ fn test_amm() {
     let assembler = Assembler::default();
 
     // Read the assembly program from a file
-    let filename = "./src/masm/amm.masm";
-    let assembly_code = fs::read_to_string(filename).expect("Failed to read the assembly file");
+    let assembly_code: &str = include_str!("../src/masm/amm.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler
-        .compile(&assembly_code)
+        .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
     let amount_in_x = 1000000;
