@@ -53,7 +53,6 @@ fn test_tx_create_fungible_asset() {
     println!("{:?}", process.get_stack_word(0));
 }
 
-
 #[test]
 fn test_tx_create_fungible_asset_and_send() {
     let (tx_inputs, tx_args) = mock_inputs(
@@ -81,5 +80,4 @@ fn test_tx_create_fungible_asset_and_send() {
         ])
     );
     println!("{:?}", process.get_stack_word(0));
-
 }
