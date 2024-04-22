@@ -32,7 +32,7 @@ pub fn get_account_with_custom_account_code(
     let account_code_src = fs::read_to_string(filename).expect("Failed to read the assembly file");
 
     let account_code_ast = ModuleAst::parse(&account_code_src).unwrap();
-    let account_assembler = TransactionKernel::assembler();
+    let account_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = AccountCode::new(account_code_ast.clone(), &account_assembler).unwrap();
     let account_storage = AccountStorage::new(vec![SlotItem {
@@ -64,7 +64,7 @@ fn create_note<R: FeltRng>(
     let filename = "./src/masm/test_note_script.masm";
     let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
 
-    let note_assembler = TransactionKernel::assembler();
+    let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
 
