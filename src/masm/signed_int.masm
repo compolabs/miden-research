@@ -47,12 +47,17 @@ proc.signed_sub
   # Check the condition: if 'a' >= 'b' and we subtracted, there might be an underflow wrap-around we need to correct
   # Here we assume we somehow stored the boolean result or can access it again
   if.true
-    # If the result was expected to be negative (a >= b for encoded negatives),
-    # and since we can't have negatives, we might need to add the full range
-    # to correct for the underflow (if the subtraction wraps around)
-    push.18446744069414584320
-    swap
-    sub
+    # Check if subtraction underflowed by comparing with zero indirectly using midpoint
+    dup
+    push.9223372034707292159
+    gte  # Checks if result < midpoint, implying a normal positive result or a huge number indicating underflow
+    if.true
+      # nothing
+    else 
+      push.18446744069414584320
+      swap
+      sub
+    end
   end
 end
 
@@ -68,8 +73,10 @@ begin
   # b = 18446744069414584300
   
   # push a, b
-  push.18446744069414584310
-  push.18446744069414584300
+  # push.18446744069414584310
+  # push.18446744069414584300
+  push.20
+  push.10
 
   # exec.signed_add
   # [18446744069414584290]
