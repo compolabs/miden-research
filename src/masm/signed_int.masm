@@ -21,6 +21,42 @@ proc.signed_add
   end
 end
 
+# [b, a]
+proc.signed_sub
+  # Assume inputs are b (top of stack), a (second in stack)
+  
+  # Duplicate inputs to check their relative sizes and original encoding
+  dup.1
+  dup.1
+  # [b, a, b, a]
+
+  # Check if 'a' is greater than or equal to 'b' (assuming both are encoded as large positive numbers for negatives)
+  gte
+  #[bool, b, a]
+
+  swap.3
+  drop
+  # [b, a, bool]
+
+  # Now perform the subtraction of the original inputs
+  sub
+  # [b-a, bool]
+
+  swap
+
+  # Check the condition: if 'a' >= 'b' and we subtracted, there might be an underflow wrap-around we need to correct
+  # Here we assume we somehow stored the boolean result or can access it again
+  if.true
+    # If the result was expected to be negative (a >= b for encoded negatives),
+    # and since we can't have negatives, we might need to add the full range
+    # to correct for the underflow (if the subtraction wraps around)
+    push.18446744069414584320
+    swap
+    sub
+  end
+end
+
+
 
 begin
 
@@ -35,7 +71,12 @@ begin
   push.18446744069414584310
   push.18446744069414584300
 
-  exec.signed_add
+  # exec.signed_add
+  # [18446744069414584290]
+  # [-30]
   
+  # swap
+
+  exec.signed_sub
 
 end
