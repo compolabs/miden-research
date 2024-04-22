@@ -1,0 +1,43 @@
+# The base field size in Miden VM is 2**64 - 2**32 - 1 = 18446744069414584000
+
+# [b, a]
+proc.signed_add
+
+  # add
+  # [c]
+
+  #dup
+  # [c, c]
+
+  #push.9223372036854775808
+  # [2**63/2, c, c]
+
+  # gte # if >= 2**63
+  # [bool, c]
+
+  # debug.stack
+
+  #if.true
+   #push.9223372036854775808
+   #sub
+  #end
+end
+
+
+begin
+
+  # a = -5
+  # b = -2
+
+  # machine format
+  # a = 9223372036854775803
+  # b = 9223372036854775806
+  
+  # push a, b
+  push.9223372036854775803
+  push.9223372036854775806
+
+  exec.signed_add
+  
+
+end
