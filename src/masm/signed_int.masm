@@ -1,4 +1,20 @@
-# The base field size in Miden VM is 2**64 - 2**32 - 1 = 18446744069414584319
+# Signed Integer Library [IN PROGRESS]
+#
+# The max uint in Miden VM is 2**64 - 2**32 = 18446744069414584320
+# The max positive integer in this library is (2**64 - 2**32 - 1) // 2 = 9223372034707292159
+# The min negative number in this library is (2**64 - 2**32) // 2 = 9223372034707292160
+# 9223372034707292160 + 9223372034707292159 + 1 = 18446744069414584320 
+# 0 --> (2**64 - 2**32 - 1) // 2 
+
+const.MAX_POSITIVE_INT=9223372034707292159
+const.MAX_VAL=18446744069414584320
+
+# [a, ...] => [b, ..]
+proc.to_negative
+  push.MAX_VAL
+  swap
+  sub
+end
 
 # [b, a]
 proc.signed_add
@@ -40,50 +56,81 @@ proc.signed_sub
 
   # Now perform the subtraction of the original inputs
   sub
-  # [b-a, bool]
+  # [c, bool]
 
   swap
 
   # Check the condition: if 'a' >= 'b' and we subtracted, there might be an underflow wrap-around we need to correct
-  # Here we assume we somehow stored the boolean result or can access it again
   if.true
     # Check if subtraction underflowed by comparing with zero indirectly using midpoint
     dup
-    push.9223372034707292159
+    # [c, c]
+    push.MAX_POSITIVE_INT
+    # [MAX_POSITIVE_INT, c]
+
     gte  # Checks if result < midpoint, implying a normal positive result or a huge number indicating underflow
     if.true
       # nothing
-    else 
-      push.18446744069414584320
-      swap
-      sub
+    else
+      exec.to_negative 
     end
   end
 end
 
-
-
 begin
+  # test 1
+  # a = 5
+  # b = 5
+  push.5
+  push.5
 
+  exec.signed_add
+  eq.10
+  assert
+  # [10]
+  # drop
+
+  # test 2
   # a = -10
-  # b = -20
+  # b = -5 
+  push.18446744069414584310
+  push.18446744069414584315
 
-  # machine format
-  # a = 18446744069414584310
-  # b = 18446744069414584300
-  
-  # push a, b
-  # push.18446744069414584310
-  # push.18446744069414584300
-  push.20
-  push.10
+  exec.signed_add
+  eq.18446744069414584305 # -15
+  assert
 
-  # exec.signed_add
-  # [18446744069414584290]
-  # [-30]
-  
-  # swap
+  # test 3 FAILING
+  # a = -10
+  # b = 5 
+  push.18446744069414584310
+  push.5
+  drop drop
+
+  # test 4 FAILING
+  # a = 5
+  # b = 10 
+  push.5
+  push.18446744069414584310
+  drop drop
+
+  # test 5
+  # a = -10
+  # b = -5
+  push.18446744069414584315
+  push.18446744069414584310
 
   exec.signed_sub
+  eq.18446744069414584315
+  assert
+
+  # test 6
+  # a = -10
+  # b = -5
+  push.18446744069414584310
+  push.18446744069414584315
+
+  exec.signed_sub
+  # FAILS
 
 end
