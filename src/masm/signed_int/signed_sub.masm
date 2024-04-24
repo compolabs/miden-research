@@ -1,0 +1,52 @@
+# [b, a]
+proc.signed_sub
+  # Assume inputs are b (top of stack), a (second in stack)
+  
+  # Duplicate inputs to check their relative sizes and original encoding
+  dup.1
+  dup.1
+  # [b, a, b, a]
+
+  # Check if 'a' is greater than or equal to 'b' (assuming both are encoded as large positive numbers for negatives)
+  gte
+  #[bool, b, a]
+
+  swap.3
+  drop
+  # [b, a, bool]
+
+  # Now perform the subtraction of the original inputs
+  sub
+  # [c, bool]
+
+  swap
+
+  # Check the condition: if 'a' >= 'b' and we subtracted, there might be an underflow wrap-around we need to correct
+  if.true
+    # Check if subtraction underflowed by comparing with zero indirectly using midpoint
+    dup
+    # [c, c]
+    push.MAX_POSITIVE_INT
+    # [MAX_POSITIVE_INT, c]
+
+    gte  # Checks if result < midpoint, implying a normal positive result or a huge number indicating underflow
+    if.true
+      # nothing
+    else
+      exec.to_negative 
+    end
+  end
+end
+
+begin
+  # test 1
+  # a = 5
+  # b = 5
+  push.10
+  push.18446744069414584315
+
+  swap
+
+  exec.signed_sub
+
+end

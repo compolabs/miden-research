@@ -1,0 +1,72 @@
+# Signed Integer Library [IN PROGRESS]
+#
+# The max uint in Miden VM is 2**64 - 2**32 = 18446744069414584320
+# The max positive integer in this library is (2**64 - 2**32 - 1) // 2 = 9223372034707292159
+# The min negative number in this library is (2**64 - 2**32) // 2 = 9223372034707292160
+# 9223372034707292160 + 9223372034707292159 + 1 = 18446744069414584320 
+# 0 --> (2**64 - 2**32 - 1) // 2 
+
+const.MAX_POSITIVE_INT=9223372034707292159
+const.MAX_VAL=18446744069414584320
+
+# [a, ...] => [b, ..]
+proc.to_negative
+  push.MAX_VAL
+  swap
+  sub
+end
+
+# [b, a]
+proc.signed_add
+
+  # must check for overflow 
+  dup
+  # [b, b, a]
+
+  push.MAX_VAL
+  # [max_val, b, b, a]
+  
+  swap
+  # [b, max_val, b, a]
+
+  sub
+  # [diff, b, a]
+
+  swap.2
+  # [a, b, diff]
+
+  dup
+  # [a, a, b, diff]
+
+  swap.2
+  # [b, a, a, diff]
+
+  swap.3
+  # [diff, a, a, b]
+
+  gt
+  #[bool, a, b]
+
+  debug.stack
+
+  if.true
+    add
+    push.1
+    add
+  else
+    add
+  end
+  # [c]
+
+end
+
+begin
+  # test 1
+  # a = 5
+  # b = 5
+
+  # swap
+
+  exec.signed_add
+
+end

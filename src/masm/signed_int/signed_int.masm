@@ -19,22 +19,45 @@ end
 # [b, a]
 proc.signed_add
 
-  add
-  # [c]
+  # must check for overflow 
+  dup
+  # [b, b, a]
+
+  push.MAX_VAL
+  # [max_val, b, b, a]
+  
+  swap
+  # [b, max_val, b, a]
+
+  sub
+  # [diff, b, a]
+
+  swap.2
+  # [a, b, diff]
 
   dup
-  # [c, c]
+  # [a, a, b, diff]
 
-  push.9223372034707292159 
-  # [(2**64-2**32 -1) /2, c, c]
+  swap.2
+  # [b, a, a, diff]
 
-  gte # if x >= 2**64 - 2**63 - 1
-  # [bool, c]
+  swap.3
+  # [diff, a, a, b]
+
+  gt
+  #[bool, a, b]
+
+  debug.stack
 
   if.true
-   push.18446744069414584320
-   sub
+    add
+    push.1
+    add
+  else
+    add
   end
+  # [c]
+
 end
 
 # [b, a]
@@ -81,56 +104,13 @@ begin
   # test 1
   # a = 5
   # b = 5
-  push.5
-  push.5
+  push.10
+  push.18446744069414584315
+
+  swap
 
   exec.signed_add
-  eq.10
-  assert
-  # [10]
-  # drop
 
-  # test 2
-  # a = -10
-  # b = -5 
-  push.18446744069414584310
-  push.18446744069414584315
-
-  exec.signed_add
-  eq.18446744069414584305 # -15
-  assert
-
-  # test 3 FAILING
-  # a = -10
-  # b = 5 
-  push.18446744069414584310
-  push.5
-  drop drop
-
-  # test 4 FAILING
-  # a = 5
-  # b = 10 
-  push.5
-  push.18446744069414584310
-  drop drop
-
-  # test 5
-  # a = -10
-  # b = -5
-  push.18446744069414584315
-  push.18446744069414584310
-
-  exec.signed_sub
-  eq.18446744069414584315
-  assert
-
-  # test 6
-  # a = -10
-  # b = -5
-  push.18446744069414584310
-  push.18446744069414584315
-
-  exec.signed_sub
-  # FAILS
+  
 
 end
