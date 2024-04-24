@@ -1,0 +1,97 @@
+const.MAX_POSITIVE_INT=9223372034707292160
+const.MAX_VAL=18446744069414584320
+
+# @ dev proc.to_negative & from_negative do the same thing
+# named differently to not get confused
+# a = from_negative(to_negative(a))
+# a = to_negative(to_negative(a))
+
+proc.to_negative
+  push.MAX_VAL
+  swap
+  sub
+end
+
+proc.from_negative
+  push.MAX_VAL
+  swap 
+  sub
+end
+
+# uses memory addresses 0 & 1
+proc.signed_div
+  dup.1 dup.1
+  # [b, a, b, a]
+
+  push.MAX_POSITIVE_INT
+  # [max_pos, b, a, b, a]
+
+  gt 
+  # [bool, a, b, a]
+
+  swap.4 drop
+  # [a, b, a, bool]
+
+  push.MAX_POSITIVE_INT
+  # [max_pos, a, b, a, bool]
+
+  gt
+
+  swap.4 drop
+  # [a, b, bool, bool]
+
+  swap.4 drop
+  swap.4 drop
+  swap
+  # [bool_a, bool_b, b, a]
+
+  dup.1
+  dup.1
+
+  mem_store.0
+  mem_store.1
+  # [bool_a, bool_b, b, a]
+
+  swap
+  # [bool_b, bool_a, b, a]
+  
+  if.true
+    swap
+    exec.from_negative
+  else
+    swap
+    # [b, bool_a, a]
+  end
+
+  swap
+  # [bool_a, b, a]
+
+  if.true
+    swap
+    exec.from_negative
+  else
+    swap
+    # [a, b]
+  end
+
+  # [a, b]
+  div
+
+  mem_load.1
+  mem_load.0
+  # [bool_a, bool_b, prod]
+  
+  xor
+  # [xor, prod]
+
+  if.true
+    exec.to_negative
+  else
+    # nothing
+  end
+
+end
+
+begin
+  exec.signed_div
+end
