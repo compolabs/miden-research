@@ -1,10 +1,6 @@
 # Signed Integer Library [IN PROGRESS]
 #
 # The max uint in Miden VM is 2**64 - 2**32 = 18446744069414584320
-# The max positive integer in this library is (2**64 - 2**32 - 1) // 2 = 9223372034707292159
-# The min negative number in this library is (2**64 - 2**32) // 2 = 9223372034707292160
-# 9223372034707292160 + 9223372034707292159 + 1 = 18446744069414584320 
-# 0 --> (2**64 - 2**32 - 1) // 2 
 
 const.MAX_POSITIVE_INT=9223372034707292160
 const.MAX_VAL=18446744069414584320
