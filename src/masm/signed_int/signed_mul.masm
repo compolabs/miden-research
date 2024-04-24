@@ -18,13 +18,8 @@ proc.from_negative
   sub
 end
 
+# uses memory addresses 0 & 1
 proc.signed_mul
-
-  # [1, 1] = 0
-  # [1, 0] = 1
-  # [0, 1] = 1
-  # [0, 0] = 0
-
   dup.1 dup.1
   # [b, a, b, a]
 
@@ -62,38 +57,25 @@ proc.signed_mul
   
   if.true
     swap
-    # [b, bool_a, a]
-
     exec.from_negative
   else
     swap
-    # nothing
+    # [b, bool_a, a]
   end
-
-  debug.stack
-
-  # [b, bool_a, a]
-
 
   swap
   # [bool_a, b, a]
 
   if.true
     swap
-    # [a, b]
-
     exec.from_negative
   else
     swap
-    # nothing
+    # [a, b]
   end
-
-  debug.stack
 
   # [a, b]
   mul
-
-  debug.stack
 
   mem_load.1
   mem_load.0
@@ -107,8 +89,6 @@ proc.signed_mul
   else
     # nothing
   end
-
-  # 
 
 end
 
