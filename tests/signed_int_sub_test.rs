@@ -22,20 +22,20 @@ fn to_normal_format(x: u128) -> i128 {
 }
 
 #[test]
-fn test_signed_int_masm() {
+fn test_signed_int_sub_masm() {
     // Instantiate the assembler
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/signed_int/signed_add.masm");
+    let assembly_code: &str = include_str!("../src/masm/signed_int/signed_sub.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input_a: i64 = -100;
-    let input_b: i64 = -100;
+    let input_a: i64 = -200;
+    let input_b: i64 = 100;
 
     let machine_input_a = to_machine_format(input_a as i64) as u64;
     let machine_input_b = to_machine_format(input_b as i64) as u64;
@@ -43,7 +43,7 @@ fn test_signed_int_masm() {
     println!("Machine input a: {}", machine_input_a);
     println!("Machine input b: {}", machine_input_b);
 
-    let stack_inputs = StackInputs::try_from_ints([machine_input_a, machine_input_b]).unwrap();
+    let stack_inputs = StackInputs::try_from_ints([machine_input_b, machine_input_a]).unwrap();
     let cloned_inputs = stack_inputs.clone();
 
     let host = DefaultHost::default();
@@ -58,7 +58,7 @@ fn test_signed_int_masm() {
     let raw_result = outputs.stack().get(0).unwrap().as_int();
     let result = to_normal_format(raw_result as u128) as i64;
 
-    let expected_result = input_a + input_b;
+    let expected_result = input_a - input_b;
 
     println!("raw_result: {}, result: {}", raw_result, result);
     println!("Expected result: {}", expected_result);
