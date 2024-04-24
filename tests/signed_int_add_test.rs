@@ -34,7 +34,7 @@ fn test_signed_int_add_masm() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input_a: i64 = 100;
+    let input_a: i64 = -150;
     let input_b: i64 = -200;
 
     let machine_input_a = to_machine_format(input_a as i64) as u64;

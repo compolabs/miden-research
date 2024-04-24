@@ -6,111 +6,63 @@
 # 9223372034707292160 + 9223372034707292159 + 1 = 18446744069414584320 
 # 0 --> (2**64 - 2**32 - 1) // 2 
 
-const.MAX_POSITIVE_INT=9223372034707292159
+const.MAX_POSITIVE_INT=9223372034707292160
 const.MAX_VAL=18446744069414584320
 
-# [a, ...] => [b, ..]
-proc.to_negative
-  push.MAX_VAL
-  swap
-  sub
-end
+begin
+  # [b, a]
 
-# [b, a]
-proc.signed_add
+  dup.1 dup.1
+  # [b, a, b, a]
 
-  # must check for overflow 
-  dup
-  # [b, b, a]
-
-  push.MAX_VAL
-  # [max_val, b, b, a]
-  
-  swap
-  # [b, max_val, b, a]
-
-  sub
-  # [diff, b, a]
-
-  swap.2
-  # [a, b, diff]
-
-  dup
-  # [a, a, b, diff]
-
-  swap.2
-  # [b, a, a, diff]
-
-  swap.3
-  # [diff, a, a, b]
+  # if both neg, then sub
+  push.MAX_POSITIVE_INT
+  # [max, b, a, b, a]
 
   gt
-  #[bool, a, b]
+  # [bool, a, b, a]
+
+  swap.4
+  drop
+  # [a, b, a, bool]
+
+  push.MAX_POSITIVE_INT
+  # [max, a, b, a, bool]
+
+  gt
+  # [bool, b, a, bool]
+
+  swap.4 drop
+  swap.4 drop
+  swap.4 drop
+  # [bool, bool, b, a]
+
+  dup
+  push.1
+  eq 
+
+  if.true
+    eq
+    if.true
+      debug.stack
+
+      sub
+      sub.1
+    else
+      add
+      add.1
+    end
+
+  else
+    sub
+  end
+
+
 
   debug.stack
 
-  if.true
-    add
-    push.1
-    add
-  else
-    add
-  end
-  # [c]
 
-end
 
-# [b, a]
-proc.signed_sub
-  # Assume inputs are b (top of stack), a (second in stack)
-  
-  # Duplicate inputs to check their relative sizes and original encoding
-  dup.1
-  dup.1
-  # [b, a, b, a]
-
-  # Check if 'a' is greater than or equal to 'b' (assuming both are encoded as large positive numbers for negatives)
-  gte
-  #[bool, b, a]
-
-  swap.3
-  drop
-  # [b, a, bool]
-
-  # Now perform the subtraction of the original inputs
-  sub
-  # [c, bool]
-
-  swap
-
-  # Check the condition: if 'a' >= 'b' and we subtracted, there might be an underflow wrap-around we need to correct
-  if.true
-    # Check if subtraction underflowed by comparing with zero indirectly using midpoint
-    dup
-    # [c, c]
-    push.MAX_POSITIVE_INT
-    # [MAX_POSITIVE_INT, c]
-
-    gte  # Checks if result < midpoint, implying a normal positive result or a huge number indicating underflow
-    if.true
-      # nothing
-    else
-      exec.to_negative 
-    end
-  end
-end
-
-begin
-  # test 1
-  # a = 5
-  # b = 5
-  push.10
-  push.18446744069414584315
-
-  swap
-
-  exec.signed_add
-
-  
+  add
 
 end

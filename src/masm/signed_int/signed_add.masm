@@ -6,7 +6,7 @@
 # 9223372034707292160 + 9223372034707292159 + 1 = 18446744069414584320 
 # 0 --> (2**64 - 2**32 - 1) // 2 
 
-const.MAX_POSITIVE_INT=9223372034707292159
+const.MAX_POSITIVE_INT=9223372034707292160
 const.MAX_VAL=18446744069414584320
 
 # [a, ...] => [b, ..]
@@ -45,28 +45,16 @@ proc.signed_add
   # [diff, a, a, b]
 
   gt
-  #[bool, a, b]
-
-  debug.stack
+  #[overflow_bool, a, b]
 
   if.true
     add
-    push.1
-    add
+    add.1
   else
     add
   end
-  # [c]
-
 end
 
 begin
-  # test 1
-  # a = 5
-  # b = 5
-
-  # swap
-
   exec.signed_add
-
 end
