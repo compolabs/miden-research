@@ -43,12 +43,10 @@ proc.signed_sub
   if.true
     dup.1
     dup.1
-
     lt
     if.true
       sub
       sub.1
-
     else
       sub
     end
@@ -56,7 +54,6 @@ proc.signed_sub
   else
     dup.1
     dup.1
-
     lt 
     if.true
       sub
