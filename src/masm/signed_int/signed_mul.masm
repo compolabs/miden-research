@@ -48,43 +48,52 @@ proc.signed_mul
   swap.4 drop
   swap.4 drop
   swap
-  # [bool_a, bool_b, a, b]
-
-  debug.stack
-
+  # [bool_a, bool_b, b, a]
 
   dup.1
   dup.1
 
   mem_store.0
   mem_store.1
-  # [bool_a, bool_b, a, b]
-  
-  swap.4
-  # [b, bool_b, a, bool_a]
+  # [bool_a, bool_b, b, a]
 
   swap
-  # [bool_b, b, a, bool_a]
-
+  # [bool_b, bool_a, b, a]
+  
   if.true
+    swap
+    # [b, bool_a, a]
+
     exec.from_negative
   else
+    swap
     # nothing
   end
 
-  # [b, a, bool_a]
+  debug.stack
 
-  swap.2
-  # [bool_a, a, b]
+  # [b, bool_a, a]
+
+
+  swap
+  # [bool_a, b, a]
 
   if.true
+    swap
+    # [a, b]
+
     exec.from_negative
   else
+    swap
     # nothing
   end
+
+  debug.stack
 
   # [a, b]
   mul
+
+  debug.stack
 
   mem_load.1
   mem_load.0
@@ -104,13 +113,5 @@ proc.signed_mul
 end
 
 begin
-
-  drop drop
-
-  push.5 # a
-  push.6 # b
-
   exec.signed_mul
-
-
 end

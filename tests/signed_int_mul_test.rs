@@ -33,8 +33,8 @@ fn test_signed_int_mul_masm() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input_a: i64 = -5;
-    let input_b: i64 = 10;
+    let input_a: i64 = 5;
+    let input_b: i64 = -50;
 
     let machine_input_a = to_machine_format(input_a as i64) as u64;
     let machine_input_b = to_machine_format(input_b as i64) as u64;
@@ -62,7 +62,7 @@ fn test_signed_int_mul_masm() {
     println!("raw_result: {}, result: {}", raw_result, result);
     println!("Expected result: {}", expected_result);
 
-    // assert_eq!(result, expected_result);
+    assert_eq!(result, expected_result);
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
     println!("Program run successfully");
