@@ -353,6 +353,7 @@ dependencies = [
  "miden-prover",
  "miden-tx",
  "miden-vm",
+ "rand",
  "rand_chacha",
 ]
 
