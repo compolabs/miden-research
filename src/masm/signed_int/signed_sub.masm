@@ -34,8 +34,6 @@ proc.signed_sub
   gt
   #[overflow_bool, a, b]
 
-  debug.stack
-
   if.true
     dup.1
     dup.1

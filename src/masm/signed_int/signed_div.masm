@@ -20,9 +20,6 @@ end
 
 # uses memory addresses 0 & 1
 proc.signed_div
-
-  debug.stack
-
   dup.1 dup.1
   # [b, a, b, a]
 
@@ -76,14 +73,10 @@ proc.signed_div
     swap
     # [a, b]
   end
-
-  debug.stack
-
+  
   # [a, b]
   u32div
   # div
-
-  debug.stack
 
   mem_load.1
   mem_load.0

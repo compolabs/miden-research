@@ -12,7 +12,6 @@ proc.to_negative
   sub
 end
 
-
 # [b, a]
 proc.signed_add
 
@@ -52,6 +51,57 @@ proc.signed_add
   end
 end
 
-begin
-  exec.signed_add
-end
+proc.signed_sub
+  # check for overflow / underflow
+  dup
+  # [b, b, a]
+
+  push.MAX_VAL
+  # [max_val, b, b, a]
+
+  swap
+  # [b, max_val, b, a]
+
+  sub
+  # [diff, b, a]
+
+  swap.2
+  # [a, b, diff]
+
+  dup
+  # [a, a, b, diff]
+
+  swap.2
+  # [b, a, a, diff]
+
+  swap.3
+  # [diff, a, a, b]
+
+  gt
+  #[overflow_bool, a, b]
+
+  if.true
+    dup.1
+    dup.1
+    lt
+    if.true
+      sub
+      sub.1
+    else
+      sub
+    end
+
+  else
+    dup.1
+    dup.1
+    lt 
+    if.true
+      sub
+      sub.1  
+    else 
+      sub
+    end
+
+  end
+
+end 
