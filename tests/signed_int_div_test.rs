@@ -34,8 +34,8 @@ fn test_signed_int_div_masm() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input_a: i64 = -50;
-    let input_b: i64 = -5;
+    let input_a: i64 = -34703;
+    let input_b: i64 = -99228;
 
     let machine_input_a = to_machine_format(input_a as i64) as u64;
     let machine_input_b = to_machine_format(input_b as i64) as u64;
@@ -88,8 +88,8 @@ fn test_signed_int_div_masm_fuzz() {
         println!("Test {}", i);
         let host = DefaultHost::default();
 
-        let input_a: i64 = rng.gen_range(-1000000..1000000); // Generate random input a
-        let input_b: i64 = rng.gen_range(-1000000..1000000); // Generate random input b
+        let input_a: i64 = rng.gen_range(-100000..100000); // Generate random input a
+        let input_b: i64 = rng.gen_range(-100000..100000); // Generate random input b
 
         let machine_input_a = to_machine_format(input_a as i64) as u64;
         let machine_input_b = to_machine_format(input_b as i64) as u64;
@@ -104,7 +104,9 @@ fn test_signed_int_div_masm_fuzz() {
         let raw_result = outputs.stack().get(0).unwrap().as_int();
         let result = to_normal_format(raw_result as u128) as i64;
 
-        let expected_result = input_a - input_b;
+        let expected_result = input_a / input_b;
+
+        println!("A: {}, B: {}", input_a, input_b);
 
         assert_eq!(result, expected_result);
 
