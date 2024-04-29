@@ -1,5 +1,4 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
-use rand::Rng;
 
 const OFFSET: u128 = 9223372034707292160; // (2^64 - 2^32) / 2
 
