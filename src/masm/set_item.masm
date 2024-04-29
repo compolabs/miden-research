@@ -1,0 +1,21 @@
+  use.miden::account
+  use.miden::kernels::tx::memory
+  use.miden::kernels::tx::prologue
+
+  begin
+      # prepare the transaction
+      exec.prologue::prepare_transaction
+
+      # push the new storage item onto the stack
+      push.1010
+
+      # push the account storage item index
+      push.1
+
+      # get the item
+      exec.account::set_item
+
+      push.1
+
+      exec.account::get_item
+  end
