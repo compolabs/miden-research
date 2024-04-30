@@ -3,6 +3,10 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
+    accounts::{
+        ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
+        ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
+    },
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::rand::{FeltRng, RpoRandomCoin},
@@ -14,7 +18,7 @@ use miden_objects::{
     Felt, NoteError, Word, ONE, ZERO,
 };
 use miden_tx::TransactionExecutor;
-use mock::mock::account::DEFAULT_AUTH_SCRIPT;
+use mock::{mock::account::DEFAULT_AUTH_SCRIPT, prepare_transaction};
 
 use miden_processor::AdviceMap;
 
@@ -87,17 +91,13 @@ fn create_note<R: FeltRng>(
 
 #[test]
 fn test_lifecycle() {
-    let ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN = 0x200000000000001F;
     let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
 
     // Create sender and target account
-    let ACCOUNT_ID_SENDER = 0x800000000000001F;
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
-    let ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN = 0x100000000000003F;
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN).unwrap();
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account =
         get_account_with_custom_account_code(target_account_id, target_pub_key, None);
@@ -139,10 +139,9 @@ fn test_lifecycle() {
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
 
     // Execute the transaction and get the witness
-    let _executed_transaction = executor
-        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
-        .unwrap();
+    let _executed_transaction =
+        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
     // println!("{:?}", _executed_transaction.output_notes());
-    // println!("{:?}", _executed_transaction);
+    // println!("{:?}", _executed_transaction.program());
 }

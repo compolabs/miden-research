@@ -1,11 +1,8 @@
 use miden_objects::{crypto::merkle::LeafIndex, Felt, Word};
 use miden_processor::ProcessState;
-use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
 use mock::{
     mock::{account::MockAccountType, notes::AssetPreservationStatus, transaction::mock_inputs},
-    prepare_transaction,
-    procedures::prepare_word,
-    run_tx,
+    prepare_transaction, run_tx,
 };
 
 mod utils;

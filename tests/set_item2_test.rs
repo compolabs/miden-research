@@ -1,5 +1,9 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
-use rand::Rng;
+
+use miden_lib::MidenLib;
+use miden_stdlib::StdLibrary;
+
+use miden_lib::transaction::TransactionKernel;
 
 const OFFSET: u128 = 9223372034707292160; // (2^64 - 2^32) / 2
 
@@ -23,9 +27,15 @@ fn to_normal_format(x: u128) -> i128 {
 }
 
 #[test]
-fn test_signed_int_add_masm() {
-    // Instantiate the assembler
-    let assembler = Assembler::default().with_debug_mode(true);
+fn test_set_item() {
+    // Instantiate the assembler with kernel
+    let assembler = Assembler::default()
+        .with_library(&MidenLib::default())
+        .expect("failed to load miden-lib")
+        .with_library(&StdLibrary::default())
+        .expect("failed to load std-lib");
+
+    // let assembler =  TransactionKernel::assembler().with_debug_mode(true);
 
     // Read the assembly program from a file
     let assembly_code: &str = include_str!("../src/masm/set_item.masm");
@@ -35,7 +45,7 @@ fn test_signed_int_add_masm() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input_a: i64 = -150;
+    let input_a: i64 = 100;
     let input_b: i64 = 200;
 
     let machine_input_a = to_machine_format(input_a as i64) as u64;
@@ -63,8 +73,6 @@ fn test_signed_int_add_masm() {
 
     println!("raw_result: {}, result: {}", raw_result, result);
     println!("Expected result: {}", expected_result);
-
-    // assert_eq!(result, expected_result);
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
     println!("Program run successfully");

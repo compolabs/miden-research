@@ -12,7 +12,7 @@ begin
     # => [num_inputs, des_pointer, ...]
 
     # Debugging https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/debugging.html
-    debug.stack # trying to print the stack
+    # debug.stack # trying to print the stack
     
     # All account and note procedures
     # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures 
@@ -25,4 +25,5 @@ begin
     # => [...]
 
     dropw
+    
 end

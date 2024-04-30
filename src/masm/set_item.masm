@@ -7,15 +7,22 @@
       exec.prologue::prepare_transaction
 
       # push the new storage item onto the stack
-      push.1010
+      push.11111
 
       # push the account storage item index
       push.1
 
+      # [1, 1010]
+      debug.stack
+
       # get the item
       exec.account::set_item
+      # 
 
       push.1
+      # [1, 0, 0..]
+      add
 
       exec.account::get_item
+      # [1010]
   end

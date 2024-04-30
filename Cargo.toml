@@ -13,4 +13,5 @@ miden-objects =  { git = "https://github.com/0xPolygonMiden/miden-base.git", pac
 miden-tx ={ git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-tx" }  
 mock = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-mock" }
 rand = "0.8.5"
+miden-stdlib = "0.9.1"
 
