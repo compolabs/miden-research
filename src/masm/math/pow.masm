@@ -1,0 +1,55 @@
+
+# in progress 
+
+# [base, exponent]
+proc.pow
+  # [5,3]
+
+  # store result
+  push.1
+  mem_store.0
+  #[5,3]
+
+  dup.1 dup.1
+
+  swap
+  # [3, 5, 5, 3]
+
+  push.2
+  # [2, 3, 5]
+ 
+  u32mod
+  # if exponent % 2 == 1
+  if.true
+    # [2, 3, 5] 
+    mem_load.0
+    debug.stack
+    # [1, 5, 5, 3]
+
+  else
+
+  end
+
+end
+
+
+proc.shr
+  push.1
+  debug.stack
+  u32shr
+end
+
+
+
+begin
+  dropw dropw dropw dropw
+
+  # push.3.5
+  # [5,3]
+
+  # exec.pow
+
+  push.10
+  exec.shr
+
+end

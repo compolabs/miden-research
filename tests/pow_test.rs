@@ -3,10 +3,10 @@ use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInput
 #[test]
 fn test_pow_masm() {
     // Instantiate the assembler
-    let assembler = Assembler::default();
+    let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/pow.masm");
+    let assembly_code: &str = include_str!("../src/masm/math/pow.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler
