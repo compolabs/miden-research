@@ -2,6 +2,7 @@
 # power func in progress
 
 # floor div by 2
+# a / 2^b = c
 proc.shr
   push.1
   debug.stack
@@ -13,56 +14,121 @@ proc.is_odd
   u32mod
 end
 
-# [base, exponent]
+# assumes 1e6 base
+# [b, a]
+proc.UD14x6_mul
+  mul
+  div.1000000
+end
+
+# assumes 1e6 base
+# [b, a]
+proc.UD14x6_div
+  div.10000
+  u32div
+  mul.10000
+end
+
+# a^b
+# [b, a]
 proc.pow
-  # [5,3]
 
   # memory layout
   # 0 => base
   # 1 => exponent
   # 2 => result
-
-  dup.1 dup.1
   mem_store.0
   mem_store.1
+
+  debug.stack
 
   push.1
   mem_store.2
 
   # [5, 3]
-
-  swap
-
+  mem_load.1
 
   exec.is_odd
-  # [is_odd, 5]
-  # debug.stack
+
 
   # if exponent % 2 == 1
   if.true
-    # [2, 3, 5] 
     mem_load.0
+    mem_load.2
     debug.stack
-    # [1, 5, 5, 3]
+
+    exec.UD14x6_mul
+    mem_store.2
+
 
   else
     # nothing
   end
 
+    
+    mem_load.0
+    # debug.stack
+
+
+
 end
 
+# is 1e6 base number odd
+# using memory addresses 10 & 11
+proc.is_odd_1e6
+  dup
+  mem_store.10
+  push.1000000
+  # x % 1e6
+  u32mod
+  swap
+  gt
+  if.true
+    # x % 1e6 > 0
+    push.1
+    mem_store.11
+  else
+    # check if x / 1e6 % 2 == 0
+    mem_load.10
+    div.1000000
+    push.2
+    u32mod
+    if.true
+      # x % 2 != 0
+      push.1
+      mem_store.11
+    else
+    end
+  end
+  # return memory address 11
+  mem_load.11
+end
 
 begin
   dropw dropw dropw dropw
 
-  push.3.5
-  # [5,3]
+  push.8000000
+  exec.is_odd_1e6
 
-  exec.pow
+  # push.3000000.4250000
+  # push.5000000.3000000
+  # [b, a]
+  # [3, 5]
 
-  push.11
+  # debug.stack
+  # exec.pow
+
+  # push.11
   # exec.is_odd
 
   #exec.shr
+
+  # push.300000.250000
+  # exec.UD14x6_mul
+
+  #debug.stack
+  #exec.UD14x6_div
+
+
 
 end
