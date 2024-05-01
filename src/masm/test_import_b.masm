@@ -1,0 +1,7 @@
+use.miden::test_import_a
+
+begin 
+
+  exec.test_import_a::func_one
+
+end

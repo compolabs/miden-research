@@ -5,6 +5,25 @@ use mock::{
     prepare_transaction, run_tx,
 };
 
+use miden_lib::transaction::TransactionKernel;
+use miden_objects::{
+    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
+    accounts::{
+        ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
+        ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
+    },
+    assembly::{ModuleAst, ProgramAst},
+    assets::{Asset, AssetVault, FungibleAsset},
+    crypto::rand::{FeltRng, RpoRandomCoin},
+    notes::{
+        Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
+        NoteTag, NoteType,
+    },
+    transaction::TransactionArgs,
+    NoteError, ONE, ZERO,
+};
+use std::fs;
+use utils::{get_new_key_pair_with_advice_map, MockDataStore};
 mod utils;
 
 #[test]

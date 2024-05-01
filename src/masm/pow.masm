@@ -1,0 +1,24 @@
+# in progress 
+proc.pow
+  push.1
+
+  add 
+
+  push.10
+  lt
+  if.true
+    # exec.pow // recursion not possible
+  else 
+    push.1
+  end
+
+
+end
+
+
+
+
+begin
+
+  exec.pow
+end

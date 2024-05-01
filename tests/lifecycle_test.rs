@@ -72,7 +72,7 @@ fn create_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
 
-    // Here you can add the inputs to the note
+    // add the inputs to the note
 
     let inputs = NoteInputs::new(vec![ONE, ONE])?;
 
@@ -142,6 +142,7 @@ fn test_lifecycle() {
     let _executed_transaction =
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
+    println!("{:?}", _executed_transaction.unwrap().account_delta().vault().added_assets);
     // println!("{:?}", _executed_transaction.output_notes());
     // println!("{:?}", _executed_transaction.program());
 }
