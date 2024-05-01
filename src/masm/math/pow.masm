@@ -5,77 +5,12 @@
 # a / 2^b = c
 proc.shr
   push.1
-  debug.stack
   u32shr
-end
-
-proc.is_odd
-  push.2
-  u32mod
-end
-
-# assumes 1e6 base
-# [b, a]
-proc.UD14x6_mul
-  mul
-  div.1000000
-end
-
-# assumes 1e6 base
-# [b, a]
-proc.UD14x6_div
-  div.10000
-  u32div
-  mul.10000
-end
-
-# a^b
-# [b, a]
-proc.pow
-
-  # memory layout
-  # 0 => base
-  # 1 => exponent
-  # 2 => result
-  mem_store.0
-  mem_store.1
-
-  debug.stack
-
-  push.1
-  mem_store.2
-
-  # [5, 3]
-  mem_load.1
-
-  exec.is_odd
-
-
-  # if exponent % 2 == 1
-  if.true
-    mem_load.0
-    mem_load.2
-    debug.stack
-
-    exec.UD14x6_mul
-    mem_store.2
-
-
-  else
-    # nothing
-  end
-
-    
-    mem_load.0
-    # debug.stack
-
-
-
 end
 
 # is 1e6 base number odd
 # using memory addresses 10 & 11
-proc.is_odd_1e6
+proc.is_odd
   dup
   mem_store.10
   push.1000000
@@ -104,19 +39,79 @@ proc.is_odd_1e6
   mem_load.11
 end
 
+# assumes 1e6 base
+# [b, a]
+proc.UD14x6_mul
+  mul
+  div.1000000
+end
+
+# assumes 1e6 base
+# [b, a]
+proc.UD14x6_div
+  div.10000
+  u32div
+  mul.10000
+end
+
+# a^b
+# [b, a]
+proc.pow
+  # memory layout
+  # 0 => base
+  # 1 => exponent
+  # 2 => result
+  mem_store.0
+  mem_store.1
+
+  debug.stack
+
+  push.1000000 # result = 1
+  mem_store.2
+
+  ##### BEGIN CYCLE ######
+  mem_load.1
+  exec.is_odd
+
+  # if exponent % 2 == 1
+  if.true
+    mem_load.0
+    mem_load.2
+    exec.UD14x6_mul
+    mem_store.2 # result *= base
+
+  else
+    # nothing
+  end
+    
+  mem_load.0
+  dup
+  exec.UD14x6_mul
+
+  mem_store.0 # base *= base
+
+  mem_load.1
+  exec.shr # exponent //= 2 (floor div)
+  mem_store.1
+  ##### END CYCLE ######
+
+end
+
+
+
 begin
   dropw dropw dropw dropw
 
-  push.8000000
-  exec.is_odd_1e6
+  # push.8000000
+  # exec.is_odd_1e6
 
   # push.3000000.4250000
-  # push.5000000.3000000
+  push.5000000.3000000
   # [b, a]
   # [3, 5]
 
   # debug.stack
-  # exec.pow
+  exec.pow
 
   # push.11
   # exec.is_odd
