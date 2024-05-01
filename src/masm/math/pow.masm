@@ -1,24 +1,43 @@
 
-# in progress 
+# power func in progress
+
+# floor div by 2
+proc.shr
+  push.1
+  debug.stack
+  u32shr
+end
+
+proc.is_odd
+  push.2
+  u32mod
+end
 
 # [base, exponent]
 proc.pow
   # [5,3]
 
-  # store result
-  push.1
-  mem_store.0
-  #[5,3]
+  # memory layout
+  # 0 => base
+  # 1 => exponent
+  # 2 => result
 
   dup.1 dup.1
+  mem_store.0
+  mem_store.1
+
+  push.1
+  mem_store.2
+
+  # [5, 3]
 
   swap
-  # [3, 5, 5, 3]
 
-  push.2
-  # [2, 3, 5]
- 
-  u32mod
+
+  exec.is_odd
+  # [is_odd, 5]
+  # debug.stack
+
   # if exponent % 2 == 1
   if.true
     # [2, 3, 5] 
@@ -27,29 +46,23 @@ proc.pow
     # [1, 5, 5, 3]
 
   else
-
+    # nothing
   end
 
 end
 
 
-proc.shr
-  push.1
-  debug.stack
-  u32shr
-end
-
-
-
 begin
   dropw dropw dropw dropw
 
-  # push.3.5
+  push.3.5
   # [5,3]
 
-  # exec.pow
+  exec.pow
 
-  push.10
-  exec.shr
+  push.11
+  # exec.is_odd
+
+  #exec.shr
 
 end
