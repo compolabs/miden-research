@@ -1,6 +1,271 @@
 
 # power func in progress
 
+const.MAX_POSITIVE_INT=9223372034707292160
+const.MAX_VAL=18446744069414584320
+
+const.ONE=1000000
+const.TWO=2000000
+
+proc.to_negative
+  push.MAX_VAL
+  swap
+  sub
+end
+
+proc.from_negative
+  push.MAX_VAL
+  swap 
+  sub
+end
+
+# [b, a]
+proc.signed_add
+
+  # must check for overflow 
+  dup
+  # [b, b, a]
+
+  push.MAX_VAL
+  # [max_val, b, b, a]
+  
+  swap
+  # [b, max_val, b, a]
+
+  sub
+  # [diff, b, a]
+
+  swap.2
+  # [a, b, diff]
+
+  dup
+  # [a, a, b, diff]
+
+  swap.2
+  # [b, a, a, diff]
+
+  swap.3
+  # [diff, a, a, b]
+
+  gt
+  #[overflow_bool, a, b]
+
+  if.true
+    add
+    add.1
+  else
+    add
+  end
+end
+
+proc.signed_sub
+  swap
+  # check for overflow / underflow
+  dup
+  # [b, b, a]
+
+  push.MAX_VAL
+  # [max_val, b, b, a]
+
+  swap
+  # [b, max_val, b, a]
+
+  sub
+  # [diff, b, a]
+
+  swap.2
+  # [a, b, diff]
+
+  dup
+  # [a, a, b, diff]
+
+  swap.2
+  # [b, a, a, diff]
+
+  swap.3
+  # [diff, a, a, b]
+
+  gt
+  #[overflow_bool, a, b]
+
+  if.true
+    dup.1
+    dup.1
+    lt
+    if.true
+      sub
+      sub.1
+    else
+      sub
+    end
+
+  else
+    dup.1
+    dup.1
+    lt 
+    if.true
+      sub
+      sub.1  
+    else 
+      sub
+    end
+
+  end
+
+end 
+
+# uses memory addresses 0 & 1
+proc.signed_mul
+  dup.1 dup.1
+  # [b, a, b, a]
+
+  push.MAX_POSITIVE_INT
+  # [max_pos, b, a, b, a]
+
+  gt 
+  # [bool, a, b, a]
+
+  swap.4 drop
+  # [a, b, a, bool]
+
+  push.MAX_POSITIVE_INT
+  # [max_pos, a, b, a, bool]
+
+  gt
+
+  swap.4 drop
+  # [a, b, bool, bool]
+
+  swap.4 drop
+  swap.4 drop
+  swap
+  # [bool_a, bool_b, b, a]
+
+  dup.1
+  dup.1
+
+  mem_store.0
+  mem_store.1
+  # [bool_a, bool_b, b, a]
+
+  swap
+  # [bool_b, bool_a, b, a]
+  
+  if.true
+    swap
+    exec.from_negative
+  else
+    swap
+    # [b, bool_a, a]
+  end
+
+  swap
+  # [bool_a, b, a]
+
+  if.true
+    swap
+    exec.from_negative
+  else
+    swap
+    # [a, b]
+  end
+
+  # [a, b]
+  mul
+
+  mem_load.1
+  mem_load.0
+  # [bool_a, bool_b, prod]
+  
+  xor
+  # [xor, prod]
+
+  if.true
+    exec.to_negative
+  else
+    # nothing
+  end
+
+end
+
+
+# uses memory addresses 0 & 1
+proc.signed_div
+
+  dup.1 dup.1
+  # [b, a, b, a]
+
+  push.MAX_POSITIVE_INT
+  # [max_pos, b, a, b, a]
+
+  gt 
+  # [bool, a, b, a]
+
+  swap.4 drop
+  # [a, b, a, bool]
+
+  push.MAX_POSITIVE_INT
+  # [max_pos, a, b, a, bool]
+
+  gt
+
+  swap.4 drop
+  # [a, b, bool, bool]
+
+  swap.4 drop
+  swap.4 drop
+  swap
+  # [bool_a, bool_b, b, a]
+
+  dup.1
+  dup.1
+
+  mem_store.0
+  mem_store.1
+  # [bool_a, bool_b, b, a]
+
+  swap
+  # [bool_b, bool_a, b, a]
+  
+  if.true
+    swap
+    exec.from_negative
+  else
+    swap
+    # [b, bool_a, a]
+  end
+
+  swap
+  # [bool_a, b, a]
+
+  if.true
+    swap
+    exec.from_negative
+  else
+    swap
+    # [a, b]
+  end
+
+  # [a, b]
+  u32div
+  # div
+
+  mem_load.1
+  mem_load.0
+  # [bool_a, bool_b, prod]
+  
+  xor
+  # [xor, prod]
+
+  if.true
+    exec.to_negative
+  else
+    # nothing
+  end
+
+end
+
+
 # floor div by 2
 # a / 2^b = c
 proc.shr
@@ -42,16 +307,19 @@ end
 # assumes 1e6 base
 # [b, a]
 proc.UD14x6_mul
+  u32div.1000
+  swap
+  u32div.1000
+  swap
   mul
-  div.1000000
 end
 
 # assumes 1e6 base
 # [b, a]
 proc.UD14x6_div
-  div.10000
+  div.1000
   u32div
-  mul.10000
+  mul.1000
 end
 
 # a^b
@@ -63,8 +331,6 @@ proc.pow
   # 2 => result
   mem_store.0
   mem_store.1
-
-  debug.stack
 
   push.1000000 # result = 1
   mem_store.2
@@ -95,8 +361,104 @@ proc.pow
   mem_store.1
   ##### END CYCLE ######
 
+  mem_load.1
+  mem_load.2
+
+
+  add
 end
 
+# 
+
+# Taylor Series Expansion
+# ln(1 + x) = x - x^2/2 + x^3/3 - x^4/4 + ...
+proc.log
+  mem_store.0 # save x to mem addr 0
+  push.ONE
+
+  # x - 1
+  mem_load.0
+  swap
+  # [1e6, x]
+  exec.signed_sub
+  mem_store.1
+
+  # x + 1
+  mem_load.0
+  push.ONE
+  add # x can't be negative
+
+  mem_store.2
+
+  mem_load.1
+  mem_load.2
+
+  exec.UD14x6_div
+
+  # y = (x - 1) / (x + 1)
+
+  dup dup
+
+  mem_store.1 # summation
+  mem_store.2 # term
+
+  # [y]
+  dup
+  exec.UD14x6_mul
+
+  debug.stack
+
+  # [y*y]
+  mem_store.3 # y2
+
+  # []
+
+  push.ONE
+  mem_store.4 # COUNTER
+
+  # []
+
+  repeat.2
+    mem_load.2 # term
+    mem_load.3 # y2
+
+    debug.stack
+
+    # 
+    exec.UD14x6_mul
+
+    dup
+    mem_store.2 # store term *= y2
+
+    mem_load.4 # counter
+    push.2000000 # 2
+    add # counter + 2
+
+    exec.UD14x6_div
+
+    mem_load.1
+    add # summation += term / (counter + 2)
+
+    mem_store.1
+
+    # increment counter
+    #mem_load.4
+    #push.TWO
+    #add
+    # mem_store.4
+    
+  end
+
+  # 2 * summation
+  mem_load.1
+  push.TWO
+  exec.UD14x6_mul
+
+  # debug.stack
+
+  # exec.to_negative
+
+end
 
 
 begin
@@ -106,12 +468,15 @@ begin
   # exec.is_odd_1e6
 
   # push.3000000.4250000
-  push.5000000.3000000
+  # push.2000000.3000000
   # [b, a]
   # [3, 5]
 
   # debug.stack
-  exec.pow
+  #exec.pow
+
+  # push.17
+  #exec.log2
 
   # push.11
   # exec.is_odd
@@ -123,6 +488,13 @@ begin
 
   #debug.stack
   #exec.UD14x6_div
+
+  # push.2000000
+  push.2000000
+  exec.log
+  #exec.UD14x6_div
+
+
 
 
 
