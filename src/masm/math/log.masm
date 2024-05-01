@@ -408,13 +408,12 @@ proc.log
 end
 
 
-# a^b
-# [b, a]
-# in progress
-proc.pow
- # return exp(exponent * log(base))
-end
-
 begin
-# in progress
+  # 3.5e6
+  push.3500000
+  exec.log
+
+  # returns 1246000
+  # 1.246
+  # 1% precision loss
 end
