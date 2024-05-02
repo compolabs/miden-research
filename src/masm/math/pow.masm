@@ -1,5 +1,4 @@
 # power func in progress
-
 const.MAX_POSITIVE_INT=9223372034707292160
 const.MAX_VAL=18446744069414584320
 
@@ -20,7 +19,6 @@ end
 
 # [b, a]
 proc.signed_add
-
   # must check for overflow 
   dup
   # [b, b, a]
@@ -449,7 +447,7 @@ end
 
 # a^b
 # [b, a]
-# in progress
+# where a, b are UD14x6 fixed point numbers
 proc.pow
  # return exp(exponent * log(base))
   swap
@@ -464,8 +462,8 @@ end
 
 begin
 # in progress
-  push.2500000 # a
-  push.2500000 # b 
+  push.2000000 # a
+  push.3000000 # b 
 
   debug.stack
 
