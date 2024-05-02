@@ -374,6 +374,10 @@ proc.log
   # []
 
   # number of loops for # of elements in the expansion
+
+  push.10
+  # [10]
+
   repeat.10
     mem_load.2 # term
     mem_load.3 # y2
