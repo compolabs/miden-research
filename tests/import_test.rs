@@ -1,6 +1,5 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
 
-
 // @dev imports not working
 #[test]
 fn test_import() {

@@ -142,7 +142,14 @@ fn test_lifecycle() {
     let _executed_transaction =
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
-    println!("{:?}", _executed_transaction.unwrap().account_delta().vault().added_assets);
+    println!(
+        "{:?}",
+        _executed_transaction
+            .unwrap()
+            .account_delta()
+            .vault()
+            .added_assets
+    );
     // println!("{:?}", _executed_transaction.output_notes());
     // println!("{:?}", _executed_transaction.program());
 }

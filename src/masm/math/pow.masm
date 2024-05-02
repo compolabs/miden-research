@@ -361,8 +361,6 @@ proc.log
   dup
   exec.UD14x6_mul
 
-  debug.stack
-
   # [y*y]
   mem_store.3 # y2
 
@@ -373,7 +371,8 @@ proc.log
 
   # []
 
-  repeat.5
+  # number of loops for # of elements in the expansion
+  repeat.7
     mem_load.2 # term
     mem_load.3 # y2
 
@@ -407,14 +406,69 @@ proc.log
 
 end
 
+proc.exp
+  mem_store.0 # x
+
+  push.ONE
+  dup dup
+  
+  mem_store.1 # counter
+  mem_store.2 # term
+  mem_store.3 # sum
+
+  # start loop
+  repeat.7
+    # term *= x / counter
+    # sum += term
+    mem_load.0 # x
+    mem_load.1 # counter
+
+    exec.UD14x6_div # x / i
+
+    mem_load.2 # load term
+    exec.UD14x6_mul # term * (x / i)
+    dup
+    mem_store.2 # store term
+
+    mem_load.3 # load sum
+    add # sum += term
+    mem_store.3 # store sum
+
+    # increment counter
+    mem_load.1
+    push.ONE
+    add
+    mem_store.1
+
+  end
+  
+  # return sum
+  mem_load.3
+
+end
 
 # a^b
 # [b, a]
 # in progress
 proc.pow
  # return exp(exponent * log(base))
+  swap
+  exec.log
+
+  exec.UD14x6_mul
+  # exponent * log(base)
+
+  exec.exp
+
 end
 
 begin
 # in progress
+  push.2500000 # a
+  push.2500000 # b 
+
+  debug.stack
+
+  exec.pow
+
 end
