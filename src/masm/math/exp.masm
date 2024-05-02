@@ -321,100 +321,56 @@ proc.UD14x6_div
   mul.1000
 end
 
+proc.exp
+  mem_store.0 # x
 
-# Mercator Series Expansion for Natural Logarithm (ln)
-# The series expansion used is derived from the transformation y = (x - 1) / (x + 1) and is given by:
-# ln(x) = 2 * (y + y^3 / 3 + y^5 / 5 + y^7 / 7 + ...)
-# where y = (x - 1) / (x + 1)
-# This series converges for x > 0 and is especially useful for values of x near 1.
-# This function has not been tested and lacks precision
-proc.log
-  mem_store.0 # save x to mem addr 0
   push.ONE
-
-  # x - 1
-  mem_load.0
-  swap
-  # [1e6, x]
-  exec.signed_sub
-  mem_store.1
-
-  # x + 1
-  mem_load.0
-  push.ONE
-  add # x can't be negative
-
-  mem_store.2
-
-  mem_load.1
-  mem_load.2
-
-  exec.UD14x6_div
-
-  # y = (x - 1) / (x + 1)
-
   dup dup
-  mem_store.1 # summation
+  
+  mem_store.1 # counter
   mem_store.2 # term
+  mem_store.3 # sum
 
-  # [y]
-  dup
-  exec.UD14x6_mul
 
-  debug.stack
-
-  # [y*y]
-  mem_store.3 # y2
-
-  # []
-
-  push.ONE
-  mem_store.4 # COUNTER
-
-  # []
-
-  # number of loops for # of elements in the expansion
+  # start loop
   repeat.10
-    mem_load.2 # term
-    mem_load.3 # y2
+    # term *= x / counter
+    # sum += term
+    mem_load.0 # x
+    mem_load.1 # counter
 
-    exec.UD14x6_mul
+    exec.UD14x6_div # x / i
 
+    mem_load.2 # load term
+    exec.UD14x6_mul # term * (x / i)
     dup
-    mem_store.2 # store term *= y2
+    mem_store.2 # store term
 
-    mem_load.4 # counter
-    push.2000000 # 2
-    add # counter + 2
+    debug.stack
 
-    exec.UD14x6_div
-
-    mem_load.1
-    add # summation += term / (counter + 2)
-    mem_store.1
+    mem_load.3 # load sum
+    add # sum += term
+    mem_store.3 # store sum
 
     # increment counter
-    mem_load.4
-    push.TWO
+    mem_load.1
+    push.ONE
     add
-    mem_store.4
-    
-  end
+    mem_store.1
 
-  # 2 * summation
-  mem_load.1
-  push.TWO
-  exec.UD14x6_mul
+  end
+  
+  # return sum
+  mem_load.3
 
 end
 
-
 begin
-  # 3.5e6
-  push.10000000
-  exec.log
+  # 2e6
+  push.2000000
+  exec.exp
 
-  # returns 1246000
-  # 1.246
-  # 1% precision loss
+  # returns 7385840
+  # 7.3854
+  #  0.04% precision loss
 end
