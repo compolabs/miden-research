@@ -452,7 +452,6 @@ fn create_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
 
-
     let inputs = NoteInputs::new(vec![ONE, ONE])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
