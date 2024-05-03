@@ -17,10 +17,13 @@ use miden_objects::{
         Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
         NoteTag, NoteType,
     },
+    transaction::TransactionArgs,
     Felt, NoteError, Word, ONE, ZERO,
 };
 use miden_objects::{assets::NonFungibleAsset, assets::NonFungibleAssetDetails};
 use miden_tx::TransactionExecutor;
+
+use miden_processor::AdviceMap;
 
 mod utils;
 use utils::{get_new_key_pair_with_advice_map, MockDataStore};
@@ -472,8 +475,7 @@ fn test_custom_proc_masm() {
     let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
 
     let assembler = TransactionKernel::assembler().with_debug_mode(true);
-    // mock_account_code(&assembler);
-
+    
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     let target_account = mock_account(
@@ -502,4 +504,37 @@ fn test_custom_proc_masm() {
 
     let mut executor = TransactionExecutor::new(data_store.clone());
     executor.load_account(target_account_id).unwrap();
+
+
+    let block_ref = data_store.block_header.block_num();
+    let note_ids = data_store
+        .notes
+        .iter()
+        .map(|note| note.id())
+        .collect::<Vec<_>>();
+
+    let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
+
+    let tx_script_target = executor
+        .compile_tx_script(
+            tx_script_code.clone(),
+            vec![],
+            vec![],
+        )
+        .unwrap();
+
+    let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
+
+    // Execute the transaction and get the witness
+    let _executed_transaction =
+        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
+
+    println!(
+        "{:?}",
+        _executed_transaction
+            .unwrap()
+            .account_delta()
+            .vault()
+            .added_assets
+    );
 }

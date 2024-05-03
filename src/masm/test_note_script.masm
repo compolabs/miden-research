@@ -1,5 +1,3 @@
-# Try to code an easy note script
-
 use.miden::account
 use.miden::note
 use.miden::contracts::wallets::basic->wallet
@@ -7,26 +5,22 @@ use.miden::contracts::wallets::basic->wallet
 begin
     # All scripts start with the NOTE_SCRIPT_ROOT, you can drop it
     dropw 
-    
+
     push.0 exec.note::get_inputs 
     # => [num_inputs, des_pointer, ...]
 
     # Debugging https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/debugging.html
-    # debug.stack # trying to print the stack
-    
+    debug.stack
+
     # All account and note procedures
     # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures 
-    
+
     push.0 exec.note::get_assets drop mem_loadw
     # => [ASSET, ...]
 
-
-    # call
-
     # load the asset and add it to the account
-    # call.wallet::receive_asset
+    call.wallet::receive_asset
     # => [...]
 
     dropw
-    
 end
