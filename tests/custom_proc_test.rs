@@ -452,7 +452,6 @@ fn create_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
 
-    // add the inputs to the note
 
     let inputs = NoteInputs::new(vec![ONE, ONE])?;
 
@@ -475,7 +474,7 @@ fn test_custom_proc_masm() {
     let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
 
     let assembler = TransactionKernel::assembler().with_debug_mode(true);
-    
+
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     let target_account = mock_account(
@@ -505,7 +504,6 @@ fn test_custom_proc_masm() {
     let mut executor = TransactionExecutor::new(data_store.clone());
     executor.load_account(target_account_id).unwrap();
 
-
     let block_ref = data_store.block_header.block_num();
     let note_ids = data_store
         .notes
@@ -516,11 +514,7 @@ fn test_custom_proc_masm() {
     let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
 
     let tx_script_target = executor
-        .compile_tx_script(
-            tx_script_code.clone(),
-            vec![],
-            vec![],
-        )
+        .compile_tx_script(tx_script_code.clone(), vec![], vec![])
         .unwrap();
 
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
@@ -529,12 +523,5 @@ fn test_custom_proc_masm() {
     let _executed_transaction =
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
-    println!(
-        "{:?}",
-        _executed_transaction
-            .unwrap()
-            .account_delta()
-            .vault()
-            .added_assets
-    );
+    println!("{:?}", _executed_transaction);
 }
