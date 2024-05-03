@@ -346,9 +346,9 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 name = "masm-test"
 version = "0.1.0"
 dependencies = [
- "miden-lib",
+ "miden-lib 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "miden-mock",
- "miden-objects",
+ "miden-objects 0.2.1 (git+https://github.com/0xPolygonMiden/miden-base.git)",
  "miden-processor",
  "miden-prover",
  "miden-stdlib",
@@ -420,10 +420,21 @@ dependencies = [
 [[package]]
 name = "miden-lib"
 version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "855aceec1ac4d01fc486a7c9c9cb348d05b3310c842580b25c5b79a65bd942e2"
+dependencies = [
+ "miden-assembly",
+ "miden-objects 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "miden-stdlib",
+]
+
+[[package]]
+name = "miden-lib"
+version = "0.2.1"
 source = "git+https://github.com/0xPolygonMiden/miden-base.git#3fec95b4fe5d2ec7d5d9e5c9f703f13f8510f1cd"
 dependencies = [
  "miden-assembly",
- "miden-objects",
+ "miden-objects 0.2.1 (git+https://github.com/0xPolygonMiden/miden-base.git)",
  "miden-stdlib",
 ]
 
@@ -434,14 +445,27 @@ source = "git+https://github.com/0xPolygonMiden/miden-base.git#3fec95b4fe5d2ec7d
 dependencies = [
  "env_logger",
  "hex",
- "miden-lib",
- "miden-objects",
+ "miden-lib 0.2.1 (git+https://github.com/0xPolygonMiden/miden-base.git)",
+ "miden-objects 0.2.1 (git+https://github.com/0xPolygonMiden/miden-base.git)",
  "miden-processor",
  "miden-prover",
  "postcard",
  "rand",
  "rand_pcg",
  "winter-rand-utils",
+]
+
+[[package]]
+name = "miden-objects"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f87a635484967ad871332d99791d7e1cada6857aa32cc4f72f1a8817c4016b4"
+dependencies = [
+ "miden-assembly",
+ "miden-core",
+ "miden-crypto",
+ "miden-processor",
+ "miden-verifier",
 ]
 
 [[package]]
@@ -497,8 +521,8 @@ name = "miden-tx"
 version = "0.2.1"
 source = "git+https://github.com/0xPolygonMiden/miden-base.git#3fec95b4fe5d2ec7d5d9e5c9f703f13f8510f1cd"
 dependencies = [
- "miden-lib",
- "miden-objects",
+ "miden-lib 0.2.1 (git+https://github.com/0xPolygonMiden/miden-base.git)",
+ "miden-objects 0.2.1 (git+https://github.com/0xPolygonMiden/miden-base.git)",
  "miden-processor",
  "miden-prover",
  "miden-verifier",

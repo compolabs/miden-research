@@ -30,9 +30,12 @@ pub fn get_account_with_custom_account_code(
     public_key: Word,
     assets: Option<Asset>,
 ) -> Account {
-    let account_code_src = include_str!("../src/masm/test_account.masm");
+    let account_code_src = include_str!("../src/masm/lifecycle/test_account.masm");
     let account_code_ast = ModuleAst::parse(account_code_src).unwrap();
     let account_assembler = TransactionKernel::assembler().with_debug_mode(true);
+
+    println!("is debug mode on: {}", account_assembler.in_debug_mode());
+    assert!(account_assembler.in_debug_mode());
 
     let account_code = AccountCode::new(account_code_ast.clone(), &account_assembler).unwrap();
     let account_storage = AccountStorage::new(vec![SlotItem {
@@ -61,15 +64,15 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../src/masm/test_note_script.masm");
+    let note_script = include_str!("../src/masm/lifecycle/test_note_script.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
+
+    println!("is debug mode on: {}", note_assembler.in_debug_mode());
+    assert!(note_assembler.in_debug_mode());
+
     let script_ast = ProgramAst::parse(note_script).unwrap();
     let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
-
-    // Here you can add the inputs to the note
-
-    //println("{}",note_assembler.);
 
     let inputs = NoteInputs::new(vec![ONE, ONE])?;
 

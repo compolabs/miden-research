@@ -5,7 +5,7 @@ use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     accounts::{
         ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-        ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
+        ACCOUNT_ID_SENDER,
     },
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
@@ -18,7 +18,7 @@ use miden_objects::{
     Felt, NoteError, Word, ONE, ZERO,
 };
 use miden_tx::TransactionExecutor;
-use mock::{mock::account::DEFAULT_AUTH_SCRIPT, prepare_transaction};
+use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use miden_processor::AdviceMap;
 
@@ -32,7 +32,7 @@ pub fn get_account_with_custom_account_code(
     public_key: Word,
     assets: Option<Asset>,
 ) -> Account {
-    let filename = "./src/masm/test_account.masm";
+    let filename = "./src/masm/lifecycle/test_account.masm";
     let account_code_src = fs::read_to_string(filename).expect("Failed to read the assembly file");
 
     let account_code_ast = ModuleAst::parse(&account_code_src).unwrap();
@@ -65,7 +65,7 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let filename = "./src/masm/test_note_script.masm";
+    let filename = "./src/masm/lifecycle/test_note_script.masm";
     let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
@@ -150,6 +150,8 @@ fn test_lifecycle() {
             .vault()
             .added_assets
     );
+
+
     // println!("{:?}", _executed_transaction.output_notes());
     // println!("{:?}", _executed_transaction.program());
 }
