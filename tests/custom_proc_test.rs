@@ -1,4 +1,5 @@
 use miden_lib::transaction::memory::FAUCET_STORAGE_DATA_SLOT;
+use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{
         get_account_seed_single, Account, AccountCode, AccountId, AccountStorage,
@@ -6,16 +7,25 @@ use miden_objects::{
         ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1,
         ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_2, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
         ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
-        ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN,
+        ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
     },
-    assembly::{Assembler, ModuleAst},
+    assembly::{Assembler, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::merkle::Smt,
-    Felt, FieldElement, Word, ZERO,
+    crypto::rand::{FeltRng, RpoRandomCoin},
+    notes::{
+        Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
+        NoteTag, NoteType,
+    },
+    Felt, NoteError, Word, ONE, ZERO,
 };
-
-use miden_lib::transaction::TransactionKernel;
 use miden_objects::{assets::NonFungibleAsset, assets::NonFungibleAssetDetails};
+use miden_tx::TransactionExecutor;
+
+mod utils;
+use utils::{get_new_key_pair_with_advice_map, MockDataStore};
+
+use std::fs;
 
 pub const FUNGIBLE_ASSET_AMOUNT: u64 = 100;
 pub const NON_FUNGIBLE_ASSET_DATA: [u8; 4] = [1, 2, 3, 4];
@@ -220,6 +230,7 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[6].to_hex(),
         code.procedures()[7].to_hex(),
     ];
+
     assert!(current == MASTS, "const MASTS: [&str; 8] = {:?};", current);
 
     code
@@ -396,7 +407,7 @@ pub fn generate_account_seed(account_seed_type: AccountSeedType) -> (AccountId, 
         AccountSeedType::RegularAccountUpdatableCodeOnChain => (
             mock_account(
                 ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
-                Felt::ONE,
+                ONE,
                 mock_account_code(&assembler),
             ),
             AccountType::RegularAccountUpdatableCode,
@@ -404,7 +415,7 @@ pub fn generate_account_seed(account_seed_type: AccountSeedType) -> (AccountId, 
         AccountSeedType::RegularAccountUpdatableCodeOffChain => (
             mock_account(
                 ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
-                Felt::ONE,
+                ONE,
                 mock_account_code(&assembler),
             ),
             AccountType::RegularAccountUpdatableCode,
@@ -425,10 +436,70 @@ pub fn generate_account_seed(account_seed_type: AccountSeedType) -> (AccountId, 
     (account_id, seed)
 }
 
+fn create_note<R: FeltRng>(
+    sender_account_id: AccountId,
+    target_account_id: AccountId,
+    assets: Vec<Asset>,
+    mut rng: R,
+) -> Result<Note, NoteError> {
+    let filename = "./src/masm/test_note_script.masm";
+    let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
+
+    let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
+    let script_ast = ProgramAst::parse(&note_script).unwrap();
+    let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
+
+    // add the inputs to the note
+
+    let inputs = NoteInputs::new(vec![ONE, ONE])?;
+
+    let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
+    let serial_num = rng.draw_word();
+    let aux = ZERO;
+    let note_type = NoteType::OffChain;
+    let metadata = NoteMetadata::new(sender_account_id, note_type, tag, aux)?;
+
+    let vault = NoteAssets::new(assets)?;
+
+    let recipient = NoteRecipient::new(serial_num, note_script, inputs);
+
+    Ok(Note::new(vault, metadata, recipient))
+}
+
 #[test]
-fn test_math_test_masm() {
-    // Instantiate the assembler
-    // let assembler = Assembler::default().with_debug_mode(true);
+fn test_custom_proc_masm() {
+    let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
+    let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
+
     let assembler = TransactionKernel::assembler().with_debug_mode(true);
-    mock_account_code(&assembler);
+    // mock_account_code(&assembler);
+
+    let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
+
+    let target_account = mock_account(
+        ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
+        ONE,
+        mock_account_code(&assembler),
+    );
+
+    let target_account_id = target_account.id();
+
+    let note = create_note(
+        sender_account_id,
+        target_account_id,
+        vec![fungible_asset],
+        RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
+    );
+    // println!("{:?}", target_account.code());
+    println!("{:?}", target_account.id());
+
+    // CONSTRUCT AND EXECUTE TX (Success)
+    // --------------------------------------------------------------------------------------------
+    let data_store = MockDataStore::with_existing(
+        Some(target_account.clone()),
+        Some(vec![note.clone().unwrap()]),
+    );
+
+    let mut executor = TransactionExecutor::new(data_store.clone());
+    executor.load_account(target_account_id).unwrap();
 }
