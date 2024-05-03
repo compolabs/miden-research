@@ -14,6 +14,7 @@ fn to_machine_format(x: i64) -> u128 {
 }
 
 fn to_normal_format(x: u128) -> i128 {
+    println!("x: {}, offset:{}", x, OFFSET);
     if x > OFFSET {
         x as i128 - ((1 << 64) - (1 << 32))
     } else {
@@ -22,20 +23,20 @@ fn to_normal_format(x: u128) -> i128 {
 }
 
 #[test]
-fn test_signed_int_mul_masm() {
+fn test_signed_int_add_masm() {
     // Instantiate the assembler
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/signed_int/signed_mul.masm");
+    let assembly_code: &str = include_str!("../../src/masm/signed_int/signed_add.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input_a: i64 = 5;
-    let input_b: i64 = -50;
+    let input_a: i64 = -150;
+    let input_b: i64 = 200;
 
     let machine_input_a = to_machine_format(input_a as i64) as u64;
     let machine_input_b = to_machine_format(input_b as i64) as u64;
@@ -58,7 +59,7 @@ fn test_signed_int_mul_masm() {
     let raw_result = outputs.stack().get(0).unwrap().as_int();
     let result = to_normal_format(raw_result as u128) as i64;
 
-    let expected_result = input_a * input_b;
+    let expected_result = input_a + input_b;
 
     println!("raw_result: {}, result: {}", raw_result, result);
     println!("Expected result: {}", expected_result);
@@ -70,12 +71,12 @@ fn test_signed_int_mul_masm() {
 }
 
 #[test]
-fn test_signed_int_mul_masm_fuzz() {
+fn test_signed_int_add_masm_fuzz() {
     // Instantiate the assembler
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/signed_int/signed_mul.masm");
+    let assembly_code: &str = include_str!("../../src/masm/signed_int/signed_add.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler
@@ -88,8 +89,8 @@ fn test_signed_int_mul_masm_fuzz() {
         println!("Test {}", i);
         let host = DefaultHost::default();
 
-        let input_a: i64 = rng.gen_range(-1000000..1000000); // Generate random input a
-        let input_b: i64 = rng.gen_range(-1000000..1000000); // Generate random input b
+        let input_a: i64 = rng.gen_range(-4611686017353646000..4611686017353646000); // Generate random input a
+        let input_b: i64 = rng.gen_range(-4611686017353646000..4611686017353646000); // Generate random input b
 
         let machine_input_a = to_machine_format(input_a as i64) as u64;
         let machine_input_b = to_machine_format(input_b as i64) as u64;
@@ -104,7 +105,7 @@ fn test_signed_int_mul_masm_fuzz() {
         let raw_result = outputs.stack().get(0).unwrap().as_int();
         let result = to_normal_format(raw_result as u128) as i64;
 
-        let expected_result = input_a * input_b;
+        let expected_result = input_a + input_b;
 
         assert_eq!(result, expected_result);
 

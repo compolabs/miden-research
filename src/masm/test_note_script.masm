@@ -1,28 +1,27 @@
-  use.miden::account
-  use.miden::kernels::tx::memory
-  use.miden::kernels::tx::prologue
 
-  begin
-      # prepare the transaction
-      exec.prologue::prepare_transaction
+use.miden::account
+use.miden::note
+use.miden::contracts::wallets::basic->wallet
 
-      # push the new storage item onto the stack
-      push.11111
+begin
+    # All scripts start with the NOTE_SCRIPT_ROOT, you can drop it
+    dropw 
 
-      # push the account storage item index
-      push.1
+    push.0 exec.note::get_inputs 
+    # => [num_inputs, des_pointer, ...]
 
-      # [1, 1010]
-      debug.stack
+    # Debugging https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/debugging.html
+    debug.stack
 
-      # get the item
-      exec.account::set_item
-      # 
+    # All account and note procedures
+    # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures 
 
-      push.1
-      # [1, 0, 0..]
-      add
+    push.0 exec.note::get_assets drop mem_loadw
+    # => [ASSET, ...]
 
-      exec.account::get_item
-      # [1010]
-  end
+    # load the asset and add it to the account
+    call.wallet::receive_asset
+    # => [...]
+
+    dropw
+end

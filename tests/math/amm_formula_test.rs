@@ -6,7 +6,7 @@ fn test_amm() {
     let assembler = Assembler::default();
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/amm.masm");
+    let assembly_code: &str = include_str!("../../src/masm/amm.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler

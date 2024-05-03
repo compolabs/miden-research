@@ -1,12 +1,12 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
 
 #[test]
-fn test_math_test_masm() {
+fn test_exp_masm() {
     // Instantiate the assembler
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/math/math_test.masm");
+    let assembly_code: &str = include_str!("../../src/masm/math/exp.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler

@@ -1,4 +1,3 @@
-use miden_objects::{crypto::merkle::LeafIndex, Felt, Word};
 use miden_processor::ProcessState;
 use mock::{
     mock::{account::MockAccountType, notes::AssetPreservationStatus, transaction::mock_inputs},
@@ -12,7 +11,7 @@ fn test_set_item() {
         AssetPreservationStatus::Preserved,
     );
 
-    let assembly_code: &str = include_str!("../src/masm/math/u64.masm");
+    let assembly_code: &str = include_str!("../../src/masm/math/u64.masm");
 
     let transaction = prepare_transaction(tx_inputs, tx_args, &assembly_code, None);
     let _process = run_tx(&transaction).unwrap();
