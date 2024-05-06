@@ -1,5 +1,3 @@
-
-
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{
@@ -17,6 +15,7 @@ use miden_objects::{
     },
     BlockHeader, Felt, Word, ZERO,
 };
+use miden_processor::utils::Deserializable;
 use miden_prover::ProvingOptions;
 use miden_tx::{
     DataStore, DataStoreError, TransactionProver, TransactionVerifier, TransactionVerifierError,
@@ -30,7 +29,6 @@ use mock::{
     },
 };
 use rand_chacha::{rand_core::SeedableRng, ChaCha20Rng};
-use miden_processor::utils::Deserializable;
 
 // MOCK DATA STORE
 // ================================================================================================
@@ -46,8 +44,10 @@ pub struct MockDataStore {
 
 impl MockDataStore {
     pub fn new() -> Self {
-        let (tx_inputs, tx_args) =
-            mock_inputs(MockAccountType::StandardExisting, AssetPreservationStatus::Preserved);
+        let (tx_inputs, tx_args) = mock_inputs(
+            MockAccountType::StandardExisting,
+            AssetPreservationStatus::Preserved,
+        );
         let (account, _, block_header, block_chain, notes) = tx_inputs.into_parts();
         Self {
             account,
@@ -160,8 +160,10 @@ pub fn get_new_key_pair_with_advice_map() -> (Word, Vec<Felt>) {
     let pub_key: Word = sec_key.public_key().into();
     let mut pk_sk_bytes = sec_key.to_bytes();
     pk_sk_bytes.append(&mut pub_key.to_bytes());
-    let pk_sk_felts: Vec<Felt> =
-        pk_sk_bytes.iter().map(|a| Felt::new(*a as u64)).collect::<Vec<Felt>>();
+    let pk_sk_felts: Vec<Felt> = pk_sk_bytes
+        .iter()
+        .map(|a| Felt::new(*a as u64))
+        .collect::<Vec<Felt>>();
 
     (pub_key, pk_sk_felts)
 }
@@ -188,7 +190,13 @@ pub fn get_account_with_default_account_code(
         None => AssetVault::new(&[]).unwrap(),
     };
 
-    Account::new(account_id, account_vault, account_storage, account_code, Felt::new(1))
+    Account::new(
+        account_id,
+        account_vault,
+        account_storage,
+        account_code,
+        Felt::new(1),
+    )
 }
 
 #[cfg(test)]

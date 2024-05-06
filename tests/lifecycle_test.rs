@@ -74,7 +74,9 @@ fn create_note<R: FeltRng>(
 
     // add the inputs to the note
 
-    let inputs = NoteInputs::new(vec![ONE, ONE])?;
+    let input_a = Felt::new(123);
+
+    let inputs = NoteInputs::new(vec![input_a, input_a])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
     let serial_num = rng.draw_word();
@@ -90,7 +92,7 @@ fn create_note<R: FeltRng>(
 }
 
 #[test]
-fn test_lifecycle() {
+fn test_send_tokens() {
     let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
 
@@ -151,7 +153,7 @@ fn test_lifecycle() {
             .added_assets
     );
 
-
+    // println!("{:?}", _executed_transaction..unwrap().account_delta.vault().added_assets);
     // println!("{:?}", _executed_transaction.output_notes());
     // println!("{:?}", _executed_transaction.program());
 }

@@ -2,16 +2,30 @@
 use.miden::account
 use.miden::note
 use.miden::contracts::wallets::basic->wallet
+use.miden::tx
+
+proc.get_block_number
+    exec.tx::get_block_number
+    debug.stack
+    add
+end
 
 begin
     # All scripts start with the NOTE_SCRIPT_ROOT, you can drop it
     dropw 
+    # debug.stack
 
     push.0 exec.note::get_inputs 
     # => [num_inputs, des_pointer, ...]
 
-    # Debugging https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/debugging.html
+    # logging note input
+    swap
+    mem_load
     debug.stack
+    drop drop
+
+    # Debugging https://0xpolygonmiden.github.io/miden-vm/user_docs/assembly/debugging.html
+    exec.get_block_number
 
     # All account and note procedures
     # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures 
