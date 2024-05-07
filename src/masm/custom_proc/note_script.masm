@@ -13,6 +13,8 @@ begin
 
     debug.stack
 
-    # account_procedure_2
-    # call.0x8ef0092134469a1330e3c468f57c7f085ce611645d09cc7516c786fefc71d794
+    # account_procedure_1
+    call.0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5
+
+    debug.stack
 end

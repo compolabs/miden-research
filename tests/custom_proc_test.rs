@@ -27,14 +27,10 @@ use std::fs;
 mod utils;
 use utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
-const MASTS: [&str; 8] = [
+const MASTS: [&str; 4] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xd0260c15a64e796833eb2987d4072ac2ea824b3ce4a54a1e693bada6e82f71dd",
-    "0xd765111e22479256e87a57eaf3a27479d19cc876c9a715ee6c262e0a0d47a2ac",
-    "0x17b326d5403115afccc0727efa72bd929bfdc7bbf284c7c28a7aadade5d4cc9d",
-    "0x73c14f65d2bab6f52eafc4397e104b3ab22a470f6b5cbc86d4aa4d3978c8b7d4",
-    "0xef07641ea1aa8fe85d8f854d29bf729b92251e1433244892138fd9ca898a5a22",
     "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
@@ -49,49 +45,15 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
             # acct proc 1
             export.wallet::send_asset
 
-            # acct proc ?
+            # acct proc 2
             export.basic_eoa::auth_tx_rpo_falcon512
 
-            # acct proc 2
-            export.incr_nonce
-                push.0 swap
-                # => [value, 0]
-
-                exec.account::incr_nonce
-                # => [0]
-            end
-
-            # acct proc 3
-            export.set_item
-                exec.account::set_item
-                # => [R', V, 0, 0, 0]
-
-                movup.8 drop movup.8 drop movup.8 drop
-                # => [R', V]
-            end
-
-            # acct proc 4
-            export.set_code
-                padw swapw
-                # => [CODE_ROOT, 0, 0, 0, 0]
-
-                exec.account::set_code
-                # => [0, 0, 0, 0]
-            end
-
-            # acct proc 5
-            export.create_note
-                exec.tx::create_note
-                # => [ptr, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            end
-
-            # acct proc 6
+            # acct proc 3
             export.account_procedure_1
                 push.1.2
                 add
                 debug.stack
             end
-
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
@@ -109,11 +71,10 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
         code.procedures()[3].to_hex(),
-        code.procedures()[4].to_hex(),
-        code.procedures()[5].to_hex(),
-        code.procedures()[6].to_hex(),
-        code.procedures()[7].to_hex(),
     ];
+
+    // println!("const MASTS: [&str; 4] = {:?};", current);
+
     assert!(current == MASTS, "const MASTS: [&str; 8] = {:?};", current);
 
     code
