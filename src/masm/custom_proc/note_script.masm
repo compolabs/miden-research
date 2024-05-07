@@ -4,30 +4,12 @@ use.miden::note
 use.miden::contracts::wallets::basic->wallet
 use.miden::tx
 
+
+
 begin
     # All scripts start with the NOTE_SCRIPT_ROOT, you can drop it
     dropw 
 
-    push.0 exec.note::get_inputs 
-    # => [num_inputs, des_pointer, ...]
-
-    # logging note input
-    swap
-    mem_load
-    debug.stack
-    drop drop
-
-    # All account and note procedures
-    # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures 
-
-    push.0 exec.note::get_assets drop mem_loadw
-    # => [ASSET, ...]
-
-    # load the asset and add it to the account
-    call.wallet::receive_asset
-    # => [...]
-
     call.0x8ef0092134469a1330e3c468f57c7f085ce611645d09cc7516c786fefc71d794
-
-    dropw
+    
 end
