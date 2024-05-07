@@ -31,7 +31,7 @@ const MASTS: [&str; 4] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xd0260c15a64e796833eb2987d4072ac2ea824b3ce4a54a1e693bada6e82f71dd",
-    "0x1f4b94111d6d6b0282c961d4fee099d2b24d2d4b926bdb4cc37ba861531f3898",
+    "0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
     let account_code = "\
@@ -53,8 +53,7 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
                 push.3.4
                 add
                 debug.stack
-                push.1 
-                add # <prevent empty SPAN error> 
+                drop
             end
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
@@ -183,14 +182,8 @@ fn test_custom_proc() {
     let tx_script_code = ProgramAst::parse(
         
         "
-        use.miden::contracts::auth::basic->auth_tx
-
         begin
-            call.auth_tx::auth_tx_rpo_falcon512
-            # dropw dropw dropw dropw dropw
-            call.0x1f4b94111d6d6b0282c961d4fee099d2b24d2d4b926bdb4cc37ba861531f3898
-            debug.stack
-            
+            call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
         end"
     
     
