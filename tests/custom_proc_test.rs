@@ -18,7 +18,7 @@ use miden_objects::{
     Felt, NoteError, Word, ONE, ZERO,
 };
 use miden_tx::TransactionExecutor;
-use mock::mock::account::DEFAULT_AUTH_SCRIPT;
+// use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use miden_processor::AdviceMap;
 
@@ -31,7 +31,7 @@ const MASTS: [&str; 4] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xd0260c15a64e796833eb2987d4072ac2ea824b3ce4a54a1e693bada6e82f71dd",
-    "0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462",
+    "0xd4b1f9fbad5d0e6d2386509eab6a865298db20095d7315226dfa513ce017c990",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
     let account_code = "\
@@ -52,8 +52,8 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
             export.account_procedure_1
                 push.3.4
                 add
+                
                 debug.stack
-                drop
             end
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
@@ -152,7 +152,7 @@ fn test_custom_proc() {
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
+    let (target_pub_key , target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
     // Create the note
@@ -182,7 +182,9 @@ fn test_custom_proc() {
     let tx_script_code = ProgramAst::parse(
         "
         begin
-            call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
+            dropw
+            call.0xd4b1f9fbad5d0e6d2386509eab6a865298db20095d7315226dfa513ce017c990
+            # dropw
         end",
     )
     .unwrap();
@@ -209,8 +211,4 @@ fn test_custom_proc() {
             .vault()
             .added_assets
     );
-
-    // println!("{:?}", _executed_transaction..unwrap().account_delta.vault().added_assets);
-    // println!("{:?}", _executed_transaction.output_notes());
-    // println!("{:?}", _executed_transaction.program());
 }

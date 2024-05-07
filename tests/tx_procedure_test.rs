@@ -2,15 +2,6 @@ use miden_objects::accounts::{
     ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
 };
 use miden_objects::{
-    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
-    assembly::{ModuleAst, ProgramAst},
-    assets::{Asset, AssetVault, FungibleAsset},
-    crypto::rand::{FeltRng, RpoRandomCoin},
-    notes::{
-        Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
-        NoteTag, NoteType,
-    },
-    transaction::TransactionArgs,
     Felt, NoteError, Word, ONE, ZERO,
 };
 use miden_processor::ProcessState;
