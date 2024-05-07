@@ -180,14 +180,12 @@ fn test_custom_proc() {
         .collect::<Vec<_>>();
 
     let tx_script_code = ProgramAst::parse(
-        
         "
         begin
             call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
-        end"
-    
-    
-    ).unwrap();
+        end",
+    )
+    .unwrap();
 
     let tx_script_target = executor
         .compile_tx_script(
