@@ -31,7 +31,7 @@ const MASTS: [&str; 4] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xd0260c15a64e796833eb2987d4072ac2ea824b3ce4a54a1e693bada6e82f71dd",
-    "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
+    "0x988312aea32fc6f7dcd023b997c9db2b8176c9d074510a9e23de37899a22ddf2",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
     let account_code = "\
@@ -53,6 +53,7 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
                 push.1.2
                 add
                 debug.stack
+                push.9 # to not get error <empty span block>
             end
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();

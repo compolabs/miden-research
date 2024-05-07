@@ -11,10 +11,10 @@ begin
     call.wallet::receive_asset
     dropw
 
-    debug.stack
-
     # account_procedure_1
-    call.0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5
+    # when not commented out below: <
+    call.0x988312aea32fc6f7dcd023b997c9db2b8176c9d074510a9e23de37899a22ddf2
+    
+    #debug.stack
 
-    debug.stack
 end
