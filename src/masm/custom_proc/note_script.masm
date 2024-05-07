@@ -4,12 +4,15 @@ use.miden::note
 use.miden::contracts::wallets::basic->wallet
 use.miden::tx
 
-
-
 begin
-    # All scripts start with the NOTE_SCRIPT_ROOT, you can drop it
     dropw 
+    push.0 exec.note::get_inputs 
+    push.0 exec.note::get_assets drop mem_loadw
+    call.wallet::receive_asset
+    dropw
 
-    call.0x8ef0092134469a1330e3c468f57c7f085ce611645d09cc7516c786fefc71d794
-    
+    debug.stack
+
+    # account_procedure_2
+    # call.0x8ef0092134469a1330e3c468f57c7f085ce611645d09cc7516c786fefc71d794
 end

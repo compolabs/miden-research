@@ -28,6 +28,7 @@ mod utils;
 use utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 const MASTS: [&str; 8] = [
+    "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xd0260c15a64e796833eb2987d4072ac2ea824b3ce4a54a1e693bada6e82f71dd",
     "0xd765111e22479256e87a57eaf3a27479d19cc876c9a715ee6c262e0a0d47a2ac",
@@ -35,18 +36,21 @@ const MASTS: [&str; 8] = [
     "0x73c14f65d2bab6f52eafc4397e104b3ab22a470f6b5cbc86d4aa4d3978c8b7d4",
     "0xef07641ea1aa8fe85d8f854d29bf729b92251e1433244892138fd9ca898a5a22",
     "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
-    "0x8ef0092134469a1330e3c468f57c7f085ce611645d09cc7516c786fefc71d794",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
     let account_code = "\
             use.miden::account
             use.miden::tx
             use.miden::contracts::wallets::basic->wallet
+            use.miden::contracts::auth::basic->basic_eoa
 
             # acct proc 0
             export.wallet::receive_asset
             # acct proc 1
             export.wallet::send_asset
+
+            # acct proc ?
+            export.basic_eoa::auth_tx_rpo_falcon512
 
             # acct proc 2
             export.incr_nonce
@@ -85,14 +89,9 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
             export.account_procedure_1
                 push.1.2
                 add
-            end
-
-            # acct proc 7
-            export.account_procedure_2
-                push.2.1
-                sub
                 debug.stack
             end
+
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
@@ -154,7 +153,7 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let filename = "./src/masm/lifecycle/test_note_script.masm";
+    let filename = "./src/masm/custom_proc/note_script.masm";
     let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
@@ -181,7 +180,7 @@ fn create_note<R: FeltRng>(
 }
 
 #[test]
-fn test_custom() {
+fn test_custom_proc() {
     let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
 
@@ -190,8 +189,7 @@ fn test_custom() {
 
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
-    let target_account =
-    get_account_with_custom_proc(target_account_id, target_pub_key, None);
+    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
     // Create the note
     let note = create_note(
