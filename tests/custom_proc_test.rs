@@ -1,4 +1,4 @@
-use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
+use miden_vm::Assembler;
 
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
@@ -15,7 +15,7 @@ use miden_objects::{
         NoteTag, NoteType,
     },
     transaction::TransactionArgs,
-    Felt, NoteError, Word, ONE, ZERO,
+    Felt, NoteError, Word, ZERO,
 };
 use miden_tx::TransactionExecutor;
 // use mock::mock::account::DEFAULT_AUTH_SCRIPT;
@@ -183,6 +183,7 @@ fn test_custom_proc() {
         "
         begin
             dropw
+            # call account_procedure_1
             call.0xd4b1f9fbad5d0e6d2386509eab6a865298db20095d7315226dfa513ce017c990
             # dropw
         end",
