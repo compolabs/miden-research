@@ -12,8 +12,8 @@ begin
     dropw
 
     # account_procedure_1
-    # when not commented out below: <
-    call.0x988312aea32fc6f7dcd023b997c9db2b8176c9d074510a9e23de37899a22ddf2
+    # when not commented out below: <PhantomCallsNotAllowed>
+    # call.0x988312aea32fc6f7dcd023b997c9db2b8176c9d074510a9e23de37899a22ddf2
     
     #debug.stack
 
