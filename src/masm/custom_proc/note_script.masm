@@ -1,18 +1,18 @@
-use.miden::account
-use.miden::note
-use.miden::contracts::wallets::basic->wallet
-use.miden::tx
+# use.miden::account
+# use.miden::note
+# use.miden::contracts::wallets::basic->wallet
+# use.miden::tx
 
 begin
     dropw 
-    push.0 exec.note::get_inputs 
-    push.0 exec.note::get_assets drop mem_loadw
-    call.wallet::receive_asset
+    #push.0 exec.note::get_inputs 
+    #push.0 exec.note::get_assets drop mem_loadw
+    #call.wallet::receive_asset
     dropw
 
     # account_procedure_1
     # when not commented out below: <PhantomCallsNotAllowed>
-    # call.0xd4b1f9fbad5d0e6d2386509eab6a865298db20095d7315226dfa513ce017c990
+    call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
     
     push.99999999
     debug.stack

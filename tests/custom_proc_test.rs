@@ -1,4 +1,4 @@
-use miden_vm::Assembler;
+use miden_vm::{Assembler};
 
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
@@ -7,13 +7,14 @@ use miden_objects::{
         ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
         ACCOUNT_ID_SENDER,
     },
-    assembly::{ModuleAst, ProgramAst},
+    assembly::{ModuleAst, ProgramAst, AssemblyContext},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::rand::{FeltRng, RpoRandomCoin},
     notes::{
         Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
         NoteTag, NoteType,
     },
+    vm::CodeBlock,
     transaction::TransactionArgs,
     Felt, NoteError, Word, ZERO,
 };
@@ -70,8 +71,8 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[2].to_hex(),
     ];
 
-    println!("{:?}", current[1]);
-    println!("{:?}", code.procedures()[1]);
+    println!("{:?}", current[2]);
+    println!("{:?}", code.procedures()[2]);
     // println!("const MASTS: [&str; 4] = {:?};", current);
 
     assert!(current == MASTS, "const MASTS: [&str; 8] = {:?};", current);
@@ -107,6 +108,20 @@ pub fn get_account_with_custom_proc(
     )
 }
 
+pub fn new_note_script(code: ProgramAst, assembler: &Assembler) -> Result<(NoteScript, CodeBlock), NoteError> {
+    // Compile the code in the context with phantom calls enabled
+    let code_block = assembler
+        .compile_in_context(&code, &mut AssemblyContext::for_program(Some(&code)).with_phantom_calls(true))
+        .map_err(NoteError::ScriptCompilationError)?;
+
+    // Use the from_parts method to create a NoteScript instance
+    let note_script = NoteScript::from_parts(code, code_block.hash());
+
+    Ok((note_script, code_block))
+}
+
+
+
 fn create_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
@@ -117,11 +132,15 @@ fn create_note<R: FeltRng>(
     let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
+    
     let script_ast = ProgramAst::parse(&note_script).unwrap();
-    let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
+    // let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
+
+    let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap(); 
+
+
 
     // add the inputs to the note
-
     let input_a = Felt::new(123);
 
     let inputs = NoteInputs::new(vec![input_a, input_a])?;
@@ -162,7 +181,7 @@ fn test_custom_proc() {
 
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store =
+     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
     let mut executor = TransactionExecutor::new(data_store.clone()).with_debug_mode(true);
@@ -202,7 +221,7 @@ fn test_custom_proc() {
         .unwrap();
 
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
-
+ 
     // Execute the transaction and get the witness
     let _executed_transaction =
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
