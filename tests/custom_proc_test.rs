@@ -27,11 +27,10 @@ use std::fs;
 mod utils;
 use utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
-const MASTS: [&str; 4] = [
+const MASTS: [&str; 3] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
-    "0xd0260c15a64e796833eb2987d4072ac2ea824b3ce4a54a1e693bada6e82f71dd",
-    "0xd4b1f9fbad5d0e6d2386509eab6a865298db20095d7315226dfa513ce017c990",
+    "0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
     let account_code = "\
@@ -42,18 +41,16 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
 
             # acct proc 0
             export.wallet::receive_asset
-            # acct proc 1
-            export.wallet::send_asset
 
-            # acct proc 2
+            # acct proc 1
             export.basic_eoa::auth_tx_rpo_falcon512
 
-            # acct proc 3
+            # acct proc 2
             export.account_procedure_1
                 push.3.4
                 add
-                
                 debug.stack
+                drop
             end
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
@@ -71,11 +68,10 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[0].to_hex(),
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
-        code.procedures()[3].to_hex(),
     ];
 
-    println!("{:?}", current[3]);
-    println!("{:?}", code.procedures()[3]);
+    println!("{:?}", current[1]);
+    println!("{:?}", code.procedures()[1]);
     // println!("const MASTS: [&str; 4] = {:?};", current);
 
     assert!(current == MASTS, "const MASTS: [&str; 8] = {:?};", current);
@@ -152,7 +148,7 @@ fn test_custom_proc() {
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let (target_pub_key , target_sk_pk_felt) = get_new_key_pair_with_advice_map();
+    let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
     // Create the note
@@ -181,11 +177,18 @@ fn test_custom_proc() {
 
     let tx_script_code = ProgramAst::parse(
         "
+        use.miden::contracts::auth::basic->auth_tx
+
         begin
-            dropw
-            # call account_procedure_1
-            call.0xd4b1f9fbad5d0e6d2386509eab6a865298db20095d7315226dfa513ce017c990
+            call.auth_tx::auth_tx_rpo_falcon512
             # dropw
+            # call account_procedure_1
+            call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
+            
+            # dropw
+            debug.stack
+            dup
+            drop
         end",
     )
     .unwrap();
