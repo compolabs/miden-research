@@ -1,14 +1,9 @@
-use miden_objects::accounts::{
-    ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-};
-use miden_objects::{Felt, NoteError, Word, ONE, ZERO};
+use miden_objects::accounts::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN;
+use miden_objects::{Felt, Word, ONE};
 use miden_processor::ProcessState;
 use mock::{
-    constants::{non_fungible_asset, FUNGIBLE_ASSET_AMOUNT, NON_FUNGIBLE_ASSET_DATA},
     mock::{account::MockAccountType, notes::AssetPreservationStatus, transaction::mock_inputs},
-    prepare_transaction,
-    procedures::prepare_word,
-    run_tx,
+    prepare_transaction, run_tx,
 };
 
 use std::fs;
