@@ -16,7 +16,7 @@ export.get_count
   exec.account::get_item
 
   # logging
-  push.44444
+  push.4000
   debug.stack
   drop
 
@@ -37,7 +37,7 @@ export.increment_counter
   add
 
   # logging
-  push.22222
+  push.2000
   debug.stack
   drop
 

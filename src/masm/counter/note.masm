@@ -4,21 +4,21 @@ use.std::sys
 begin
     dropw
 
-    push.11111
+    push.1000
     debug.stack
     drop
 
     # increment counter  
-    call.0x3f8dd16ed793bc46ce587a16751a303c80473c9b57c26659cd273dc504b4a367
+    call.0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f
     
-    push.33333
+    push.3000
     debug.stack
     drop
 
     # get count from counter
-    call.0xcf397c13408406ae4ade412f0684689d963d6376db46c5d1ebfe5765b9e169b5
+    call.0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a
 
-    push.55555
+    push.5000
     debug.stack
     drop
 
