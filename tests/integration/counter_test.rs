@@ -24,8 +24,8 @@ use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 const MASTS: [&str; 3] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
-    "0x0ea05068a6b57c86e952c1b8c55f83a816ad0d2439a5e961ed282f74549e270d",
-    "0x775ddf55835334cc1c4ca91a04db4f7b9db6a121c09719360de70a466962a3f6",
+    "0xc1c7cbf0ab7b28230ea0d27693cd643023b8fe4a473b1023b0a34a94b947c0da",
+    "0x9215673479460787a00bbbe31767dbdabb5184bd6a0216f046bbd0356979c72e",
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/masm/counter/counter.masm");
@@ -37,7 +37,6 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[0].to_hex(),
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
-
     ];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
@@ -191,8 +190,5 @@ fn test_increment_counter() {
     let _executed_transaction =
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
-    println!(
-        "{:?}",
-        _executed_transaction
-            .unwrap());
+    println!("{:?}", _executed_transaction.unwrap());
 }

@@ -1,5 +1,6 @@
 use.miden::account
 use.miden::kernels::tx::memory
+use.std::sys
 use.miden::contracts::auth::basic->basic_eoa
 
 # acct proc 0
@@ -35,4 +36,10 @@ export.increment_counter
   # dup
   push.3 # index
   exec.account::set_item
+
+  push.3 # index
+  exec.account::get_item 
+
+  # debug.stack
+  exec.sys::truncate_stack
 end
