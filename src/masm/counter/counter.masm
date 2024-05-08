@@ -10,21 +10,29 @@ export.basic_eoa::auth_tx_rpo_falcon512
 
 # [] => count
 export.get_count
+
+  # Get Count
   push.3 # index
   exec.account::get_item
 
   # logging
   push.44444
   debug.stack
-  drop 
+  drop
+
+  # truncate stack to 16
+  exec.sys::truncate_stack
 end
 
 # acct proc 2
 
 # [] => [count]
 export.increment_counter
+  # Get count
   push.3 # index
   exec.account::get_item
+
+  # Increment count
   push.1
   add
 
@@ -33,13 +41,10 @@ export.increment_counter
   debug.stack
   drop
 
-  # dup
+  # Set count
   push.3 # index
   exec.account::set_item
 
-  push.3 # index
-  exec.account::get_item 
-
-  # debug.stack
+  # truncate stack to 16
   exec.sys::truncate_stack
 end

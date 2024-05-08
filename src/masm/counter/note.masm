@@ -1,7 +1,6 @@
 use.miden::account
 use.std::sys
 
-
 begin
     dropw
 
@@ -10,14 +9,18 @@ begin
     drop
 
     # increment counter  
-    call.0x9215673479460787a00bbbe31767dbdabb5184bd6a0216f046bbd0356979c72e
+    call.0x3f8dd16ed793bc46ce587a16751a303c80473c9b57c26659cd273dc504b4a367
     
     push.33333
     debug.stack
     drop
 
     # get count from counter
-    call.0xc1c7cbf0ab7b28230ea0d27693cd643023b8fe4a473b1023b0a34a94b947c0da
+    call.0xcf397c13408406ae4ade412f0684689d963d6376db46c5d1ebfe5765b9e169b5
+
+    push.55555
+    debug.stack
+    drop
 
     exec.sys::truncate_stack
 end

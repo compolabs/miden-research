@@ -24,8 +24,8 @@ use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 const MASTS: [&str; 3] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
-    "0xc1c7cbf0ab7b28230ea0d27693cd643023b8fe4a473b1023b0a34a94b947c0da",
-    "0x9215673479460787a00bbbe31767dbdabb5184bd6a0216f046bbd0356979c72e",
+    "0xcf397c13408406ae4ade412f0684689d963d6376db46c5d1ebfe5765b9e169b5",
+    "0x3f8dd16ed793bc46ce587a16751a303c80473c9b57c26659cd273dc504b4a367",
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/masm/counter/counter.masm");
@@ -160,6 +160,8 @@ fn test_increment_counter() {
     let tx_script_code = ProgramAst::parse(
         "
         use.miden::contracts::auth::basic->auth_tx
+        use.std::sys
+
 
         begin
             # call.auth_tx::auth_tx_rpo_falcon512
@@ -168,10 +170,11 @@ fn test_increment_counter() {
             # call.0xa2093701d379c35b9510660d9c038c78b510437fcf86e44d5d4fc5737b918ad7
             
             # dropw
-            push.44444
+            push.66666
             debug.stack
-            dup
             drop
+
+            exec.sys::truncate_stack
         end",
     )
     .unwrap();
