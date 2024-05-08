@@ -24,8 +24,8 @@ use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 const MASTS: [&str; 3] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
-    "0xc4f7a82fec3822bd85d4c7c6610a1c56f32d93cc16716e5b5dae9cad0dec5f53",
-    "0x38b1c4a3d19db6d0fbfe81f57d87751bd65deacbe3441e36b902cedc30080faf",
+    "0x0ea05068a6b57c86e952c1b8c55f83a816ad0d2439a5e961ed282f74549e270d",
+    "0x775ddf55835334cc1c4ca91a04db4f7b9db6a121c09719360de70a466962a3f6",
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/masm/counter/counter.masm");
@@ -169,7 +169,7 @@ fn test_increment_counter() {
             # call.0xa2093701d379c35b9510660d9c038c78b510437fcf86e44d5d4fc5737b918ad7
             
             # dropw
-            push.333333333
+            push.44444
             debug.stack
             dup
             drop

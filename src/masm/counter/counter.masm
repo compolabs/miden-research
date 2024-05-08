@@ -9,10 +9,11 @@ export.basic_eoa::auth_tx_rpo_falcon512
 
 # [] => count
 export.get_count
-  mem_load.0
+  push.3 # index
+  exec.account::get_item
 
   # logging
-  push.3333333
+  push.44444
   debug.stack
   drop 
 end
@@ -21,15 +22,17 @@ end
 
 # [] => [count]
 export.increment_counter
-  mem_load.0
+  push.3 # index
+  exec.account::get_item
   push.1
   add
 
   # logging
-  push.1111111111
+  push.22222
   debug.stack
   drop
 
   # dup
-  mem_store.0
+  push.3 # index
+  exec.account::set_item
 end
