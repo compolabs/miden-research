@@ -1,6 +1,6 @@
-# Miden Assembly Research
+# Miden Research
 
-This repository is dedicated to exploring and experimenting with writing accounts and notes using MASM.
+This repository is dedicated to exploring, experimenting, and learning more about how to use Miden and Miden Assembly.
 
 
 Getting started:
