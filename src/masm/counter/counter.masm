@@ -1,0 +1,35 @@
+use.miden::account
+use.miden::kernels::tx::memory
+use.miden::contracts::auth::basic->basic_eoa
+
+# acct proc 0
+export.basic_eoa::auth_tx_rpo_falcon512
+
+# acct proc 1
+
+# [] => count
+export.get_count
+  mem_load.0
+
+  # logging
+  push.3333333
+  debug.stack
+  drop 
+end
+
+# acct proc 2
+
+# [] => [count]
+export.increment_counter
+  mem_load.0
+  push.1
+  add
+
+  # logging
+  push.1111111111
+  debug.stack
+  drop
+
+  # dup
+  mem_store.0
+end

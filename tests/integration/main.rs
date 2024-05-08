@@ -5,3 +5,4 @@ mod custom_proc_test;
 
 mod set_item_test;
 mod tx_procedure_test;
+mod counter_test;

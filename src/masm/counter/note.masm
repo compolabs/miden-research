@@ -1,0 +1,16 @@
+use.miden::account
+use.miden::note
+use.miden::tx
+
+begin
+    dropw
+    # increment counter  
+    call.0x38b1c4a3d19db6d0fbfe81f57d87751bd65deacbe3441e36b902cedc30080faf
+    
+    push.222222222
+    debug.stack
+
+    call.0xc4f7a82fec3822bd85d4c7c6610a1c56f32d93cc16716e5b5dae9cad0dec5f53
+
+    add
+end
