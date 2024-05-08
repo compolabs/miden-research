@@ -120,8 +120,6 @@ pub fn new_note_script(code: ProgramAst, assembler: &Assembler) -> Result<(NoteS
     Ok((note_script, code_block))
 }
 
-
-
 fn create_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
@@ -137,8 +135,6 @@ fn create_note<R: FeltRng>(
     // let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
 
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap(); 
-
-
 
     // add the inputs to the note
     let input_a = Felt::new(123);

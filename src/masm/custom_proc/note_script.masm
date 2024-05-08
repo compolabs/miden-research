@@ -1,13 +1,13 @@
-# use.miden::account
-# use.miden::note
-# use.miden::contracts::wallets::basic->wallet
-# use.miden::tx
+use.miden::account
+use.miden::note
+use.miden::contracts::wallets::basic->wallet
+use.miden::tx
 
 begin
     dropw 
-    #push.0 exec.note::get_inputs 
-    #push.0 exec.note::get_assets drop mem_loadw
-    #call.wallet::receive_asset
+    push.0 exec.note::get_inputs 
+    push.0 exec.note::get_assets drop mem_loadw
+    call.wallet::receive_asset
     dropw
 
     # account_procedure_1
