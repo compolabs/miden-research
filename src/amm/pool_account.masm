@@ -1,0 +1,12 @@
+use.miden::account
+use.miden::contracts::wallets::basic->wallet
+
+# acct proc 0
+export.wallet::receive_asset
+            
+# acct proc 1
+export.account::incr_nonce
+
+# 
+export.account::get_token_amounts
+
