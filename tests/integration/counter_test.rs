@@ -22,8 +22,9 @@ use miden_vm::Assembler;
 
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
-const MASTS: [&str; 3] = [
-    "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
+const MASTS: [&str; 4] = [
+    "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386",
+    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a",
     "0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f",
 ];
@@ -37,6 +38,7 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[0].to_hex(),
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
+        code.procedures()[3].to_hex(),
     ];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
@@ -123,12 +125,14 @@ fn create_note<R: FeltRng>(
 
 #[test]
 fn test_increment_counter() {
+    // Create fungible asset (right now notes must have at least one asset, so we create a fungible asset with 0 amount)
     let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
+    let fungible_asset: Asset = FungibleAsset::new(faucet_id, 0).unwrap().into();
 
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
+    // Create target account
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
@@ -157,32 +161,12 @@ fn test_increment_counter() {
         .map(|note| note.id())
         .collect::<Vec<_>>();
 
-    let tx_script_code = ProgramAst::parse(
-        "
-        use.miden::contracts::auth::basic->auth_tx
-        use.std::sys
-
-        begin
-            call.auth_tx::auth_tx_rpo_falcon512
-            # dropw
-            # call get_count proc
-            # call.0xa2093701d379c35b9510660d9c038c78b510437fcf86e44d5d4fc5737b918ad7
-            
-            # dropw
-            push.6000
-            debug.stack
-            drop
-
-            debug.stack
-
-            exec.sys::truncate_stack
-        end",
-    )
-    .unwrap();
+    let tx_script_code = include_str!("../../src/masm/counter/tx_script.masm");
+    let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
 
     let tx_script_target = executor
         .compile_tx_script(
-            tx_script_code.clone(),
+            tx_script_ast.clone(),
             vec![(target_pub_key, target_sk_pk_felt)],
             vec![],
         )
@@ -194,5 +178,5 @@ fn test_increment_counter() {
     let _executed_transaction =
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
-    println!("{:?}", _executed_transaction.unwrap());
+    println!("{:?}", _executed_transaction.unwrap().account_delta());
 }

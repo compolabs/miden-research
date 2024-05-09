@@ -1,13 +1,16 @@
 use.miden::account
 use.miden::kernels::tx::memory
 use.std::sys
-use.miden::contracts::auth::basic->basic_eoa
+use.miden::contracts::wallets::basic->wallet
 
 # acct proc 0
-export.basic_eoa::auth_tx_rpo_falcon512
-
+export.wallet::receive_asset
+            
 # acct proc 1
+export.account::incr_nonce
+# export.basic_eoa::auth_tx_rpo_falcon512
 
+# acct proc 2
 # [] => count
 export.get_count
 
@@ -15,7 +18,7 @@ export.get_count
   push.3 # index
   exec.account::get_item
 
-  # logging
+  # log 4
   push.4000
   debug.stack
   drop
@@ -24,8 +27,7 @@ export.get_count
   exec.sys::truncate_stack
 end
 
-# acct proc 2
-
+# acct proc 3
 # [] => [count]
 export.increment_counter
   # Get count
@@ -36,7 +38,7 @@ export.increment_counter
   push.1
   add
 
-  # logging
+  # log 2
   push.2000
   debug.stack
   drop

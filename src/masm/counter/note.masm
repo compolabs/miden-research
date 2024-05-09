@@ -1,9 +1,20 @@
 use.miden::account
+use.miden::note
+use.miden::kernels::tx::memory
+use.miden::contracts::wallets::basic->wallet
 use.std::sys
 
 begin
+    # drop note root
+    dropw 
+
+    # call receive asset since 0 asset notes aren't available yet
+    push.0 exec.note::get_inputs 
+    push.0 exec.note::get_assets drop mem_loadw
+    call.wallet::receive_asset
     dropw
 
+    # log 1
     push.1000
     debug.stack
     drop
@@ -11,16 +22,38 @@ begin
     # increment counter  
     call.0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f
     
+    # log 3
     push.3000
     debug.stack
     drop
 
     # get count from counter
     call.0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a
+    drop # drop return count
 
+    # log 5
     push.5000
+    exec.account::get_nonce
     debug.stack
-    drop
+    drop drop
 
+    # increment nonce
+    push.1
+    call.account::incr_nonce
+
+    # log 6
+    push.6000
+    exec.account::get_nonce
+    debug.stack
+    drop drop
+
+    # log 7
+    push.7000
+    exec.memory::get_input_vault_root 
+    exec.memory::get_output_vault_root
+    debug.stack
+    dropw dropw drop
+
+    # truncate stack
     exec.sys::truncate_stack
 end

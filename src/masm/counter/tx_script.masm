@@ -1,0 +1,16 @@
+# This is a transaction script
+# It gets executed after all notes are executed
+# Right now, this is empty, but here's an example of using auth_tx_rpo_falcon512
+
+# use.miden::contracts::auth::basic->auth_tx
+
+begin
+  # call.auth_tx::auth_tx_rpo_falcon512
+  # dropw
+  # call a procedure in an account
+  # call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
+
+  call.0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a
+  push.1 
+  assert_eq # assert that the counter is 1
+end
