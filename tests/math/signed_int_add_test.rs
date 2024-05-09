@@ -28,7 +28,7 @@ fn test_signed_int_add_masm() {
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../../src/masm/signed_int/signed_add.masm");
+    let assembly_code: &str = include_str!("../../src/signed_int/signed_add.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler
@@ -76,7 +76,7 @@ fn test_signed_int_add_masm_fuzz() {
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../../src/masm/signed_int/signed_add.masm");
+    let assembly_code: &str = include_str!("../../src/signed_int/signed_add.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler

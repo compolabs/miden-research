@@ -6,7 +6,7 @@ fn test_pow_masm() {
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../../src/masm/math/pow.masm");
+    let assembly_code: &str = include_str!("../../src/math/pow.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler

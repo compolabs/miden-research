@@ -29,7 +29,7 @@ const MASTS: [&str; 4] = [
     "0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f", // increment_counter custom proc
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
-    let account_code = include_str!("../../src/masm/counter/counter.masm");
+    let account_code = include_str!("../../src/counter/counter.masm");
 
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
@@ -98,7 +98,7 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../../src/masm/counter/note.masm");
+    let note_script = include_str!("../../src/counter/note.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
@@ -161,7 +161,7 @@ fn test_increment_counter() {
         .map(|note| note.id())
         .collect::<Vec<_>>();
 
-    let tx_script_code = include_str!("../../src/masm/counter/tx_script.masm");
+    let tx_script_code = include_str!("../../src/counter/tx_script.masm");
     let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
 
     let tx_script_target = executor

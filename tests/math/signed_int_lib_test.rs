@@ -26,7 +26,7 @@ fn test_signed_int_lib() {
     let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../src/masm/signed_int/signed_int_lib.masm");
+    let assembly_code: &str = include_str!("../src/signed_int/signed_int_lib.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler

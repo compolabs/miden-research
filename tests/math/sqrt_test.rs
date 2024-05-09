@@ -6,7 +6,7 @@ fn test_sqrt_masm() {
     let assembler = Assembler::default();
 
     // Read the assembly program from a file
-    let assembly_code: &str = include_str!("../../src/masm/math/sqrt.masm");
+    let assembly_code: &str = include_str!("../../src/math/sqrt.masm");
 
     // Compile the program from the loaded assembly code
     let program = assembler

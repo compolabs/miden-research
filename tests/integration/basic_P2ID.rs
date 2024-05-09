@@ -29,7 +29,7 @@ pub fn get_account_with_custom_account_code(
     public_key: Word,
     assets: Option<Asset>,
 ) -> Account {
-    let account_code_src = include_str!("../../src/masm/lifecycle/test_account.masm");
+    let account_code_src = include_str!("../../src/lifecycle/test_account.masm");
 
     let account_code_ast = ModuleAst::parse(&account_code_src).unwrap();
     let account_assembler = TransactionKernel::assembler().with_debug_mode(true);
@@ -61,7 +61,7 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../../src/masm/lifecycle/test_note_script.masm");
+    let note_script = include_str!("../../src/lifecycle/test_note_script.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
     let script_ast = ProgramAst::parse(&note_script).unwrap();

@@ -127,7 +127,7 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../../src/masm/custom_proc/note_script.masm");
+    let note_script = include_str!("../../src/custom_proc/note_script.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
