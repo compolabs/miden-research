@@ -159,11 +159,11 @@ fn test_increment_counter() {
 
     let tx_script_code = ProgramAst::parse(
         "
-        # use.miden::contracts::auth::basic->auth_tx
-        # use.std::sys
+        use.miden::contracts::auth::basic->auth_tx
+        use.std::sys
 
         begin
-            # call.auth_tx::auth_tx_rpo_falcon512
+            call.auth_tx::auth_tx_rpo_falcon512
             # dropw
             # call get_count proc
             # call.0xa2093701d379c35b9510660d9c038c78b510437fcf86e44d5d4fc5737b918ad7
@@ -173,7 +173,9 @@ fn test_increment_counter() {
             debug.stack
             drop
 
-            # exec.sys::truncate_stack
+            debug.stack
+
+            exec.sys::truncate_stack
         end",
     )
     .unwrap();
