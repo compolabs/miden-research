@@ -23,10 +23,10 @@ use miden_vm::Assembler;
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 const MASTS: [&str; 4] = [
-    "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386",
-    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
-    "0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a",
-    "0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f",
+    "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386", // receive_asset proc
+    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // incr_nonce proc
+    "0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a", // get_counter custom proc
+    "0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f", // increment_counter custom proc
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/masm/counter/counter.masm");

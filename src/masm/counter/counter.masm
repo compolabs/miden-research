@@ -12,7 +12,7 @@ export.account::incr_nonce
 
 # acct proc 2
 # [] => count
-export.get_count
+export.get_counter
 
   # Get Count
   push.3 # index

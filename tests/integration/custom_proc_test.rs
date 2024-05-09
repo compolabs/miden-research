@@ -21,7 +21,7 @@ use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
-use std::fs;
+// use std::fs;
 
 const MASTS: [&str; 3] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
@@ -127,14 +127,11 @@ fn create_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let filename = "./src/masm/custom_proc/note_script.masm";
-    let note_script = fs::read_to_string(filename).expect("Failed to read the assembly file");
+    let note_script = include_str!("../../src/masm/custom_proc/note_script.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let script_ast = ProgramAst::parse(&note_script).unwrap();
-    // let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
-
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
     // add the inputs to the note
