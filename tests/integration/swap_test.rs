@@ -9,7 +9,7 @@ use miden_lib::{
 use miden_objects::{
     accounts::{
         Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot,
-        ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
+        ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1,
         ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
     },
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
@@ -138,14 +138,10 @@ pub fn create_custom_swap_note<R: FeltRng>(
 fn prove_swap_script() {
     // Create assets
     let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let fungible_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
+    let token_a: Asset = FungibleAsset::new(faucet_id, 101).unwrap().into();
 
-    let faucet_id_2 = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let non_fungible_asset: Asset = NonFungibleAsset::new(
-        &NonFungibleAssetDetails::new(faucet_id_2, vec![1, 2, 3, 4]).unwrap(),
-    )
-    .unwrap()
-    .into();
+    let faucet_id_2 = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
+    let token_b: Asset = FungibleAsset::new(faucet_id_2, 99).unwrap().into();
 
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
@@ -153,14 +149,13 @@ fn prove_swap_script() {
     let target_account_id =
         AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN).unwrap();
     let (target_pub_key, target_sk_felt) = get_new_key_pair_with_advice_map();
-    let target_account =
-        get_custom_account_code(target_account_id, target_pub_key, Some(non_fungible_asset));
+    let target_account = get_custom_account_code(target_account_id, target_pub_key, Some(token_b));
 
     // Create the note containing the SWAP script
     let (note, repay_serial_num) = create_custom_swap_note(
         sender_account_id,
-        fungible_asset,
-        non_fungible_asset,
+        token_a,
+        token_b,
         NoteType::Public,
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
@@ -201,7 +196,7 @@ fn prove_swap_script() {
     // target account vault delta
     let target_account_after: Account = Account::new(
         target_account.id(),
-        AssetVault::new(&[fungible_asset]).unwrap(),
+        AssetVault::new(&[token_a]).unwrap(),
         target_account.storage().clone(),
         target_account.code().clone(),
         Felt::new(2),
@@ -221,7 +216,7 @@ fn prove_swap_script() {
     let tag = NoteTag::from_account_id(sender_account_id, NoteExecutionMode::Local).unwrap();
     let note_metadata =
         NoteMetadata::new(target_account_id, NoteType::OffChain, tag, ZERO).unwrap();
-    let assets = NoteAssets::new(vec![non_fungible_asset]).unwrap();
+    let assets = NoteAssets::new(vec![token_b]).unwrap();
     let note_id = NoteId::new(recipient, assets.commitment());
 
     let created_note = executed_transaction.output_notes().get_note(0);

@@ -43,7 +43,11 @@ begin
     push.3 exec.note::get_assets assert.err=ERR_SWAP_WRONG_NUMBER_OF_ASSETS
     # => [ptr]
 
+    # logging 
+    mem_loadw
     debug.stack
+    dropw
+    push.3
 
     # load the asset and add it to the account
     mem_loadw call.wallet::receive_asset dropw
@@ -72,6 +76,8 @@ begin
 
     push.OFFCHAIN_NOTE movdn.5
     # => [ASSET, tag, note_type, RECIPIENT]
+
+    debug.stack
 
     # create a note using inputs
     call.wallet::send_asset
