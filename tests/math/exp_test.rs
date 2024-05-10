@@ -13,13 +13,15 @@ fn test_exp_masm() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    // let input = 2000000;
-    // let real_input = (input as f64) / 1e6;
+    // Define the input for the exponential calculation
+    let input = 2000000;
+    let real_input = (input as f64) / 1e6;
 
-    // let real_sqrt = real_input.sqrt();
-    // let expected_result = (real_sqrt * 1e6).round() as u64;
+    // Calculate the exponential using Rust's standard library
+    let rust_exp = real_input.exp();
+    let expected_result = (rust_exp * 1e6).round() as u64;
 
-    let stack_inputs = StackInputs::try_from_ints([]).unwrap();
+    let stack_inputs = StackInputs::try_from_ints([input]).unwrap();
     let cloned_inputs = stack_inputs.clone();
 
     let host = DefaultHost::default();
@@ -34,6 +36,17 @@ fn test_exp_masm() {
     let result = outputs.stack().get(0).unwrap().as_int();
 
     println!("Result: {}", result);
+    println!("Expected (Rust calculated): {}", expected_result);
+
+    // Define a relative margin of error (for example, 0.05% of the expected result)
+    let margin_of_error = (expected_result as f64 * 0.0005).round() as u64;
+    let is_within_error = (result as i64 - expected_result as i64).abs() <= margin_of_error as i64;
+
+    assert!(
+        is_within_error,
+        "The result from MASM and Rust's calculation differ beyond the allowed margin: ±{}",
+        margin_of_error
+    );
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
     println!("Program run successfully");

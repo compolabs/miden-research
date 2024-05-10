@@ -23,10 +23,12 @@ use miden_vm::Assembler;
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 // use std::fs;
 
-const MASTS: [&str; 3] = [
+const MASTS: [&str; 5] = [
     "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
     "0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462",
+    "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
+    "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
     let account_code = "\
@@ -48,6 +50,18 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
                 debug.stack
                 drop
             end
+
+            # acct proc 3
+            export.proc_1
+                push.1.2
+                add
+            end
+
+            # acct proc 4 
+            export.proc_2
+                push.1.2
+                add
+            end
             ";
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
@@ -64,6 +78,8 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[0].to_hex(),
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
+        code.procedures()[3].to_hex(),
+        code.procedures()[4].to_hex(),
     ];
 
     println!("{:?}", current[2]);
