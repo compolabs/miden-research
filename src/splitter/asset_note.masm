@@ -13,7 +13,7 @@ begin
     # call receive asset since 0 asset notes aren't available yet
     push.0 exec.note::get_inputs 
     push.0 exec.note::get_assets drop mem_loadw
-    call.0x3cf31bf0c1f7b876b2408f627993ba03c6dcf0a66c8d12b9184b6dfda8a7ea93
+    call.0x3f62b6ba76355777fd4f9f67cf70e318b6809bf0d1d46ee804b156dd315660c1
 
     # call.wallet::receive_asset
     dropw

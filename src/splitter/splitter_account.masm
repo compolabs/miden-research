@@ -58,10 +58,25 @@ export.split_note
 
   mem_store.1 # store half amount @ mem addr 1
 
-  push.0x800000000000001F # recipient
-  push.1 # note_type => offchain
-  push.201326592 # placeholder for now...
-  mem_load.0 # asset_id
+  # recipient
+  push.13811048127276320074
+  push.14363880661162107679
+  push.17767783389258379986
+  push.6030920770376313201
+
+  # note type
+  push.2
+
+  # tag
+  push.536870912
+  push.101
+
+  push.0.0
+
+  # asset_id
+  mem_load.0 # load asset_id from mem addr 0
+
+
 
   push.66666
   debug.stack

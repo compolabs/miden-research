@@ -25,7 +25,7 @@ use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 const MASTS: [&str; 3] = [
     "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386", // receive_asset proc
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // incr_nonce proc
-    "0x3cf31bf0c1f7b876b2408f627993ba03c6dcf0a66c8d12b9184b6dfda8a7ea93", // split_note custom proc
+    "0x3f62b6ba76355777fd4f9f67cf70e318b6809bf0d1d46ee804b156dd315660c1", // split_note custom proc
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/splitter/splitter_account.masm");
