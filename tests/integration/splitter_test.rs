@@ -25,7 +25,7 @@ use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 const MASTS: [&str; 3] = [
     "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386", // receive_asset proc
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // incr_nonce proc
-    "0x3f62b6ba76355777fd4f9f67cf70e318b6809bf0d1d46ee804b156dd315660c1", // split_note custom proc
+    "0xab0d0611fb3479537eda90d59b388aeb1daba0428642b7b50b35ed2aa5c73ef6", // split_note custom proc
 ];
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/splitter/splitter_account.masm");
@@ -49,7 +49,7 @@ pub fn get_account_with_custom_proc(
     public_key: Word,
     assets: Option<Asset>,
 ) -> Account {
-    let assembler = TransactionKernel::assembler().with_debug_mode(true);
+    let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = account_code(&assembler);
     let account_storage = AccountStorage::new(vec![SlotItem {
@@ -122,6 +122,22 @@ fn create_note<R: FeltRng>(
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
     Ok(Note::new(vault, metadata, recipient))
+}
+
+#[test]
+pub fn get_account_proc() {
+  let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
+  let account_code = include_str!("../../src/splitter/splitter_account.masm");
+
+  let account_module_ast = ModuleAst::parse(account_code).unwrap();
+  let code = AccountCode::new(account_module_ast, &assembler).unwrap();
+
+  let current = [
+      code.procedures()[0].to_hex(),
+      code.procedures()[1].to_hex(),
+      code.procedures()[2].to_hex(),
+  ];
+  assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]

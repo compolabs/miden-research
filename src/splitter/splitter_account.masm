@@ -40,7 +40,6 @@ export.split_note
   debug.stack
   drop
 
-
   mem_load.0
   exec.account::get_balance
 
@@ -58,35 +57,55 @@ export.split_note
 
   mem_store.1 # store half amount @ mem addr 1
 
-  # recipient
-  push.13811048127276320074
-  push.14363880661162107679
-  push.17767783389258379986
-  push.6030920770376313201
+  # recipient_id
+  push.13811048127276320074 # felt
+  push.14363880661162107679 # felt 
+  push.17767783389258379986 # felt
+  push.6030920770376313201 # felt
 
   # note type
-  push.2
+  push.2 # onchain note
 
   # tag
-  push.536870912
-  push.101
+  push.536870912 # wft is this?
+  push.101 # amount to send
 
-  push.0.0
+  push.0.0 # push ZERO ZERO
 
   # asset_id
   mem_load.0 # load asset_id from mem addr 0
 
-
+  # stack at this point: 
+  #├──  1: 2305843009213693983  # account_id
+  #├──  2: 0                    # ZERO 
+  #├──  3: 0                    # ZERO
+  #├──  4: 101                  # token amount
+  #├──  5: 536870912            # tag
+  #├──  6: 2                    # note type
+  #├──  7: 6030920770376313201  # recipient_id FELT
+  #├──  8: 17767783389258379986 # recipient_id FELT
+  #├──  9: 14363880661162107679 # recipient_id FELT
+  #├── 10: 13811048127276320074 # recipient_id FELT
 
   push.66666
   debug.stack
   drop
 
   exec.wallet::send_asset
+  # [note_ptr]
 
   push.77777
   debug.stack
   drop
+
+  
+  mem_load.0
+  exec.account::get_balance
+
+  push.88888
+  debug.stack
+  drop
+
   # Inputs: [ASSET, tag, note_type, RECIPIENT, ...]
   # exec.wallet::send_asset
   
