@@ -1,4 +1,5 @@
 use.miden::account
+use.miden::note
 use.miden::kernels::tx::memory
 use.std::sys
 use.miden::contracts::wallets::basic->wallet
@@ -47,7 +48,6 @@ export.split_note
   drop
 
   # [balance]
-
   exec.calculate_half
 
   push.55555
@@ -63,10 +63,12 @@ export.split_note
   push.6030920770376313201 # felt
 
   # note type
-  push.2 # onchain note
+  push.2 # onchain note?
 
   # tag
-  push.536870912 # wft is this?
+  push.536870912 # note tag
+
+  # value
   mem_load.1 # value from calculate_half proc
 
   push.0.0 # push ZERO ZERO

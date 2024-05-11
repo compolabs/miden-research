@@ -8,13 +8,28 @@ use.std::sys
 
 begin
     # drop note root
-    dropw 
+    dropw
 
-    # call receive asset since 0 asset notes aren't available yet
+    push.0 exec.note::get_inputs
+    debug.stack
+
+    mem_loadw.0
+
+    push.1111
+    debug.stack
+    drop
+    
+
     push.0 exec.note::get_inputs 
     push.0 exec.note::get_assets drop mem_loadw
+
+
+    push.11111
+    debug.stack
+    drop
+
     call.0xcc7d72856b5ca24a028d86397561b68daa2efed2fdf1eaddd86107d1593a6211
 
-    
+
     exec.sys::truncate_stack
 end

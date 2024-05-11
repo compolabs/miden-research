@@ -1,6 +1,6 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
+    accounts::{Account, AccountCode, AccountId, AccountType, AccountStorage, AccountStorageType, SlotItem, StorageSlot},
     accounts::{
         ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
         ACCOUNT_ID_SENDER,
@@ -21,6 +21,8 @@ use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
+
+
 
 const MASTS: [&str; 2] = [
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // receive_asset proc
@@ -89,6 +91,16 @@ pub fn new_note_script(
     Ok((note_script, code_block))
 }
 
+const fn account_id(account_type: AccountType, storage: AccountStorageType, rest: u64) -> u64 {
+  let mut id = 0;
+
+  id ^= (storage as u64) << 62;
+  id ^= (account_type as u64) << 60;
+  id ^= rest;
+
+  id
+}
+
 fn create_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
@@ -102,15 +114,25 @@ fn create_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    // add the inputs to the note
-    let input_a = Felt::new(123);
+    // @dev TODO add user addresses as input to the note
+    let user_0 = account_id(
+      AccountType::RegularAccountImmutableCode,
+      AccountStorageType::OffChain,
+      45,
+    );
 
-    let inputs = NoteInputs::new(vec![input_a, input_a])?;
+    let user_1 = account_id(
+      AccountType::RegularAccountImmutableCode,
+      AccountStorageType::OffChain,
+      46,
+    );
+
+    let user_0_felt = Felt::new(user_0);
+    let user_1_felt = Felt::new(user_1);
+
+    let inputs = NoteInputs::new(vec![user_0_felt, user_1_felt])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
-
-    println!("TAG: {:?}", tag);
-
     let serial_num = rng.draw_word();
     let aux = ZERO;
     let note_type = NoteType::OffChain;
@@ -123,6 +145,7 @@ fn create_note<R: FeltRng>(
     Ok(Note::new(vault, metadata, recipient))
 }
 
+// Run this first to check MASTs are correct
 #[test]
 pub fn check_account_masts() {
   let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
@@ -197,5 +220,5 @@ fn test_call_split_asset() {
 
     let created_note = _executed_transaction.output_notes().get_note(0);
     println!("{:?}", created_note);
-    
+
 }
