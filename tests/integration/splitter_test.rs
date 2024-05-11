@@ -1,6 +1,9 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{Account, AccountCode, AccountId, AccountType, AccountStorage, AccountStorageType, SlotItem, StorageSlot},
+    accounts::{
+        Account, AccountCode, AccountId, AccountStorage, AccountStorageType, AccountType, SlotItem,
+        StorageSlot,
+    },
     accounts::{
         ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
         ACCOUNT_ID_SENDER,
@@ -22,8 +25,6 @@ use miden_vm::Assembler;
 
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
-
-
 const MASTS: [&str; 2] = [
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // receive_asset proc
     "0xcc7d72856b5ca24a028d86397561b68daa2efed2fdf1eaddd86107d1593a6211", // split_note custom proc
@@ -35,10 +36,7 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
 
-    let current = [
-        code.procedures()[0].to_hex(),
-        code.procedures()[1].to_hex(),
-    ];
+    let current = [code.procedures()[0].to_hex(), code.procedures()[1].to_hex()];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 
@@ -92,13 +90,13 @@ pub fn new_note_script(
 }
 
 const fn account_id(account_type: AccountType, storage: AccountStorageType, rest: u64) -> u64 {
-  let mut id = 0;
+    let mut id = 0;
 
-  id ^= (storage as u64) << 62;
-  id ^= (account_type as u64) << 60;
-  id ^= rest;
+    id ^= (storage as u64) << 62;
+    id ^= (account_type as u64) << 60;
+    id ^= rest;
 
-  id
+    id
 }
 
 fn create_note<R: FeltRng>(
@@ -116,15 +114,15 @@ fn create_note<R: FeltRng>(
 
     // @dev TODO add user addresses as input to the note
     let user_0 = account_id(
-      AccountType::RegularAccountImmutableCode,
-      AccountStorageType::OffChain,
-      45,
+        AccountType::RegularAccountImmutableCode,
+        AccountStorageType::OffChain,
+        45,
     );
 
     let user_1 = account_id(
-      AccountType::RegularAccountImmutableCode,
-      AccountStorageType::OffChain,
-      46,
+        AccountType::RegularAccountImmutableCode,
+        AccountStorageType::OffChain,
+        46,
     );
 
     let user_0_felt = Felt::new(user_0);
@@ -148,17 +146,14 @@ fn create_note<R: FeltRng>(
 // Run this first to check MASTs are correct
 #[test]
 pub fn check_account_masts() {
-  let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
-  let account_code = include_str!("../../src/splitter/splitter_account.masm");
+    let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
+    let account_code = include_str!("../../src/splitter/splitter_account.masm");
 
-  let account_module_ast = ModuleAst::parse(account_code).unwrap();
-  let code = AccountCode::new(account_module_ast, &assembler).unwrap();
+    let account_module_ast = ModuleAst::parse(account_code).unwrap();
+    let code = AccountCode::new(account_module_ast, &assembler).unwrap();
 
-  let current = [
-      code.procedures()[0].to_hex(),
-      code.procedures()[1].to_hex(),
-  ];
-  assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
+    let current = [code.procedures()[0].to_hex(), code.procedures()[1].to_hex()];
+    assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]
@@ -213,12 +208,12 @@ fn test_call_split_asset() {
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
 
     // Execute the transaction and get the witness
-    let _executed_transaction =
-        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target).expect("Transaction consuming swap note failed");
+    let _executed_transaction = executor
+        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
+        .expect("Transaction consuming swap note failed");
 
     println!("{:?}", _executed_transaction.account_delta());
 
     let created_note = _executed_transaction.output_notes().get_note(0);
     println!("{:?}", created_note);
-
 }
