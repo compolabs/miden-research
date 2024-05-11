@@ -1,0 +1,42 @@
+
+
+use.miden::account
+use.miden::note
+use.miden::kernels::tx::memory
+use.miden::contracts::wallets::basic->wallet
+use.std::sys
+
+begin
+    # drop note root
+    dropw 
+
+    # call receive asset since 0 asset notes aren't available yet
+    push.0 exec.note::get_inputs 
+    push.0 exec.note::get_assets drop mem_loadw
+    call.0x3cf31bf0c1f7b876b2408f627993ba03c6dcf0a66c8d12b9184b6dfda8a7ea93
+
+    # call.wallet::receive_asset
+    dropw
+
+    # log 1
+    push.1000
+    debug.stack
+    drop
+    
+    # log 3
+    push.3000
+    debug.stack
+    drop
+
+
+
+    # log 7
+    #push.7000
+    #exec.memory::get_input_vault_root 
+    #exec.memory::get_output_vault_root
+    #debug.stack
+    #dropw dropw drop
+
+    # truncate stack
+    exec.sys::truncate_stack
+end

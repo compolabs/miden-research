@@ -1,0 +1,94 @@
+use.miden::account
+use.miden::kernels::tx::memory
+use.std::sys
+use.miden::contracts::wallets::basic->wallet
+
+# acct proc 0
+export.wallet::receive_asset
+            
+# acct proc 1
+export.account::incr_nonce
+# export.basic_eoa::auth_tx_rpo_falcon512
+
+# [value]
+proc.calculate_half
+
+  push.2
+  u32div
+
+  push.44444
+  debug.stack
+  drop
+end
+
+# [faucet_id]
+export.split_note
+
+  # store faucet_id @ memory address 0
+  mem_store.0
+  mem_load.0
+
+  push.11111
+  debug.stack
+  drop
+
+  exec.wallet::receive_asset
+
+  # debug.stack
+
+  push.22222
+  debug.stack
+  drop
+
+
+  mem_load.0
+  exec.account::get_balance
+
+  push.33333
+  debug.stack
+  drop
+
+  # [balance]
+
+  exec.calculate_half
+
+  push.55555
+  debug.stack
+  drop
+
+  mem_store.1 # store half amount @ mem addr 1
+
+  push.0x800000000000001F # recipient
+  push.1 # note_type => offchain
+  push.201326592 # placeholder for now...
+  mem_load.0 # asset_id
+
+  push.66666
+  debug.stack
+  drop
+
+  exec.wallet::send_asset
+
+  push.77777
+  debug.stack
+  drop
+  # Inputs: [ASSET, tag, note_type, RECIPIENT, ...]
+  # exec.wallet::send_asset
+  
+
+  # Increment count
+  #push.1
+  #add
+
+  # log 2
+  #push.2000
+  #debug.stack
+  #drop
+
+  # Set count
+  #push.3 # index
+  #exec.account::set_item
+
+  # truncate stack to 16
+  exec.sys::truncate_stack
+end

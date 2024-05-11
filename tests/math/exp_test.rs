@@ -54,7 +54,6 @@ fn test_exp_masm() {
     println!("Program run successfully");
 }
 
-
 /* #[test]
 fn test_random_exp_masm() {
     // Instantiate the assembler
@@ -103,7 +102,7 @@ fn test_random_exp_masm() {
         // Define a relative margin of error (for example, 0.05% of the expected result)
         let margin_of_error: u64 = (expected_result as f64 * 0.0005).round() as u64;
         let is_within_error: bool = (result as i64 - expected_result as i64).abs() <= margin_of_error as i64;
-        
+
         assert!(is_within_error, "The result from MASM and Rust's calculation differ beyond the allowed margin: ±{}", margin_of_error);
 
         verify(program_clone.into(), cloned_inputs, outputs, proof).unwrap();
