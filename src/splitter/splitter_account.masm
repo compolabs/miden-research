@@ -6,8 +6,6 @@ use.miden::contracts::wallets::basic->wallet
 # acct proc 0
 export.wallet::receive_asset
             
-# acct proc 1
-export.account::incr_nonce
 # export.basic_eoa::auth_tx_rpo_falcon512
 
 # [value]
@@ -21,6 +19,7 @@ proc.calculate_half
   drop
 end
 
+# account proc 1
 # [faucet_id]
 export.split_note
 
@@ -68,7 +67,7 @@ export.split_note
 
   # tag
   push.536870912 # wft is this?
-  push.101 # amount to send
+  mem_load.1 # value from calculate_half proc
 
   push.0.0 # push ZERO ZERO
 
@@ -109,6 +108,8 @@ export.split_note
   # Inputs: [ASSET, tag, note_type, RECIPIENT, ...]
   # exec.wallet::send_asset
   
+
+  exec.account::incr_nonce
 
   # Increment count
   #push.1

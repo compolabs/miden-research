@@ -22,11 +22,11 @@ use miden_vm::Assembler;
 
 use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
-const MASTS: [&str; 3] = [
-    "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386", // receive_asset proc
-    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // incr_nonce proc
-    "0xab0d0611fb3479537eda90d59b388aeb1daba0428642b7b50b35ed2aa5c73ef6", // split_note custom proc
+const MASTS: [&str; 2] = [
+    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // receive_asset proc
+    "0xcc7d72856b5ca24a028d86397561b68daa2efed2fdf1eaddd86107d1593a6211", // split_note custom proc
 ];
+
 pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_code = include_str!("../../src/splitter/splitter_account.masm");
 
@@ -36,7 +36,6 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
     let current = [
         code.procedures()[0].to_hex(),
         code.procedures()[1].to_hex(),
-        code.procedures()[2].to_hex(),
     ];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
@@ -125,7 +124,7 @@ fn create_note<R: FeltRng>(
 }
 
 #[test]
-pub fn get_account_proc() {
+pub fn check_account_masts() {
   let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
   let account_code = include_str!("../../src/splitter/splitter_account.masm");
 
@@ -135,7 +134,6 @@ pub fn get_account_proc() {
   let current = [
       code.procedures()[0].to_hex(),
       code.procedures()[1].to_hex(),
-      code.procedures()[2].to_hex(),
   ];
   assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
@@ -193,7 +191,11 @@ fn test_call_split_asset() {
 
     // Execute the transaction and get the witness
     let _executed_transaction =
-        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
+        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target).expect("Transaction consuming swap note failed");
 
-    println!("{:?}", _executed_transaction.unwrap().account_delta());
+    println!("{:?}", _executed_transaction.account_delta());
+
+    let created_note = _executed_transaction.output_notes().get_note(0);
+    println!("{:?}", created_note);
+    
 }

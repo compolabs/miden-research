@@ -13,28 +13,8 @@ begin
     # call receive asset since 0 asset notes aren't available yet
     push.0 exec.note::get_inputs 
     push.0 exec.note::get_assets drop mem_loadw
-    call.0xab0d0611fb3479537eda90d59b388aeb1daba0428642b7b50b35ed2aa5c73ef6
+    call.0xcc7d72856b5ca24a028d86397561b68daa2efed2fdf1eaddd86107d1593a6211
 
-    # call.wallet::receive_asset
-    dropw
-
-    # log 1
-    push.1000
-    debug.stack
-    drop
     
-    # log 3
-    push.3000
-    debug.stack
-    drop
-
-    # log 7
-    #push.7000
-    #exec.memory::get_input_vault_root 
-    #exec.memory::get_output_vault_root
-    #debug.stack
-    #dropw dropw drop
-
-    # truncate stack
     exec.sys::truncate_stack
 end
