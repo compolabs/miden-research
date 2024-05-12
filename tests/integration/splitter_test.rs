@@ -27,7 +27,7 @@ use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
 
 const MASTS: [&str; 2] = [
     "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // receive_asset proc
-    "0xcc7d72856b5ca24a028d86397561b68daa2efed2fdf1eaddd86107d1593a6211", // split_note custom proc
+    "0x5b6c888475118067bc48ae7bf5262a34ddac1a75d5bbaf4b871dc8790ef022ff", // split_note custom proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
