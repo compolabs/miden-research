@@ -1,15 +1,11 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
-    accounts::{
-        ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-        ACCOUNT_ID_SENDER,
-    },
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::rand::{FeltRng, RpoRandomCoin},
     notes::{
-        Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
+        Note, NoteAssets, NoteExecutionHint, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
         NoteTag, NoteType,
     },
     transaction::TransactionArgs,
@@ -20,11 +16,12 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
-use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
+use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_SENDER,};
 
 const MASTS: [&str; 4] = [
     "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386", // receive_asset proc
-    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6", // incr_nonce proc
+    "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // incr_nonce proc
     "0xeb1be347e44e73d1438b824fe7c351739345d9da86732c0000483128ae8e339a", // get_counter custom proc
     "0xb9e16c4ad3e1d3482487efb7ce47c36fc3f878c363c15a2357e857c7a252050f", // increment_counter custom proc
 ];
@@ -57,7 +54,7 @@ pub fn get_account_with_custom_proc(
     let account_storage = AccountStorage::new(vec![SlotItem {
         index: 0,
         slot: StorageSlot::new_value(public_key),
-    }])
+    }], vec![],)
     .unwrap();
 
     let account_vault = match assets {
@@ -110,7 +107,7 @@ fn create_note<R: FeltRng>(
 
     let inputs = NoteInputs::new(vec![input_a, input_a])?;
 
-    let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
+    let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
     let aux = ZERO;
     let note_type = NoteType::OffChain;
@@ -121,6 +118,20 @@ fn create_note<R: FeltRng>(
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
     Ok(Note::new(vault, metadata, recipient))
+}
+
+
+// Run this first to check MASTs are correct
+#[test]
+pub fn check_account_masts() {
+    let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
+    let account_code = include_str!("../../src/counter/counter.masm");
+
+    let account_module_ast = ModuleAst::parse(account_code).unwrap();
+    let code = AccountCode::new(account_module_ast, &assembler).unwrap();
+
+    let current = [code.procedures()[0].to_hex(), code.procedures()[1].to_hex(), code.procedures()[2].to_hex(), code.procedures()[3].to_hex()];
+    assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]
@@ -151,7 +162,7 @@ fn test_increment_counter() {
     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor = TransactionExecutor::new(data_store.clone()).with_debug_mode(true);
+    let mut executor: TransactionExecutor<_, ()> = TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
     let block_ref = data_store.block_header.block_num();

@@ -1,8 +1,6 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{
-        Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot, ACCOUNT_ID_SENDER,
-    },
+    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::{dsa::rpo_falcon512::SecretKey, utils::Serializable},
@@ -29,6 +27,132 @@ use mock::{
     },
 };
 use rand_chacha::{rand_core::SeedableRng, ChaCha20Rng};
+
+pub const ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN: u64 = 0x900000000000003F; // 10376293541461622847
+pub const ACCOUNT_ID_SENDER: u64 = 0x800000000000001F; // 9223372036854775839
+
+// ACCOUNT TYPES
+// ================================================================================================
+
+pub const FUNGIBLE_FAUCET: u64 = 0b10;
+pub const NON_FUNGIBLE_FAUCET: u64 = 0b11;
+pub const REGULAR_ACCOUNT_IMMUTABLE_CODE: u64 = 0b00;
+pub const REGULAR_ACCOUNT_UPDATABLE_CODE: u64 = 0b01;
+
+// ACCOUNT STORAGE TYPES
+// ================================================================================================
+
+// CONSTANTS
+// ================================================================================================
+
+// The higher two bits of the most significant nibble determines the account type
+pub const ACCOUNT_STORAGE_MASK_SHIFT: u64 = 62;
+pub const ACCOUNT_STORAGE_MASK: u64 = 0b11 << ACCOUNT_STORAGE_MASK_SHIFT;
+
+// The lower two bits of the most significant nibble determines the account type
+pub const ACCOUNT_TYPE_MASK_SHIFT: u64 = 60;
+pub const ACCOUNT_TYPE_MASK: u64 = 0b11 << ACCOUNT_TYPE_MASK_SHIFT;
+pub const ACCOUNT_ISFAUCET_MASK: u64 = 0b10 << ACCOUNT_TYPE_MASK_SHIFT;
+
+pub const ON_CHAIN: u64 = 0b00;
+pub const OFF_CHAIN: u64 = 0b10;
+
+// UTILITIES
+// --------------------------------------------------------------------------------------------
+
+#[repr(u64)]
+pub enum AccountType {
+    FungibleFaucet = FUNGIBLE_FAUCET,
+    NonFungibleFaucet = NON_FUNGIBLE_FAUCET,
+    RegularAccountImmutableCode = REGULAR_ACCOUNT_IMMUTABLE_CODE,
+    RegularAccountUpdatableCode = REGULAR_ACCOUNT_UPDATABLE_CODE,
+}
+
+/// Returns the [AccountType] given an integer representation of `account_id`.
+impl From<u64> for AccountType {
+    fn from(value: u64) -> Self {
+        debug_assert!(
+            ACCOUNT_TYPE_MASK.count_ones() == 2,
+            "This method assumes there are only 2bits in the mask"
+        );
+
+        let bits = (value & ACCOUNT_TYPE_MASK) >> ACCOUNT_TYPE_MASK_SHIFT;
+        match bits {
+            REGULAR_ACCOUNT_UPDATABLE_CODE => AccountType::RegularAccountUpdatableCode,
+            REGULAR_ACCOUNT_IMMUTABLE_CODE => AccountType::RegularAccountImmutableCode,
+            FUNGIBLE_FAUCET => AccountType::FungibleFaucet,
+            NON_FUNGIBLE_FAUCET => AccountType::NonFungibleFaucet,
+            _ => {
+                unreachable!("account_type mask contains only 2bits, there are 4 options total")
+            }
+        }
+    }
+}
+
+#[repr(u64)]
+pub enum AccountStorageType {
+    OnChain = ON_CHAIN,
+    OffChain = OFF_CHAIN,
+}
+pub const fn account_id(account_type: AccountType, storage: AccountStorageType, rest: u64) -> u64 {
+    let mut id = 0;
+
+    id ^= (storage as u64) << ACCOUNT_STORAGE_MASK_SHIFT;
+    id ^= (account_type as u64) << ACCOUNT_TYPE_MASK_SHIFT;
+    id ^= rest;
+
+    id
+}
+// FUNGIBLE TOKENS - OFF-CHAIN
+pub const ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN: u64 = account_id(
+    AccountType::FungibleFaucet,
+    AccountStorageType::OffChain,
+    0b0001_1111,
+);
+// FUNGIBLE TOKENS - ON-CHAIN
+pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
+    AccountType::FungibleFaucet,
+    AccountStorageType::OnChain,
+    0b0001_1111,
+);
+pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
+    AccountType::FungibleFaucet,
+    AccountStorageType::OnChain,
+    0b0010_1111,
+);
+pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_2: u64 = account_id(
+    AccountType::FungibleFaucet,
+    AccountStorageType::OnChain,
+    0b0011_1111,
+);
+pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_3: u64 = account_id(
+    AccountType::FungibleFaucet,
+    AccountStorageType::OnChain,
+    0b0100_1111,
+);
+
+// NON-FUNGIBLE TOKENS - OFF-CHAIN
+pub const ACCOUNT_ID_INSUFFICIENT_ONES: u64 = account_id(
+    AccountType::NonFungibleFaucet,
+    AccountStorageType::OffChain,
+    0b0000_0000,
+); // invalid
+pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_OFF_CHAIN: u64 = account_id(
+    AccountType::NonFungibleFaucet,
+    AccountStorageType::OffChain,
+    0b0001_1111,
+);
+// NON-FUNGIBLE TOKENS - ON-CHAIN
+pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
+    AccountType::NonFungibleFaucet,
+    AccountStorageType::OnChain,
+    0b0010_1111,
+);
+pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
+    AccountType::NonFungibleFaucet,
+    AccountStorageType::OnChain,
+    0b0011_1111,
+);
 
 // MOCK DATA STORE
 // ================================================================================================
@@ -73,8 +197,8 @@ impl MockDataStore {
             input_notes,
         );
         let output_notes = created_notes.into_iter().filter_map(|note| match note {
-            OutputNote::Public(note) => Some(note),
-            OutputNote::Private(_) => None,
+            OutputNote::Full(note) => Some(note),
+            OutputNote::Header(_) => None,
         });
         let mut tx_args = TransactionArgs::default();
         tx_args.extend_expected_output_notes(output_notes);
@@ -179,10 +303,13 @@ pub fn get_account_with_default_account_code(
     let account_assembler = TransactionKernel::assembler();
 
     let account_code = AccountCode::new(account_code_ast.clone(), &account_assembler).unwrap();
-    let account_storage = AccountStorage::new(vec![SlotItem {
-        index: 0,
-        slot: StorageSlot::new_value(public_key),
-    }])
+    let account_storage = AccountStorage::new(
+        vec![SlotItem {
+            index: 0,
+            slot: StorageSlot::new_value(public_key),
+        }],
+        vec![],
+    )
     .unwrap();
 
     let account_vault = match assets {
@@ -215,4 +342,24 @@ pub fn get_note_with_fungible_asset_and_script(
     let recipient = NoteRecipient::new(SERIAL_NUM, note_script, inputs);
 
     Note::new(vault, metadata, recipient)
+}
+pub fn get_new_pk_and_authenticator(
+) -> (Word, std::rc::Rc<miden_tx::host::BasicAuthenticator<rand::rngs::StdRng>>) {
+    use std::rc::Rc;
+
+    use miden_tx::host::BasicAuthenticator;
+    use rand::rngs::StdRng;
+
+    let seed = [0_u8; 32];
+    let mut rng = ChaCha20Rng::from_seed(seed);
+
+    let sec_key = SecretKey::with_rng(&mut rng);
+    let pub_key: Word = sec_key.public_key().into();
+
+    let authenticator = BasicAuthenticator::<StdRng>::new(&[(
+        pub_key,
+        miden_tx::host::AuthSecretKey::RpoFalcon512(sec_key),
+    )]);
+
+    (pub_key, Rc::new(authenticator))
 }

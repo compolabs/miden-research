@@ -1,15 +1,14 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
-    accounts::{
-        ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-        ACCOUNT_ID_SENDER,
+    accounts::account_id::{
+        
     },
+    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::rand::{FeltRng, RpoRandomCoin},
     notes::{
-        Note, NoteAssets, NoteExecutionMode, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
+        Note, NoteAssets, NoteExecutionHint, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
         NoteTag, NoteType,
     },
     transaction::TransactionArgs,
@@ -20,7 +19,8 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
-use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore};
+use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_SENDER};
 // use std::fs;
 
 const MASTS: [&str; 5] = [
@@ -99,10 +99,13 @@ pub fn get_account_with_custom_proc(
     let assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = mock_account_code(&assembler);
-    let account_storage = AccountStorage::new(vec![SlotItem {
-        index: 0,
-        slot: StorageSlot::new_value(public_key),
-    }])
+    let account_storage = AccountStorage::new(
+        vec![SlotItem {
+            index: 0,
+            slot: StorageSlot::new_value(public_key),
+        }],
+        vec![],
+    )
     .unwrap();
 
     let account_vault = match assets {
@@ -155,7 +158,7 @@ fn create_note<R: FeltRng>(
 
     let inputs = NoteInputs::new(vec![input_a, input_a])?;
 
-    let tag = NoteTag::from_account_id(target_account_id, NoteExecutionMode::Local)?;
+    let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
     let aux = ZERO;
     let note_type = NoteType::OffChain;
@@ -194,7 +197,7 @@ fn test_custom_proc() {
     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor = TransactionExecutor::new(data_store.clone()).with_debug_mode(true);
+    let mut executor: TransactionExecutor<_, ()> = TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
     let block_ref = data_store.block_header.block_num();

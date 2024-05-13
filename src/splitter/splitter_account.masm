@@ -58,12 +58,12 @@ export.split_note
 
   # recipient_id
   push.13811048127276320074 # felt
-  # push.0 # push.14363880661162107679 # felt 
-  # push.0 #push.17767783389258379986 # felt
-  # push.0 # push.6030920770376313201 # felt
+  push.0 # push.14363880661162107679 # felt 
+  push.0 #push.17767783389258379986 # felt
+  push.0 # push.6030920770376313201 # felt
   
   # note type
-  push.2 # onchain note?
+  push.1 # onchain note?
 
   # tag
   push.536870912 # note tag
