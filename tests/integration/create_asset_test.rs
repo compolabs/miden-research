@@ -19,8 +19,7 @@ fn test_tx_create_fungible_asset() {
         AssetPreservationStatus::Preserved,
     );
 
-    let filename = "./src/create_asset.masm";
-    let assembly_code = fs::read_to_string(filename).expect("Failed to read the assembly file");
+    let assembly_code = include_str!("../../src/asset/create_asset.masm");
 
     let transaction = prepare_transaction(tx_inputs, tx_args, &assembly_code, None);
     let process = run_tx(&transaction).unwrap();
@@ -48,8 +47,7 @@ fn test_tx_create_fungible_asset_and_send() {
         AssetPreservationStatus::Preserved,
     );
 
-    let filename = "./src/create_asset.masm";
-    let assembly_code = fs::read_to_string(filename).expect("Failed to read the assembly file");
+    let assembly_code = include_str!("../../src/asset/create_asset.masm");
 
     let transaction = prepare_transaction(tx_inputs, tx_args, &assembly_code, None);
     let process = run_tx(&transaction).unwrap();
