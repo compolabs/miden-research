@@ -136,10 +136,6 @@ pub fn check_account_masts() {
 
 #[test]
 fn test_increment_counter() {
-    // Create fungible asset (right now notes must have at least one asset, so we create a fungible asset with 0 amount)
-    let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let fungible_asset: Asset = FungibleAsset::new(faucet_id, 0).unwrap().into();
-
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
@@ -152,7 +148,7 @@ fn test_increment_counter() {
     let note = create_note(
         sender_account_id,
         target_account_id,
-        vec![fungible_asset],
+        vec![],
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();

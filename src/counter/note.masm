@@ -8,12 +8,6 @@ begin
     # drop note root
     dropw 
 
-    # call receive asset since 0 asset notes aren't available yet
-    push.0 exec.note::get_inputs 
-    push.0 exec.note::get_assets drop mem_loadw
-    call.wallet::receive_asset
-    dropw
-
     # log 1
     push.1000
     debug.stack
