@@ -385,9 +385,9 @@ dependencies = [
 
 [[package]]
 name = "miden-assembly"
-version = "0.9.1"
+version = "0.9.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "015abf93a083b1255a45c5bde02479e5203468c662fd33dd092b6daf1e4a3988"
+checksum = "5b26c20a3c18d414655ea8bd014c4157f786994f0924aff007fb5b4570d35b25"
 dependencies = [
  "miden-core",
  "num_enum",
@@ -829,9 +829,9 @@ checksum = "a8f112729512f8e442d81f95a8a7ddf2b7c6b8a1a6f509a95864142b30cab2d3"
 
 [[package]]
 name = "syn"
-version = "2.0.61"
+version = "2.0.63"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c993ed8ccba56ae856363b1845da7266a7cb78e1d146c8a32d54b45a8b831fc9"
+checksum = "bf5be731623ca1a1fb7d8be6f261a3be6d3e2337b8a1f97be944d020c8fcb704"
 dependencies = [
  "proc-macro2",
  "quote",
