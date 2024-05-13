@@ -63,10 +63,10 @@ export.split_note
   push.0 # push.6030920770376313201 # felt
   
   # note type
-  push.1 # onchain note?
+  push.2 # offchain note?
 
   # tag
-  push.536870912 # note tag
+  push.2833536870912 # note tag
 
   # value
   mem_load.1 # value from calculate_half proc

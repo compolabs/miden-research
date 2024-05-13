@@ -3,7 +3,6 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
-
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
     crypto::rand::{FeltRng, RpoRandomCoin},
@@ -18,8 +17,10 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
-use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_SENDER};
+use crate::utils::{
+    get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_SENDER,
+};
 
 pub fn get_account_with_custom_account_code(
     account_id: AccountId,
@@ -32,10 +33,13 @@ pub fn get_account_with_custom_account_code(
     let account_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = AccountCode::new(account_code_ast.clone(), &account_assembler).unwrap();
-    let account_storage = AccountStorage::new(vec![SlotItem {
-        index: 0,
-        slot: StorageSlot::new_value(public_key),
-    }], vec![],)
+    let account_storage = AccountStorage::new(
+        vec![SlotItem {
+            index: 0,
+            slot: StorageSlot::new_value(public_key),
+        }],
+        vec![],
+    )
     .unwrap();
 
     let account_vault = match assets {
@@ -110,7 +114,8 @@ fn test_send_tokens() {
     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor: TransactionExecutor<_, ()>  = TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    let mut executor: TransactionExecutor<_, ()> =
+        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
     let block_ref = data_store.block_header.block_num();

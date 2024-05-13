@@ -1,8 +1,5 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::account_id::{
-        
-    },
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
@@ -19,8 +16,10 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
-use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_SENDER};
+use crate::utils::{
+    get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_SENDER,
+};
 // use std::fs;
 
 const MASTS: [&str; 5] = [
@@ -197,7 +196,8 @@ fn test_custom_proc() {
     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor: TransactionExecutor<_, ()> = TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    let mut executor: TransactionExecutor<_, ()> =
+        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
     let block_ref = data_store.block_header.block_num();

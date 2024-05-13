@@ -19,7 +19,6 @@ begin
     debug.stack
     drop
     
-
     push.0 exec.note::get_inputs 
     push.0 exec.note::get_assets drop mem_loadw
 
@@ -27,7 +26,7 @@ begin
     debug.stack
     drop
 
-    call.0x724c0c13bc82941e22d7a6c802308e576bab227014d7d47eee6c532202a73912
+    call.0xd344c176798324b64e91af88fccabfa9b6a159b1b79b929e6eca51e1fb082208
 
     exec.sys::truncate_stack
 end

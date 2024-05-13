@@ -16,8 +16,10 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
-use crate::utils::{get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_SENDER,};
+use crate::utils::{
+    get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_SENDER,
+};
 
 const MASTS: [&str; 4] = [
     "0x2f70e94379ea477e0019657539639d5eedad8fd2ab9fbe5c3ad65910d06d6386", // receive_asset proc
@@ -51,10 +53,13 @@ pub fn get_account_with_custom_proc(
     let assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = account_code(&assembler);
-    let account_storage = AccountStorage::new(vec![SlotItem {
-        index: 0,
-        slot: StorageSlot::new_value(public_key),
-    }], vec![],)
+    let account_storage = AccountStorage::new(
+        vec![SlotItem {
+            index: 0,
+            slot: StorageSlot::new_value(public_key),
+        }],
+        vec![],
+    )
     .unwrap();
 
     let account_vault = match assets {
@@ -120,7 +125,6 @@ fn create_note<R: FeltRng>(
     Ok(Note::new(vault, metadata, recipient))
 }
 
-
 // Run this first to check MASTs are correct
 #[test]
 pub fn check_account_masts() {
@@ -130,7 +134,12 @@ pub fn check_account_masts() {
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, &assembler).unwrap();
 
-    let current = [code.procedures()[0].to_hex(), code.procedures()[1].to_hex(), code.procedures()[2].to_hex(), code.procedures()[3].to_hex()];
+    let current = [
+        code.procedures()[0].to_hex(),
+        code.procedures()[1].to_hex(),
+        code.procedures()[2].to_hex(),
+        code.procedures()[3].to_hex(),
+    ];
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
@@ -158,7 +167,8 @@ fn test_increment_counter() {
     let data_store =
         MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor: TransactionExecutor<_, ()> = TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    let mut executor: TransactionExecutor<_, ()> =
+        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
     let block_ref = data_store.block_header.block_num();

@@ -6,7 +6,6 @@ use miden_lib::{
 use miden_objects::{
     accounts::{
         Account, AccountCode, AccountId, AccountStorage, AccountStorageType, SlotItem, StorageSlot,
-        
     },
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset, TokenSymbol},
@@ -21,7 +20,7 @@ use rand_chacha::{rand_core::SeedableRng, ChaCha20Rng};
 
 use crate::utils::{
     get_new_key_pair_with_advice_map, get_note_with_fungible_asset_and_script,
-    prove_and_verify_transaction, MockDataStore,ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN
+    prove_and_verify_transaction, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN,
 };
 
 fn get_faucet_account_with_max_supply_and_total_issuance(
@@ -43,16 +42,19 @@ fn get_faucet_account_with_max_supply_and_total_issuance(
         Felt::new(0),
         Felt::new(0),
     ];
-    let mut faucet_account_storage = AccountStorage::new(vec![
-        SlotItem {
-            index: 0,
-            slot: StorageSlot::new_value(public_key),
-        },
-        SlotItem {
-            index: 1,
-            slot: StorageSlot::new_value(faucet_storage_slot_1),
-        },
-    ], vec![])
+    let mut faucet_account_storage = AccountStorage::new(
+        vec![
+            SlotItem {
+                index: 0,
+                slot: StorageSlot::new_value(public_key),
+            },
+            SlotItem {
+                index: 1,
+                slot: StorageSlot::new_value(faucet_storage_slot_1),
+            },
+        ],
+        vec![],
+    )
     .unwrap();
 
     if total_issuance.is_some() {
@@ -118,7 +120,8 @@ fn prove_faucet_contract_burn_fungible_asset_succeeds() {
     let data_store =
         MockDataStore::with_existing(Some(faucet_account.clone()), Some(vec![note.clone()]));
 
-    let mut executor:TransactionExecutor<_, ()>  = TransactionExecutor::new(data_store.clone(), None);
+    let mut executor: TransactionExecutor<_, ()> =
+        TransactionExecutor::new(data_store.clone(), None);
     executor.load_account(faucet_account.id()).unwrap();
 
     let block_ref = data_store.block_header.block_num();

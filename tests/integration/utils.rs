@@ -3,6 +3,7 @@ use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
+    crypto::rand::FeltRng,
     crypto::{dsa::rpo_falcon512::SecretKey, utils::Serializable},
     notes::{
         Note, NoteAssets, NoteId, NoteInputs, NoteMetadata, NoteRecipient, NoteScript, NoteType,
@@ -11,7 +12,7 @@ use miden_objects::{
         ChainMmr, ExecutedTransaction, InputNote, InputNotes, OutputNote, ProvenTransaction,
         TransactionArgs, TransactionInputs,
     },
-    BlockHeader, Felt, Word, ZERO,
+    BlockHeader, Felt, NoteError, Word, ZERO,
 };
 use miden_processor::utils::Deserializable;
 use miden_prover::ProvingOptions;
@@ -300,7 +301,7 @@ pub fn get_account_with_default_account_code(
 ) -> Account {
     let account_code_src = DEFAULT_ACCOUNT_CODE;
     let account_code_ast = ModuleAst::parse(account_code_src).unwrap();
-    let account_assembler = TransactionKernel::assembler();
+    let account_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = AccountCode::new(account_code_ast.clone(), &account_assembler).unwrap();
     let account_storage = AccountStorage::new(
@@ -343,8 +344,10 @@ pub fn get_note_with_fungible_asset_and_script(
 
     Note::new(vault, metadata, recipient)
 }
-pub fn get_new_pk_and_authenticator(
-) -> (Word, std::rc::Rc<miden_tx::host::BasicAuthenticator<rand::rngs::StdRng>>) {
+pub fn get_new_pk_and_authenticator() -> (
+    Word,
+    std::rc::Rc<miden_tx::host::BasicAuthenticator<rand::rngs::StdRng>>,
+) {
     use std::rc::Rc;
 
     use miden_tx::host::BasicAuthenticator;

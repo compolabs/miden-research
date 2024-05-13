@@ -1,10 +1,10 @@
+use crate::utils::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN;
 use miden_objects::{Felt, Word, ONE};
 use miden_processor::ProcessState;
 use mock::{
     mock::{account::MockAccountType, notes::AssetPreservationStatus, transaction::mock_inputs},
     prepare_transaction, run_tx,
 };
-use crate::utils::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN;
 
 #[test]
 fn test_tx_create_fungible_asset() {
