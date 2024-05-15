@@ -11,13 +11,8 @@ export.wallet::receive_asset
 
 # [value]
 proc.calculate_half
-
   push.2
   u32div
-
-  push.44444
-  debug.stack
-  drop
 end
 
 proc.create_split_note
@@ -36,14 +31,7 @@ export.split_note
   debug.stack
   drop
 
-  # store user1 & user2 @ memory address 3 & 4
-  # drop drop
-  # mem_store.3 
-  # mem_store.4
-
   exec.wallet::receive_asset
-
-  # debug.stack
 
   dropw
 
@@ -54,30 +42,28 @@ export.split_note
   # store user addresses at memory addresses 5 & 6
   mem_store.5 
   mem_store.6
-  
 
-  push.555553
+  push.55555
   debug.stack
   drop
-
-
 
   mem_load.0
   exec.account::get_balance
 
-  push.55555
+  push.66666
   debug.stack
   drop
 
   # [balance]
   exec.calculate_half
 
-  push.66666
+  push.77777
   debug.stack
   drop
 
   mem_store.1 # store half amount @ mem addr 1
 
+  # Creating Note #1
   # recipient_id
   # push.13811048127276320074 # felt
   mem_load.5
@@ -151,43 +137,18 @@ export.split_note
   #├──  9: 14363880661162107679 # recipient_id FELT
   #├── 10: 13811048127276320074 # recipient_id FELT
 
-  push.77777
+  push.88888
   debug.stack
   drop
 
   exec.wallet::send_asset
 
-  push.88888
-  debug.stack
-  drop
-
-  
-  mem_load.0
-  exec.account::get_balance
-
   push.99999
   debug.stack
   drop
-
-  # Inputs: [ASSET, tag, note_type, RECIPIENT, ...]
-  # exec.wallet::send_asset
   
-
+  mem_load.0
+  exec.account::get_balance
   exec.account::incr_nonce
-
-  # Increment count
-  #push.1
-  #add
-
-  # log 2
-  #push.2000
-  #debug.stack
-  #drop
-
-  # Set count
-  #push.3 # index
-  #exec.account::set_item
-
-  # truncate stack to 16
   exec.sys::truncate_stack
 end

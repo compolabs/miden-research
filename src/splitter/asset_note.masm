@@ -25,7 +25,7 @@ begin
     debug.stack
     drop
 
-    call.0x96504f4f47d5727768b81d35a511bc19d74544f09d4cbc917a88673edcd71578
+    call.0xb445abacc4fab990d657118225db09f0042825c5cdf55b2faa390b258bc1ed3e
 
     exec.sys::truncate_stack
 end
