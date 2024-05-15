@@ -65,7 +65,7 @@ fn test_string() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let input = "hello world";
+    let input = "hello world, this is a test";
 
     // Convert the input string to a concatenated ASCII array
     let concatenated_values = concatenate_ascii(input);
@@ -88,7 +88,7 @@ fn test_string() {
     println!("Result: {}", result);
 
     let decompressed_string = decompress_ascii(concatenated_values);
-    // assert_eq!(input, decompressed_string);
+    assert_eq!(input, decompressed_string);
     println!("Decompressed string: {}", decompressed_string);
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
