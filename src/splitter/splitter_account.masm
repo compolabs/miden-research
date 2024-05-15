@@ -20,6 +20,10 @@ proc.calculate_half
   drop
 end
 
+proc.create_split_note
+  add
+end
+
 # account proc 1
 # [faucet_id]
 export.split_note
@@ -28,36 +32,55 @@ export.split_note
   mem_store.0
   mem_load.0
 
-  push.11111
+  push.33333
   debug.stack
   drop
+
+  # store user1 & user2 @ memory address 3 & 4
+  # drop drop
+  # mem_store.3 
+  # mem_store.4
 
   exec.wallet::receive_asset
 
   # debug.stack
 
-  push.22222
+  dropw
+
+  push.44444
   debug.stack
   drop
+
+  # store user addresses at memory addresses 5 & 6
+  mem_store.5 
+  mem_store.6
+  
+
+  push.555553
+  debug.stack
+  drop
+
+
 
   mem_load.0
   exec.account::get_balance
 
-  push.33333
+  push.55555
   debug.stack
   drop
 
   # [balance]
   exec.calculate_half
 
-  push.55555
+  push.66666
   debug.stack
   drop
 
   mem_store.1 # store half amount @ mem addr 1
 
   # recipient_id
-  push.13811048127276320074 # felt
+  # push.13811048127276320074 # felt
+  mem_load.5
   push.0 # push.14363880661162107679 # felt 
   push.0 #push.17767783389258379986 # felt
   push.0 # push.6030920770376313201 # felt
@@ -66,7 +89,7 @@ export.split_note
   push.2 # offchain note?
 
   # tag
-  push.2833536870912 # note tag
+  push.3758096384 # note tag
 
   # value
   mem_load.1 # value from calculate_half proc
@@ -88,14 +111,53 @@ export.split_note
   #├──  9: 14363880661162107679 # recipient_id FELT
   #├── 10: 13811048127276320074 # recipient_id FELT
 
-  push.66666
+  push.77777
   debug.stack
   drop
 
   exec.wallet::send_asset
   # [note_ptr]
+  drop
+
+  # NOTE 2
+  mem_load.6
+  push.0 # push.14363880661162107679 # felt 
+  push.0 #push.17767783389258379986 # felt
+  push.0 # push.6030920770376313201 # felt
+  
+  # note type
+  push.2 # offchain note?
+
+  # tag
+  push.3758096384 # note tag
+
+  # value
+  mem_load.1 # value from calculate_half proc
+
+  push.0.0 # push ZERO ZERO
+
+  # asset_id
+  mem_load.0 # load asset_id from mem addr 0
+
+  # stack at this point: 
+  #├──  1: 2305843009213693983  # account_id
+  #├──  2: 0                    # ZERO 
+  #├──  3: 0                    # ZERO
+  #├──  4: 101                  # token amount
+  #├──  5: 536870912            # tag
+  #├──  6: 2                    # note type
+  #├──  7: 6030920770376313201  # recipient_id FELT
+  #├──  8: 17767783389258379986 # recipient_id FELT
+  #├──  9: 14363880661162107679 # recipient_id FELT
+  #├── 10: 13811048127276320074 # recipient_id FELT
 
   push.77777
+  debug.stack
+  drop
+
+  exec.wallet::send_asset
+
+  push.88888
   debug.stack
   drop
 
@@ -103,7 +165,7 @@ export.split_note
   mem_load.0
   exec.account::get_balance
 
-  push.88888
+  push.99999
   debug.stack
   drop
 

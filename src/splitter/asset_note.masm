@@ -11,7 +11,6 @@ begin
     dropw
 
     push.0 exec.note::get_inputs
-    debug.stack
 
     mem_loadw.0
 
@@ -22,11 +21,11 @@ begin
     push.0 exec.note::get_inputs 
     push.0 exec.note::get_assets drop mem_loadw
 
-    push.11111
+    push.22222
     debug.stack
     drop
 
-    call.0xd344c176798324b64e91af88fccabfa9b6a159b1b79b929e6eca51e1fb082208
+    call.0x96504f4f47d5727768b81d35a511bc19d74544f09d4cbc917a88673edcd71578
 
     exec.sys::truncate_stack
 end

@@ -26,7 +26,7 @@ use crate::utils::{
 
 const MASTS: [&str; 2] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
-    "0xd344c176798324b64e91af88fccabfa9b6a159b1b79b929e6eca51e1fb082208", // split_note custom proc
+    "0x96504f4f47d5727768b81d35a511bc19d74544f09d4cbc917a88673edcd71578", // split_note custom proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -130,6 +130,8 @@ fn create_note<R: FeltRng>(
     let user_0_felt = Felt::new(user_0);
     let user_1_felt = Felt::new(user_1);
 
+    println!("user 1 & 2 :{:?} {:?}", user_0_felt, user_1_felt);
+
     let inputs = NoteInputs::new(vec![user_0_felt, user_1_felt])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
@@ -221,6 +223,9 @@ fn test_call_split_asset() {
 
     // println!("{:?}", _executed_transaction.account_delta());
 
-    let created_note = _executed_transaction.output_notes().get_note(0);
-    println!("{:?}", created_note);
+    let created_note_0 = _executed_transaction.output_notes().get_note(0);
+    println!("Note 1 {:?}", created_note_0);
+
+    let created_note_1 = _executed_transaction.output_notes().get_note(1);
+    println!("Note 2 {:?}", created_note_1);
 }
