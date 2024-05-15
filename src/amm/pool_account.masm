@@ -3,10 +3,20 @@ use.miden::contracts::wallets::basic->wallet
 
 # acct proc 0
 export.wallet::receive_asset
+
+# acc proc 1
+export.get_assets
+  push.1
+  add
+  debug.stack
+  drop
+end
             
-# acct proc 1
-export.account::incr_nonce
+# acct proc 2
+export.swap
+  push.1.2
+  debug.stack
+  add
+  drop
 
-# 
-export.account::get_token_amounts
-
+end

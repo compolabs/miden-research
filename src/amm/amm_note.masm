@@ -1,0 +1,29 @@
+use.miden::account
+use.miden::note
+use.miden::kernels::tx::memory
+use.miden::contracts::wallets::basic->wallet
+use.std::sys
+
+begin
+    # drop note root
+    dropw
+
+    push.0 exec.note::get_inputs
+
+    mem_loadw.0
+
+    push.1111
+    debug.stack
+    drop
+    
+    push.0 exec.note::get_inputs 
+    push.0 exec.note::get_assets drop mem_loadw
+
+    push.22222
+    debug.stack
+    drop
+
+    call.0xb445abacc4fab990d657118225db09f0042825c5cdf55b2faa390b258bc1ed3e
+
+    exec.sys::truncate_stack
+end

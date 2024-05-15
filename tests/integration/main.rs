@@ -11,3 +11,5 @@ mod swap_test;
 mod burn_test;
 
 mod splitter_test;
+
+mod amm_P2ID_test;
