@@ -36,7 +36,11 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
 
-    let current = [code.procedures()[0].to_hex(), code.procedures()[1].to_hex(), code.procedures()[2].to_hex()];
+    let current = [
+        code.procedures()[0].to_hex(),
+        code.procedures()[1].to_hex(),
+        code.procedures()[2].to_hex(),
+    ];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 
@@ -157,7 +161,11 @@ pub fn check_account_masts() {
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, &assembler).unwrap();
 
-    let current = [code.procedures()[0].to_hex(), code.procedures()[1].to_hex(),code.procedures()[2].to_hex()];
+    let current = [
+        code.procedures()[0].to_hex(),
+        code.procedures()[1].to_hex(),
+        code.procedures()[2].to_hex(),
+    ];
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
