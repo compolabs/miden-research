@@ -11,12 +11,61 @@ export.get_assets
   debug.stack
   drop
 end
+
+# internal procedure
+proc.calculate_amount_y_out
+  # [x, y, dx]
+  # [5e6, 10e6, 9e6]
+  
+  dup.2
+  # [dx, x, y, dx]
+  # [9e6, 5e6, 10e6, 9e6]
+  
+  movup.2
+  # [y, dx, x, dx]
+  # [10e6, 9e6, 5e6, 9e6]
+
+  mul
+  div.1000000
+  # [dx * y, x, dx]
+  # [90e6, 5e6, 9e6]
+
+  swap.2
+  # [dx, x, dx * y]
+  # [9e6, 5e6, 90e6]
+
+  add
+  # [dx + x, dx * y]
+  # [14e6, 90e6]
+
+  # divide by 1e3 to have some floating point
+  div.1000
+  # [14e3, 90e6]
+
+  # note when dividing...
+  # a / b
+  # [b, a]
+  # 90e6 / 16e6
+  u32div
+  # div
+
+  # scale back up by 1e3
+  mul.1000
+  # [1.666e6]
+  
+end
             
 # acct proc 2
 export.swap
   # store faucet_id @ memory address 0
   mem_store.0
   mem_load.0
+
+  # store amount in X @ memory address 1
+  swap.3
+  mem_store.1
+  mem_load.1
+  swap.3
 
   push.11111
   debug.stack
@@ -42,7 +91,36 @@ export.swap
   push.0x200000000000002F
   exec.account::get_balance
 
+  # stack
+  # ├──  0: tokenB balance
+  # ├──  1: tokenA balance
+
+  mul.1000000
+  swap
+  mul.1000000
+  swap
+
+  # stack
+  # ├──  0: tokenB balance scaled 1e6
+  # ├──  1: tokenA balance scaled 1e6
+
   push.44444
+  debug.stack
+  drop
+
+  # load amount in X
+  mem_load.1
+  mul.100000
+  swap.2
+
+  push.55555
+  debug.stack
+  drop
+
+  # getting to here: bal X = X - dx
+  exec.calculate_amount_y_out
+
+  push.66666
   debug.stack
   drop
 

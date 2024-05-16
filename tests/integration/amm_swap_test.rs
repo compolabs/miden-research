@@ -1,7 +1,8 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{
-        account_id::testing::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, Account, AccountCode, AccountId, AccountStorage, AccountStorageType, AccountType, SlotItem, StorageSlot
+        account_id::testing::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, Account, AccountCode,
+        AccountId, AccountStorage, AccountStorageType, AccountType, SlotItem, StorageSlot,
     },
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
@@ -26,7 +27,7 @@ use crate::utils::{
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0x0a538556265f946d3fc34d6dcf99bb2d208defc5bdda8a7642f1d8e9f24c45e7", // swap assets proc
+    "0xeaf5040f0a1fca16789295fea501e54c508d7fdd7f6db0bcb5414993e46ca802", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -116,7 +117,7 @@ fn create_note<R: FeltRng>(
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
     // @dev TODO add user addresses as input to the note
-/*     let user_0 = account_id(
+    /*     let user_0 = account_id(
         AccountType::RegularAccountImmutableCode,
         AccountStorageType::OffChain,
         45,
@@ -166,7 +167,7 @@ fn test_swap_asset_amm() {
         .unwrap()
         .into();
 
-    let fungible_asset_amount_user: u64 = 100;
+    let fungible_asset_amount_user: u64 = 101;
     let fungible_asset_a_user: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_user)
         .unwrap()
         .into();
@@ -176,7 +177,7 @@ fn test_swap_asset_amm() {
     let fungible_asset_amount_b = 1006;
     let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
         .unwrap()
-        .into();  
+        .into();
 
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
@@ -187,9 +188,9 @@ fn test_swap_asset_amm() {
     let target_account = get_account_with_custom_proc(
         target_account_id,
         target_pub_key,
-        vec![fungible_asset_b, fungible_asset_a]
+        vec![fungible_asset_b, fungible_asset_a],
     );
-    
+
     // Create the user AMM swap note (not SWAP note)
     let note = create_note(
         sender_account_id,
