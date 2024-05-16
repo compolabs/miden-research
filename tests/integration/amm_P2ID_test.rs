@@ -27,11 +27,11 @@ use crate::utils::{
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0x81af61fd579899d1ae13a8fa38bee982870fc9105689fda3b1c062f693367817", // swap assets proc
+    "0xcf68f8cb27bb8db6bd95c3b1a43b407f6d00f2a20b72736d12e196b37efbef61", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
-    let account_code = include_str!("../../src/splitter/splitter_account.masm");
+    let account_code = include_str!("../../src/amm/pool_account.masm");
 
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();

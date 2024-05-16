@@ -14,9 +14,31 @@ end
             
 # acct proc 2
 export.swap
-  push.1.2
+  # store faucet_id @ memory address 0
+  mem_store.0
+  mem_load.0
+
+  push.11111
   debug.stack
-  add
+  drop
+
+  exec.wallet::receive_asset
+
+  dropw
+
+  push.22222
+  debug.stack
+  drop
+
+  push.33333
+  debug.stack
+  drop
+
+  mem_load.0
+  exec.account::get_balance
+
+  push.44444
+  debug.stack
   drop
 
 end
