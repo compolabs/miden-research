@@ -27,7 +27,7 @@ use crate::utils::{
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0x08e6c47c296bad2f2ba0604b31ac73841573cc6261f4a3fd9c7e641ac88fea8d", // swap assets proc
+    "0xbfc82a0785cba42b125147f5716ef7df0c7c0b0e60a49dae71121310c6cca0dc", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -153,30 +153,30 @@ pub fn check_account_masts() {
 
 #[test]
 fn test_swap_asset_amm() {
-    // Create fungible asset (right now notes must have at least one asset, so we create a fungible asset with 0 amount)
+    // TOKEN A
     let faucet_id_a = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-
     let fungible_asset_amount_a: u64 = 1005;
     let fungible_asset_a: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_a)
         .unwrap()
         .into();
 
-    let fungible_asset_amount_user: u64 = 101;
-    let fungible_asset_a_user: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_user)
+    // TOKEN B
+    let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
+    let fungible_asset_amount_b = 1006;
+    let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
         .unwrap()
         .into();
 
-    let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
-
-    let fungible_asset_amount_b = 1006;
-    let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
+    // Create user asset TOKEN A
+    let fungible_asset_amount_user: u64 = 101;
+    let fungible_asset_a_user: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_user)
         .unwrap()
         .into();
 
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
-    // Create target account
+    // Create AMM SWAP contract account
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(
