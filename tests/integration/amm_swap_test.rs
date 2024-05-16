@@ -49,7 +49,7 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
 pub fn get_account_with_custom_proc(
     account_id: AccountId,
     public_key: Word,
-    assets: Option<Asset>,
+    assets: Vec<Asset>,
 ) -> Account {
     let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
 
@@ -63,10 +63,7 @@ pub fn get_account_with_custom_proc(
     )
     .unwrap();
 
-    let account_vault = match assets {
-        Some(asset) => AssetVault::new(&[asset]).unwrap(),
-        None => AssetVault::new(&[]).unwrap(),
-    };
+    let account_vault = AssetVault::new(&assets).unwrap();
 
     Account::new(
         account_id,
@@ -119,11 +116,11 @@ fn create_note<R: FeltRng>(
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
     // @dev TODO add user addresses as input to the note
-    let user_0 = account_id(
+/*     let user_0 = account_id(
         AccountType::RegularAccountImmutableCode,
         AccountStorageType::OffChain,
         45,
-    );
+    ); */
 
     // let user_0_felt = Felt::new(user_0);
 
@@ -164,15 +161,19 @@ fn test_swap_asset_amm() {
     // Create fungible asset (right now notes must have at least one asset, so we create a fungible asset with 0 amount)
     let faucet_id_a = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
 
-    let fungible_asset_amount_a = 101;
+    let fungible_asset_amount_a: u64 = 1005;
     let fungible_asset_a: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_a)
         .unwrap()
         .into();
 
+    let fungible_asset_amount_user: u64 = 100;
+    let fungible_asset_a_user: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_user)
+        .unwrap()
+        .into();
 
     let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
 
-    let fungible_asset_amount_b = 201;
+    let fungible_asset_amount_b = 1006;
     let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
         .unwrap()
         .into();  
@@ -183,13 +184,17 @@ fn test_swap_asset_amm() {
     // Create target account
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
-    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, Some(fungible_asset_b));
-
-    // Create the note
+    let target_account = get_account_with_custom_proc(
+        target_account_id,
+        target_pub_key,
+        vec![fungible_asset_b, fungible_asset_a]
+    );
+    
+    // Create the user AMM swap note (not SWAP note)
     let note = create_note(
         sender_account_id,
         target_account_id,
-        vec![fungible_asset_a],
+        vec![fungible_asset_a_user],
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();
