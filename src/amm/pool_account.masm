@@ -19,11 +19,9 @@ end
 proc.calculate_amount_y_out
   dup.2
   # [dx, x, y, dx]
-  # [9e6, 5e6, 10e6, 9e6]
   
   movup.2
   # [y, dx, x, dx]
-  # [10e6, 9e6, 5e6, 9e6]
 
   mul
   div.1000000
@@ -34,7 +32,6 @@ proc.calculate_amount_y_out
 
   add
   # [dx + x, dx * y]
-  # [14e6, 90e6]
 
   # divide by 1e3 to have some floating point
   div.1000
@@ -43,7 +40,6 @@ proc.calculate_amount_y_out
   # a / b
   # [b, a]
   u32div
-  # div
 
 end
             
@@ -108,7 +104,6 @@ export.swap
   mul.1000
   swap.2
 
-  # getting to here: bal X = X - dx
   exec.calculate_amount_y_out
 
   mem_store.3 # overwrite tokenInAmount
