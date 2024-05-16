@@ -34,7 +34,12 @@ export.swap
   debug.stack
   drop
 
+  # token balance A
   mem_load.0
+  exec.account::get_balance
+
+  # token balance B 
+  push.0x200000000000002F
   exec.account::get_balance
 
   push.44444

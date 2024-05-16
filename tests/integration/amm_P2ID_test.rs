@@ -1,8 +1,7 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{
-        Account, AccountCode, AccountId, AccountStorage, AccountStorageType, AccountType, SlotItem,
-        StorageSlot,
+        account_id::testing::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, Account, AccountCode, AccountId, AccountStorage, AccountStorageType, AccountType, SlotItem, StorageSlot
     },
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
@@ -27,7 +26,7 @@ use crate::utils::{
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0xcf68f8cb27bb8db6bd95c3b1a43b407f6d00f2a20b72736d12e196b37efbef61", // swap assets proc
+    "0x0a538556265f946d3fc34d6dcf99bb2d208defc5bdda8a7642f1d8e9f24c45e7", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -126,18 +125,9 @@ fn create_note<R: FeltRng>(
         45,
     );
 
-    let user_1 = account_id(
-        AccountType::RegularAccountImmutableCode,
-        AccountStorageType::OffChain,
-        46,
-    );
+    // let user_0_felt = Felt::new(user_0);
 
-    let user_0_felt = Felt::new(user_0);
-    let user_1_felt = Felt::new(user_1);
-
-    println!("user 1 & 2 :{:?} {:?}", user_0_felt, user_1_felt);
-
-    let inputs = NoteInputs::new(vec![user_0_felt, user_1_felt])?;
+    let inputs = NoteInputs::new(vec![])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -172,12 +162,20 @@ pub fn check_account_masts() {
 #[test]
 fn test_swap_asset_amm() {
     // Create fungible asset (right now notes must have at least one asset, so we create a fungible asset with 0 amount)
-    let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
+    let faucet_id_a = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
 
-    let fungible_asset_amount = 1010000;
-    let fungible_asset: Asset = FungibleAsset::new(faucet_id, fungible_asset_amount)
+    let fungible_asset_amount_a = 101;
+    let fungible_asset_a: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_a)
         .unwrap()
         .into();
+
+
+    let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
+
+    let fungible_asset_amount_b = 201;
+    let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
+        .unwrap()
+        .into();  
 
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
@@ -185,13 +183,13 @@ fn test_swap_asset_amm() {
     // Create target account
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
-    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
+    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, Some(fungible_asset_b));
 
     // Create the note
     let note = create_note(
         sender_account_id,
         target_account_id,
-        vec![fungible_asset],
+        vec![fungible_asset_a],
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();
