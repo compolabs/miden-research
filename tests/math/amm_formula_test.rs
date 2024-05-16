@@ -3,7 +3,7 @@ use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInput
 #[test]
 fn test_amm() {
     // Instantiate the assembler
-    let assembler = Assembler::default();
+    let assembler = Assembler::default().with_debug_mode(true);
 
     // Read the assembly program from a file
     let assembly_code: &str = include_str!("../../src/math/amm.masm");
@@ -13,7 +13,7 @@ fn test_amm() {
         .compile(assembly_code)
         .expect("Failed to compile the assembly code");
 
-    let amount_in_x = 1000000;
+    let amount_in_x = 10000;
 
     let stack_inputs = StackInputs::try_from_ints([amount_in_x]).unwrap();
     let cloned_inputs = stack_inputs.clone();

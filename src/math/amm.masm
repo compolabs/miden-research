@@ -31,16 +31,21 @@ proc.calculate_amount_y_out
   # [dx + x, dx * y]
   # [14e6, 90e6]
 
+  debug.stack
   # divide by 1e3 to have some floating point
   div.1000
   # [14e3, 90e6]
 
+  debug.stack
   # note when dividing...
   # a / b
   # [b, a]
   # 90e6 / 16e6
-  u32div
+  # u32div
+  # swap
   # div
+  u32div
+  debug.stack
 
   # scale back up by 1e3
   mul.1000

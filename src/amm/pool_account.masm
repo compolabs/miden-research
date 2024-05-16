@@ -1,4 +1,5 @@
 use.miden::account
+use.std::sys
 use.miden::contracts::wallets::basic->wallet
 
 # acct proc 0
@@ -50,78 +51,126 @@ proc.calculate_amount_y_out
   # div
 
   # scale back up by 1e3
-  mul.1000
+  # mul.1000
   # [1.666e6]
   
 end
             
 # acct proc 2
+
+# [tokenIn, ZERO, ZERO, amountIn, ZERO, tokenOut, recipient, maxSlippage]
 export.swap
-  # store faucet_id @ memory address 0
-  mem_store.0
-  mem_load.0
-
-  # store amount in X @ memory address 1
-  swap.3
-  mem_store.1
-  mem_load.1
-  swap.3
-
   push.11111
   debug.stack
   drop
 
-  exec.wallet::receive_asset
+  # store tokenIn, tokenOut @ memory address 0, 1
+  mem_store.0
+  # mem_load.0
 
-  dropw
+  swap.4
 
   push.22222
   debug.stack
   drop
 
+  mem_store.1
+  # mem_load.1
+
+  # store recipient @ memory address 5
+  swap.2
+  mem_store.5 
+  swap
+
+  # __________
+
   push.33333
   debug.stack
   drop
 
-  # token balance A
+  # store amountIn X @ memory address 2
+  swap
+  mem_store.2
+
+  push.44444
+  debug.stack
+  drop
+
+  # tokenIn, tokenOut balance @ memory address 3, 4
   mem_load.0
   exec.account::get_balance
+  mem_store.3
 
-  # token balance B 
-  push.0x200000000000002F
+  mem_load.1
   exec.account::get_balance
+  mem_store.4
 
+  push.55555
+  debug.stack
+  drop
+
+  mem_load.2
+  push.0.0
+  mem_load.0
+  
+  exec.wallet::receive_asset
+  
+  push.66666
+  debug.stack
+  drop
+
+  ## RECIEVE ASSET 
+  dropw
+
+  push.77777
+  debug.stack
+  drop
+
+  mem_load.3
+  mem_load.4
   # stack
   # ├──  0: tokenB balance
   # ├──  1: tokenA balance
 
-  mul.1000000
+  mul.1000
   swap
-  mul.1000000
+  mul.1000
   swap
 
   # stack
   # ├──  0: tokenB balance scaled 1e6
   # ├──  1: tokenA balance scaled 1e6
 
-  push.44444
+  push.88888
   debug.stack
   drop
 
   # load amount in X
-  mem_load.1
-  mul.100000
+  mem_load.2
+  mul.1000
   swap.2
 
-  push.55555
+  push.99999
   debug.stack
   drop
 
   # getting to here: bal X = X - dx
   exec.calculate_amount_y_out
 
-  push.66666
+  push.90909090
   debug.stack
   drop
+
+  mem_load.5      # recipient 
+  push.2          # note type offchain  
+  push.536870912  # tag
+  mem_load.3      # token amount  
+  push.0.0        # zero zero
+  mem_load.0      # faucet_id 
+
+  exec.wallet::send_asset
+
+  exec.account::incr_nonce
+  exec.sys::truncate_stack
 
 end

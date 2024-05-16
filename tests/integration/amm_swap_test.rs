@@ -27,7 +27,7 @@ use crate::utils::{
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0xeaf5040f0a1fca16789295fea501e54c508d7fdd7f6db0bcb5414993e46ca802", // swap assets proc
+    "0x1f19ea35a570f47be8baa9541e17a6d1bb0b0061ec83fa1e0dffe5b42abe00a0", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -93,7 +93,7 @@ pub fn new_note_script(
     Ok((note_script, code_block))
 }
 
-const fn account_id(account_type: AccountType, storage: AccountStorageType, rest: u64) -> u64 {
+/* const fn account_id(account_type: AccountType, storage: AccountStorageType, rest: u64) -> u64 {
     let mut id = 0;
 
     id ^= (storage as u64) << 62;
@@ -101,12 +101,13 @@ const fn account_id(account_type: AccountType, storage: AccountStorageType, rest
     id ^= rest;
 
     id
-}
+} */
 
-fn create_note<R: FeltRng>(
+fn create_amm_swap_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
-    assets: Vec<Asset>,
+    token_in: Asset,
+    token_out: Asset,
     mut rng: R,
 ) -> Result<Note, NoteError> {
     let note_script = include_str!("../../src/amm/amm_note.masm");
@@ -116,16 +117,9 @@ fn create_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    // @dev TODO add user addresses as input to the note
-    /*     let user_0 = account_id(
-        AccountType::RegularAccountImmutableCode,
-        AccountStorageType::OffChain,
-        45,
-    ); */
+    let token_out_felt = Felt::new(token_out.faucet_id().into());
 
-    // let user_0_felt = Felt::new(user_0);
-
-    let inputs = NoteInputs::new(vec![])?;
+    let inputs = NoteInputs::new(vec![token_out_felt, sender_account_id.into()])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -133,7 +127,7 @@ fn create_note<R: FeltRng>(
     let note_type = NoteType::OffChain;
     let metadata = NoteMetadata::new(sender_account_id, note_type, tag, aux)?;
 
-    let vault = NoteAssets::new(assets)?;
+    let vault = NoteAssets::new(vec![token_in])?;
 
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
@@ -192,10 +186,11 @@ fn test_swap_asset_amm() {
     );
 
     // Create the user AMM swap note (not SWAP note)
-    let note = create_note(
+    let note = create_amm_swap_note(
         sender_account_id,
         target_account_id,
-        vec![fungible_asset_a_user],
+        fungible_asset_a_user,
+        fungible_asset_b,
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();
