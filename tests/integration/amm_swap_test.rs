@@ -155,14 +155,14 @@ pub fn check_account_masts() {
 fn test_swap_asset_amm() {
     // TOKEN A
     let faucet_id_a = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let fungible_asset_amount_a: u64 = 1005;
+    let fungible_asset_amount_a: u64 = 10002;
     let fungible_asset_a: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_a)
         .unwrap()
         .into();
 
     // TOKEN B
     let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
-    let fungible_asset_amount_b = 1006;
+    let fungible_asset_amount_b = 10005;
     let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
         .unwrap()
         .into();

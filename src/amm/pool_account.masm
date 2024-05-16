@@ -14,10 +14,9 @@ export.get_assets
 end
 
 # internal procedure
+# [tokenBalX, tokenBalY, tokenAmountInX]
+# [x, y, dx]
 proc.calculate_amount_y_out
-  # [x, y, dx]
-  # [5e6, 10e6, 9e6]
-  
   dup.2
   # [dx, x, y, dx]
   # [9e6, 5e6, 10e6, 9e6]
@@ -29,11 +28,9 @@ proc.calculate_amount_y_out
   mul
   div.1000000
   # [dx * y, x, dx]
-  # [90e6, 5e6, 9e6]
 
   swap.2
   # [dx, x, dx * y]
-  # [9e6, 5e6, 90e6]
 
   add
   # [dx + x, dx * y]
@@ -41,19 +38,13 @@ proc.calculate_amount_y_out
 
   # divide by 1e3 to have some floating point
   div.1000
-  # [14e3, 90e6]
 
   # note when dividing...
   # a / b
   # [b, a]
-  # 90e6 / 16e6
   u32div
   # div
 
-  # scale back up by 1e3
-  # mul.1000
-  # [1.666e6]
-  
 end
             
 # acct proc 2
