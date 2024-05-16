@@ -27,7 +27,7 @@ use crate::utils::{
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0x1f19ea35a570f47be8baa9541e17a6d1bb0b0061ec83fa1e0dffe5b42abe00a0", // swap assets proc
+    "0x08e6c47c296bad2f2ba0604b31ac73841573cc6261f4a3fd9c7e641ac88fea8d", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -229,11 +229,6 @@ fn test_swap_asset_amm() {
         .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
         .expect("Transaction consuming swap note failed");
 
-    // println!("{:?}", _executed_transaction.account_delta());
-
     let created_note_0 = _executed_transaction.output_notes().get_note(0);
     println!("Note 1 {:?}", created_note_0);
-
-    let created_note_1 = _executed_transaction.output_notes().get_note(1);
-    println!("Note 2 {:?}", created_note_1);
 }

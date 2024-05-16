@@ -15,7 +15,7 @@ begin
     push.0 exec.note::get_inputs 
     push.0 exec.note::get_assets drop mem_loadw
 
-    call.0x1f19ea35a570f47be8baa9541e17a6d1bb0b0061ec83fa1e0dffe5b42abe00a0
+    call.0x08e6c47c296bad2f2ba0604b31ac73841573cc6261f4a3fd9c7e641ac88fea8d
 
     exec.sys::truncate_stack
 end

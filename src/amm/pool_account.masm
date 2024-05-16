@@ -58,7 +58,7 @@ end
             
 # acct proc 2
 
-# [tokenIn, ZERO, ZERO, amountIn, ZERO, tokenOut, recipient, maxSlippage]
+# [tokenIn, ZERO, ZERO, amountIn, tokenOut, recipient, maxSlippage]
 export.swap
   push.11111
   debug.stack
@@ -66,35 +66,19 @@ export.swap
 
   # store tokenIn, tokenOut @ memory address 0, 1
   mem_store.0
-  # mem_load.0
 
   swap.4
 
-  push.22222
-  debug.stack
-  drop
-
   mem_store.1
-  # mem_load.1
 
   # store recipient @ memory address 5
   swap.2
   mem_store.5 
   swap
 
-  # __________
-
-  push.33333
-  debug.stack
-  drop
-
   # store amountIn X @ memory address 2
   swap
   mem_store.2
-
-  push.44444
-  debug.stack
-  drop
 
   # tokenIn, tokenOut balance @ memory address 3, 4
   mem_load.0
@@ -105,30 +89,17 @@ export.swap
   exec.account::get_balance
   mem_store.4
 
-  push.55555
-  debug.stack
-  drop
-
   mem_load.2
   push.0.0
   mem_load.0
   
   exec.wallet::receive_asset
-  
-  push.66666
-  debug.stack
-  drop
-
-  ## RECIEVE ASSET 
   dropw
-
-  push.77777
-  debug.stack
-  drop
 
   mem_load.3
   mem_load.4
-  # stack
+
+  # stack 
   # ├──  0: tokenB balance
   # ├──  1: tokenA balance
 
@@ -138,38 +109,42 @@ export.swap
   swap
 
   # stack
-  # ├──  0: tokenB balance scaled 1e6
-  # ├──  1: tokenA balance scaled 1e6
-
-  push.88888
-  debug.stack
-  drop
+  # ├──  0: tokenB balance scaled 1e3
+  # ├──  1: tokenA balance scaled 1e3
 
   # load amount in X
   mem_load.2
   mul.1000
   swap.2
 
-  push.99999
-  debug.stack
-  drop
-
   # getting to here: bal X = X - dx
   exec.calculate_amount_y_out
 
-  push.90909090
+  mem_store.3 # overwrite tokenInAmount
+
+  mem_load.5      # recipient (sender)
+  push.2          # note type offchain  
+  push.3758096384 # tag
+  mem_load.3      # token amount  
+  push.0.0        # zero zero
+  mem_load.1      # tokenOut 
+
+  push.22222
   debug.stack
   drop
 
-  mem_load.5      # recipient 
-  push.2          # note type offchain  
-  push.536870912  # tag
-  mem_load.3      # token amount  
-  push.0.0        # zero zero
-  mem_load.0      # faucet_id 
+  # ├──  0: 2305843009213693999 # tokenOut
+  # ├──  1: 0                   # ZERO
+  # ├──  2: 0                   # ZERO
+  # ├──  3: 91                  # amountOut
+  # ├──  4: 3758096384          # tag
+  # ├──  5: 2                   # noteType
+  # ├──  6: 9223372036854775839 # recipient
 
   exec.wallet::send_asset
+  drop
 
+  push.1
   exec.account::incr_nonce
   exec.sys::truncate_stack
 
