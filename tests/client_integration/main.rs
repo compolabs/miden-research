@@ -18,9 +18,10 @@ use miden_tx::TransactionExecutorError;
 mod common;
 use common::*;
 
+mod onchain_tests;
+
 /* 
 mod custom_transactions_tests;
-mod onchain_tests;
 mod swap_transactions_tests;
  */
 
