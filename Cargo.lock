@@ -967,26 +967,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "masm-test"
-version = "0.1.0"
-dependencies = [
- "figment",
- "miden-client",
- "miden-lib 0.3.0 (git+https://github.com/0xPolygonMiden/miden-base.git?branch=main)",
- "miden-mock",
- "miden-objects",
- "miden-processor",
- "miden-prover",
- "miden-stdlib",
- "miden-tx",
- "miden-vm",
- "rand",
- "rand_chacha",
- "tokio",
- "uuid",
-]
-
-[[package]]
 name = "matchers"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1197,6 +1177,26 @@ dependencies = [
  "miden-processor",
  "tracing",
  "winter-prover",
+]
+
+[[package]]
+name = "miden-research"
+version = "0.1.0"
+dependencies = [
+ "figment",
+ "miden-client",
+ "miden-lib 0.3.0 (git+https://github.com/0xPolygonMiden/miden-base.git?branch=main)",
+ "miden-mock",
+ "miden-objects",
+ "miden-processor",
+ "miden-prover",
+ "miden-stdlib",
+ "miden-tx",
+ "miden-vm",
+ "rand",
+ "rand_chacha",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]

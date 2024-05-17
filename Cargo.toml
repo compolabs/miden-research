@@ -1,5 +1,5 @@
 [package]
-name = "masm-test"
+name = "miden-research"
 version = "0.1.0"
 edition = "2021"
 
@@ -22,3 +22,7 @@ uuid = { version = "1.6.1", features = ["serde", "v4"] }
 [patch.crates-io]
 miden-objects = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-objects", branch = "main" }
 miden-tx = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-tx", branch = "main" }
+
+[features]
+default = []
+integration = []

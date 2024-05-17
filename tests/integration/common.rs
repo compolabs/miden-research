@@ -40,7 +40,7 @@ pub type TestClient = Client<
     StoreAuthenticator<RpoRandomCoin, SqliteStore>,
 >;
 
-pub const TEST_CLIENT_CONFIG_FILE_PATH: &str = "./tests/client_integration/config/miden-client.toml";
+pub const TEST_CLIENT_CONFIG_FILE_PATH: &str = "./tests/integration/config/miden-client.toml";
 /// Creates a `TestClient`
 ///
 /// Creates the client using the config at `TEST_CLIENT_CONFIG_FILE_PATH`. The store's path is at a random temporary location, so the store section of the config file is ignored.
