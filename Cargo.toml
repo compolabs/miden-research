@@ -10,7 +10,6 @@ miden-tx = { git = "https://github.com/0xPolygonMiden/miden-base.git", package =
 mock = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-mock", branch = "next" }
 rand = "0.8.5"
 miden-stdlib = "0.9.1"
-# miden-lib = "0.2.1"
 
 miden-lib = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-lib", branch = "next" }
 miden-vm = "0.9.1"
