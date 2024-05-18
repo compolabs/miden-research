@@ -25,10 +25,13 @@ use miden_objects::{
     },
     assets::{Asset, FungibleAsset, TokenSymbol},
     crypto::rand::RpoRandomCoin,
+    crypto::{dsa::rpo_falcon512::SecretKey, utils::Serializable},
     notes::{NoteId, NoteType},
     transaction::InputNote,
+    Felt, Word,
 };
 use miden_tx::{DataStoreError, TransactionExecutorError};
+use rand_chacha::{rand_core::SeedableRng, ChaCha20Rng};
 use uuid::Uuid;
 
 pub const ACCOUNT_ID_REGULAR: u64 = ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN;
@@ -294,4 +297,20 @@ pub async fn assert_note_cannot_be_consumed_twice(
         Ok(_) => panic!("Double-spend error: Note should not be consumable!"),
         _ => panic!("Unexpected error: {}", note_to_consume_id.to_hex()),
     }
+}
+
+pub fn get_new_key_pair_with_advice_map() -> (Word, Vec<Felt>) {
+    let seed = [0_u8; 32];
+    let mut rng = ChaCha20Rng::from_seed(seed);
+
+    let sec_key = SecretKey::with_rng(&mut rng);
+    let pub_key: Word = sec_key.public_key().into();
+    let mut pk_sk_bytes = sec_key.to_bytes();
+    pk_sk_bytes.append(&mut pub_key.to_bytes());
+    let pk_sk_felts: Vec<Felt> = pk_sk_bytes
+        .iter()
+        .map(|a| Felt::new(*a as u64))
+        .collect::<Vec<Felt>>();
+
+    (pub_key, pk_sk_felts)
 }
