@@ -17,12 +17,16 @@ miden-prover = "0.9.1"
 tokio = "1.37.0"
 miden-client = "0.3.0"
 figment = "0.10.19"
-uuid = { version = "1.6.1", features = ["serde", "v4"] }
+uuid = { version = "1.6.1", features = ["serde", "v4"], optional = true }
 
 [patch.crates-io]
 miden-objects = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-objects", branch = "main" }
 miden-tx = { git = "https://github.com/0xPolygonMiden/miden-base.git", package = "miden-tx", branch = "main" }
 
 [features]
-default = []
-integration = []
+default = ["std"]
+integration = ["testing", "concurrent", "uuid"]
+concurrent = ["miden-lib/concurrent", "miden-objects/concurrent", "miden-tx/concurrent"]
+std = ["miden-objects/std"]
+testing = ["miden-objects/testing", "miden-lib/testing"]
+test_utils = ["miden-objects/testing"]

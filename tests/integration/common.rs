@@ -69,7 +69,13 @@ pub fn create_test_client() -> TestClient {
     let rng = get_random_coin();
 
     let authenticator = StoreAuthenticator::new_with_rng(store.clone(), rng);
-    TestClient::new(TonicRpcClient::new(&client_config.rpc), rng, store, authenticator, true)
+    TestClient::new(
+        TonicRpcClient::new(&client_config.rpc),
+        rng,
+        store,
+        authenticator,
+        true,
+    )
 }
 
 pub fn create_test_store_path() -> std::path::PathBuf {
@@ -84,7 +90,10 @@ pub async fn execute_tx_and_sync(client: &mut TestClient, tx_request: Transactio
     let transaction_id = transaction_execution_result.executed_transaction().id();
 
     println!("Sending transaction to node");
-    client.submit_transaction(transaction_execution_result).await.unwrap();
+    client
+        .submit_transaction(transaction_execution_result)
+        .await
+        .unwrap();
 
     // wait until tx is committed
     loop {
@@ -92,8 +101,9 @@ pub async fn execute_tx_and_sync(client: &mut TestClient, tx_request: Transactio
         client.sync_state().await.unwrap();
 
         // Check if executed transaction got committed by the node
-        let uncommited_transactions =
-            client.get_transactions(TransactionFilter::Uncomitted).unwrap();
+        let uncommited_transactions = client
+            .get_transactions(TransactionFilter::Uncomitted)
+            .unwrap();
         let is_tx_committed = uncommited_transactions
             .iter()
             .all(|uncommited_tx| uncommited_tx.id != transaction_id);
@@ -114,7 +124,10 @@ pub async fn wait_for_blocks(client: &mut TestClient, amount_of_blocks: u32) -> 
     // wait until tx is committed
     loop {
         let summary = client.sync_state().await.unwrap();
-        println!("Synced to block {} (syncing until {})...", summary.block_num, final_block);
+        println!(
+            "Synced to block {} (syncing until {})...",
+            summary.block_num, final_block
+        );
 
         if summary.block_num >= final_block {
             return summary;
@@ -140,10 +153,10 @@ pub async fn wait_for_node(client: &mut TestClient) {
         match client.sync_state().await {
             Err(ClientError::NodeRpcClientError(NodeRpcClientError::ConnectionError(_))) => {
                 std::thread::sleep(Duration::from_secs(NODE_TIME_BETWEEN_ATTEMPTS));
-            },
+            }
             Err(other_error) => {
                 panic!("Unexpected error: {other_error}");
-            },
+            }
             _ => return,
         }
     }
@@ -161,7 +174,10 @@ pub async fn setup(
 ) -> (Account, Account, Account) {
     // Enusre clean state
     assert!(client.get_account_stubs().unwrap().is_empty());
-    assert!(client.get_transactions(TransactionFilter::All).unwrap().is_empty());
+    assert!(client
+        .get_transactions(TransactionFilter::All)
+        .unwrap()
+        .is_empty());
     assert!(client.get_input_notes(NoteFilter::All).unwrap().is_empty());
 
     // Create faucet account
@@ -274,7 +290,7 @@ pub async fn assert_note_cannot_be_consumed_twice(
             TransactionExecutorError::FetchTransactionInputsFailed(
                 DataStoreError::NoteAlreadyConsumed(_),
             ),
-        )) => {},
+        )) => {}
         Ok(_) => panic!("Double-spend error: Note should not be consumable!"),
         _ => panic!("Unexpected error: {}", note_to_consume_id.to_hex()),
     }
