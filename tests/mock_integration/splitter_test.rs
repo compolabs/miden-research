@@ -26,7 +26,7 @@ use crate::utils::{
 
 const MASTS: [&str; 2] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
-    "0xcf77b62b0dc0e288d60ef453436946f4b1a7a281ce253c5ec3f29b9dee5f82bc", // split_note custom proc
+    "0x9412be4041fa973811edd760d56c9646f7169c41938d866a285b77c5b6358623", // split_note custom proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {

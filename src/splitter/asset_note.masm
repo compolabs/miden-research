@@ -26,7 +26,7 @@ begin
     drop
 
     # calling split note
-    call.0xcf77b62b0dc0e288d60ef453436946f4b1a7a281ce253c5ec3f29b9dee5f82bc
+    call.0x9412be4041fa973811edd760d56c9646f7169c41938d866a285b77c5b6358623
 
     exec.sys::truncate_stack
 end
