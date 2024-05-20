@@ -111,7 +111,6 @@ fn create_amm_swap_note<R: FeltRng>(
     mut rng: R,
 ) -> Result<Note, NoteError> {
     let note_script = include_str!("../../src/amm/amm_note.masm");
-
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let script_ast = ProgramAst::parse(&note_script).unwrap();

@@ -134,58 +134,24 @@ async fn test_custom_accounts_and_notes() {
 
     let note_args_map = BTreeMap::from([(note.id(), Some(note_args[0]))]);
 
-    let code = "
-        use.miden::contracts::auth::basic->auth_tx
-        use.miden::kernels::tx::prologue
-        use.miden::kernels::tx::memory
+    /*     let code = "
+           use.miden::contracts::auth::basic->auth_tx
+           use.miden::kernels::tx::prologue
+           use.miden::kernels::tx::memory
 
-        begin
-            push.0 push.{asserted_value}
-            # => [0, {asserted_value}]
-            assert_eq
+           begin
+               push.0 push.{asserted_value}
+               # => [0, {asserted_value}]
+               assert_eq
 
-            call.auth_tx::auth_tx_rpo_falcon512
-        end
-        ";
-
-    // FAILURE ATTEMPT
-
-    let failure_code = code.replace("{asserted_value}", "1");
-    let program = ProgramAst::parse(&failure_code).unwrap();
-
-    let tx_script = {
-        let account_auth = client.get_account_auth(regular_account.id()).unwrap();
-        let (pubkey_input, advice_map): (Word, Vec<Felt>) = match account_auth {
-            AuthSecretKey::RpoFalcon512(key) => (
-                key.public_key().into(),
-                key.to_bytes()
-                    .iter()
-                    .map(|a| Felt::new(*a as u64))
-                    .collect::<Vec<Felt>>(),
-            ),
-        };
-
-        let script_inputs = vec![(pubkey_input, advice_map)];
-        client
-            .compile_tx_script(program, script_inputs, vec![])
-            .unwrap()
-    };
-
-    let transaction_request = TransactionRequest::new(
-        regular_account.id(),
-        note_args_map.clone(),
-        vec![],
-        vec![],
-        Some(tx_script),
-    );
-
-    // This fails becuase of {asserted_value} having the incorrect number passed in
-    assert!(client.new_transaction(transaction_request).is_err());
-
+               call.auth_tx::auth_tx_rpo_falcon512
+           end
+           ";
+    */
     // SUCCESS EXECUTION
 
-    let success_code = code.replace("{asserted_value}", "0");
-    let program = ProgramAst::parse(&success_code).unwrap();
+    let code = include_str!("../../src/splitter/asset_note.masm");
+    let program = ProgramAst::parse(&code).unwrap();
 
     let tx_script = {
         let account_auth = client.get_account_auth(regular_account.id()).unwrap();

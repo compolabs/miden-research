@@ -3,7 +3,6 @@ use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
-    crypto::rand::FeltRng,
     crypto::{dsa::rpo_falcon512::SecretKey, utils::Serializable},
     notes::{
         Note, NoteAssets, NoteId, NoteInputs, NoteMetadata, NoteRecipient, NoteScript, NoteType,
@@ -12,7 +11,7 @@ use miden_objects::{
         ChainMmr, ExecutedTransaction, InputNote, InputNotes, OutputNote, ProvenTransaction,
         TransactionArgs, TransactionInputs,
     },
-    BlockHeader, Felt, NoteError, Word, ZERO,
+    BlockHeader, Felt, Word, ZERO,
 };
 use miden_processor::utils::Deserializable;
 use miden_prover::ProvingOptions;
@@ -104,6 +103,36 @@ pub const fn account_id(account_type: AccountType, storage: AccountStorageType, 
 
     id
 }
+// CONSTANTS
+// --------------------------------------------------------------------------------------------
+
+/* pub const ACCOUNT_ID_OFF_CHAIN_SENDER: u64 = account_id(
+    AccountType::RegularAccountImmutableCode,
+    AccountStorageType::OffChain,
+    0b0010_1111,
+);
+// REGULAR ACCOUNTS - ON-CHAIN
+pub const ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN: u64 = account_id(
+    AccountType::RegularAccountImmutableCode,
+    AccountStorageType::OnChain,
+    0b0001_1111,
+);
+pub const ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN_2: u64 = account_id(
+    AccountType::RegularAccountImmutableCode,
+    AccountStorageType::OnChain,
+    0b0010_1111,
+);
+pub const ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN: u64 = account_id(
+    AccountType::RegularAccountUpdatableCode,
+    AccountStorageType::OnChain,
+    0b0011_1111,
+);
+pub const ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN_2: u64 = account_id(
+    AccountType::RegularAccountUpdatableCode,
+    AccountStorageType::OnChain,
+    0b0100_1111,
+); */
+
 // FUNGIBLE TOKENS - OFF-CHAIN
 pub const ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN: u64 = account_id(
     AccountType::FungibleFaucet,
@@ -149,6 +178,7 @@ pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
     AccountStorageType::OnChain,
     0b0010_1111,
 );
+
 pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
     AccountType::NonFungibleFaucet,
     AccountStorageType::OnChain,
