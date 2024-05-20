@@ -23,45 +23,14 @@ use crate::utils::{
 // use std::fs;
 
 const MASTS: [&str; 5] = [
-    "0x6b42a86658b1ecb729e86d47bd0fae6d57cecbc2ef52a81e0d87b3371fa75174",
-    "0xe06a83054c72efc7e32698c4fc6037620cde834c9841afb038a5d39889e502b6",
+    "0x61e28f7c3fd6d79ea2f225f8d64961ba935329b9a68016ada1fabf22eee726b0",
+    "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306",
     "0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462",
     "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
     "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
-    let account_code = "\
-            use.miden::account
-            use.miden::tx
-            use.miden::contracts::wallets::basic->wallet
-            use.miden::contracts::auth::basic->basic_eoa
-
-            # acct proc 0
-            export.wallet::receive_asset
-
-            # acct proc 1
-            export.basic_eoa::auth_tx_rpo_falcon512
-
-            # acct proc 2
-            export.account_procedure_1
-                push.3.4
-                add
-                debug.stack
-                drop
-            end
-
-            # acct proc 3
-            export.proc_1
-                push.1.2
-                add
-            end
-
-            # acct proc 4 
-            export.proc_2
-                push.1.2
-                add
-            end
-            ";
+    let account_code = include_str!("../../src/custom_proc/custom_account.masm");
     let account_module_ast = ModuleAst::parse(account_code).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
 
@@ -168,6 +137,25 @@ fn create_note<R: FeltRng>(
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
     Ok(Note::new(vault, metadata, recipient))
+}
+
+// Run this first to check MASTs are correct
+#[test]
+pub fn check_account_masts() {
+    let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
+    let account_code = include_str!("../../src/custom_proc/custom_account.masm");
+
+    let account_module_ast = ModuleAst::parse(account_code).unwrap();
+    let code = AccountCode::new(account_module_ast, &assembler).unwrap();
+
+    let current = [
+        code.procedures()[0].to_hex(),
+        code.procedures()[1].to_hex(),
+        code.procedures()[2].to_hex(),
+        code.procedures()[3].to_hex(),
+        code.procedures()[4].to_hex(),
+    ];
+    assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]

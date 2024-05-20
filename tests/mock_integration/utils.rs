@@ -47,12 +47,12 @@ pub const REGULAR_ACCOUNT_UPDATABLE_CODE: u64 = 0b01;
 
 // The higher two bits of the most significant nibble determines the account type
 pub const ACCOUNT_STORAGE_MASK_SHIFT: u64 = 62;
-pub const ACCOUNT_STORAGE_MASK: u64 = 0b11 << ACCOUNT_STORAGE_MASK_SHIFT;
+// pub const ACCOUNT_STORAGE_MASK: u64 = 0b11 << ACCOUNT_STORAGE_MASK_SHIFT;
 
 // The lower two bits of the most significant nibble determines the account type
 pub const ACCOUNT_TYPE_MASK_SHIFT: u64 = 60;
 pub const ACCOUNT_TYPE_MASK: u64 = 0b11 << ACCOUNT_TYPE_MASK_SHIFT;
-pub const ACCOUNT_ISFAUCET_MASK: u64 = 0b10 << ACCOUNT_TYPE_MASK_SHIFT;
+// pub const ACCOUNT_ISFAUCET_MASK: u64 = 0b10 << ACCOUNT_TYPE_MASK_SHIFT;
 
 pub const ON_CHAIN: u64 = 0b00;
 pub const OFF_CHAIN: u64 = 0b10;
@@ -145,7 +145,7 @@ pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
     AccountStorageType::OnChain,
     0b0001_1111,
 );
-pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
+/* pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
     AccountType::FungibleFaucet,
     AccountStorageType::OnChain,
     0b0010_1111,
@@ -159,10 +159,10 @@ pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_3: u64 = account_id(
     AccountType::FungibleFaucet,
     AccountStorageType::OnChain,
     0b0100_1111,
-);
+); */
 
 // NON-FUNGIBLE TOKENS - OFF-CHAIN
-pub const ACCOUNT_ID_INSUFFICIENT_ONES: u64 = account_id(
+/* pub const ACCOUNT_ID_INSUFFICIENT_ONES: u64 = account_id(
     AccountType::NonFungibleFaucet,
     AccountStorageType::OffChain,
     0b0000_0000,
@@ -171,7 +171,7 @@ pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_OFF_CHAIN: u64 = account_id(
     AccountType::NonFungibleFaucet,
     AccountStorageType::OffChain,
     0b0001_1111,
-);
+); */
 // NON-FUNGIBLE TOKENS - ON-CHAIN
 pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
     AccountType::NonFungibleFaucet,
@@ -179,12 +179,12 @@ pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
     0b0010_1111,
 );
 
-pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
+/* pub const ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
     AccountType::NonFungibleFaucet,
     AccountStorageType::OnChain,
     0b0011_1111,
 );
-
+ */
 // MOCK DATA STORE
 // ================================================================================================
 

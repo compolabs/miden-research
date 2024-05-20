@@ -14,7 +14,7 @@ Square root test:
 cargo test --package miden-research --test math -- sqrt_test::test_sqrt_masm --exact --show-output
 ```
 
-Testnet integration tests:
+Testnet client integration tests:
 ```
 # This will ensure we start from a clean node and client
 cargo make reset
@@ -24,4 +24,9 @@ cargo make node
 cargo make start-node 
 # This will run the integration test 
 cargo make integration-test
+```
+
+Before pushing run:
+```
+cargo test --test mock_integration
 ```

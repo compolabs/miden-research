@@ -16,7 +16,6 @@ use miden_objects::{
 };
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
-use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use crate::utils::{
     get_account_with_default_account_code, get_new_pk_and_authenticator, MockDataStore,

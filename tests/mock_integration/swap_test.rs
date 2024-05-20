@@ -1,4 +1,3 @@
-use miden_lib::notes::create_swap_note;
 use miden_lib::{notes::utils::build_p2id_recipient, transaction::TransactionKernel};
 use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
@@ -17,7 +16,7 @@ use miden_vm::Assembler;
 use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use crate::utils::{
-    get_new_pk_and_authenticator, prove_and_verify_transaction, MockDataStore,
+    get_new_pk_and_authenticator, MockDataStore,
     ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
     ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
 };

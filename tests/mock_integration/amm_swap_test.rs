@@ -2,7 +2,7 @@ use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{
         account_id::testing::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, Account, AccountCode,
-        AccountId, AccountStorage, AccountStorageType, AccountType, SlotItem, StorageSlot,
+        AccountId, AccountStorage, SlotItem, StorageSlot,
     },
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault, FungibleAsset},
