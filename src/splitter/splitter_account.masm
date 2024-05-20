@@ -143,14 +143,12 @@ export.split_note
 
   exec.wallet::send_asset
 
-  push.99999
-  debug.stack
-  drop
-  
   mem_load.0
   exec.account::get_balance
 
-  push.1
+  dropw
+
+  push.2
   exec.account::incr_nonce
   exec.sys::truncate_stack
 end

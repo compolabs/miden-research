@@ -25,7 +25,8 @@ begin
     debug.stack
     drop
 
-    call.0xb445abacc4fab990d657118225db09f0042825c5cdf55b2faa390b258bc1ed3e
+    # calling split note
+    call.0xcf77b62b0dc0e288d60ef453436946f4b1a7a281ce253c5ec3f29b9dee5f82bc
 
     exec.sys::truncate_stack
 end
