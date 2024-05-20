@@ -15,16 +15,13 @@ export.account_procedure_1
     add
     debug.stack
     drop
+
+    push.1
+    exec.account::incr_nonce
 end
 
 # acct proc 3
 export.proc_1
-    push.1.2
-    add
-end
-
-# acct proc 4 
-export.proc_2
     push.1.2
     add
 end

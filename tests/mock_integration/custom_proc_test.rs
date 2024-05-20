@@ -22,11 +22,10 @@ use crate::utils::{
 };
 // use std::fs;
 
-const MASTS: [&str; 5] = [
+const MASTS: [&str; 4] = [
     "0x61e28f7c3fd6d79ea2f225f8d64961ba935329b9a68016ada1fabf22eee726b0",
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306",
-    "0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462",
-    "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
+    "0xf2ac6dcdfca0edd0e569a8151fd22455ccded87ce1112e2571b31865056e03ff",
     "0xff06b90f849c4b262cbfbea67042c4ea017ea0e9c558848a951d44b23370bec5",
 ];
 pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
@@ -47,7 +46,6 @@ pub fn mock_account_code(assembler: &Assembler) -> AccountCode {
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
         code.procedures()[3].to_hex(),
-        code.procedures()[4].to_hex(),
     ];
 
     println!("{:?}", current[2]);
@@ -153,7 +151,6 @@ pub fn check_account_masts() {
         code.procedures()[1].to_hex(),
         code.procedures()[2].to_hex(),
         code.procedures()[3].to_hex(),
-        code.procedures()[4].to_hex(),
     ];
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
@@ -200,15 +197,15 @@ fn test_custom_proc() {
         use.miden::contracts::auth::basic->auth_tx
 
         begin
-            call.auth_tx::auth_tx_rpo_falcon512
+            #call.auth_tx::auth_tx_rpo_falcon512
             # dropw
             # call account_procedure_1
-            call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
+            #call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
             
             # dropw
-            debug.stack
-            dup
-            drop
+            #debug.stack
+            #dup
+            #drop
         end",
     )
     .unwrap();

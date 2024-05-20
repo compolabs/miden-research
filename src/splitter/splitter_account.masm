@@ -149,6 +149,8 @@ export.split_note
   
   mem_load.0
   exec.account::get_balance
+
+  push.1
   exec.account::incr_nonce
   exec.sys::truncate_stack
 end

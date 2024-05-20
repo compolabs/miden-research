@@ -10,9 +10,8 @@ begin
     call.wallet::receive_asset
     dropw
 
-    # account_procedure_1
-    # when not commented out below: <PhantomCallsNotAllowed>
-    call.0xf3bf6e2af9084abd1b24580d1378b61b7ce146831e65f5a6d9646c85332dd462
+    # acct proc 2
+    call.0xf2ac6dcdfca0edd0e569a8151fd22455ccded87ce1112e2571b31865056e03ff
     
     push.99999999
     debug.stack
