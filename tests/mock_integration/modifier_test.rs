@@ -18,11 +18,12 @@ use miden_vm::Assembler;
 
 use crate::utils::{
     get_new_key_pair_with_advice_map, MockDataStore,
-    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_SENDER,
+    ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN,
+    ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN_2, ACCOUNT_ID_SENDER,
 };
 
 const MASTS: [&str; 1] = [
-    "0x56da1c86b0484add0f88692809f35b01b61359b13d2259d66066a9b7d3c28ae8", // check caller
+    "0x950a1895a6da04922b5b0ada414a3ac675eb37af16c02963e367e5c98880ed95", // check caller
 ];
 
 const ACCOUNT_CODE: &str = include_str!("../../src/modifier/modifier_account.masm");
@@ -31,9 +32,7 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_module_ast = ModuleAst::parse(ACCOUNT_CODE).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
 
-    let current = [
-        code.procedures()[0].to_hex()
-    ];
+    let current = [code.procedures()[0].to_hex()];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 
@@ -95,7 +94,7 @@ fn create_custom_note<R: FeltRng>(
     assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../../src/counter/note.masm");
+    let note_script = include_str!("../../src/modifier/note.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
@@ -103,9 +102,9 @@ fn create_custom_note<R: FeltRng>(
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
     // add the inputs to the note
-    let input_a = Felt::new(123);
+    // let input_a = Felt::new(123);
 
-    let inputs = NoteInputs::new(vec![input_a, input_a])?;
+    let inputs = NoteInputs::new(vec![])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -128,19 +127,18 @@ pub fn check_account_masts() {
     let account_module_ast = ModuleAst::parse(ACCOUNT_CODE).unwrap();
     let code = AccountCode::new(account_module_ast, &assembler).unwrap();
 
-    let current = [
-        code.procedures()[0].to_hex()
-    ];
+    let current = [code.procedures()[0].to_hex()];
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]
-fn test_modifier() {
-    // Create sender and target account
+fn test_modifier_success() {
+    // Create note sender account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
-    // Create target account
-    let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
+    // Create target smart contract
+    let target_account_id =
+        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
@@ -187,4 +185,61 @@ fn test_modifier() {
         executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
     println!("{:?}", _executed_transaction.unwrap().account_delta());
+}
+
+#[test]
+fn test_modifier_failure() {
+    // Create note sender account
+    let sender_account_id =
+        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN_2).unwrap();
+
+    // Create target smart contract
+    let target_account_id =
+        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+    let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
+    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
+
+    // Create the note
+    let note = create_custom_note(
+        sender_account_id,
+        target_account_id,
+        vec![],
+        RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
+    )
+    .unwrap();
+
+    // CONSTRUCT AND EXECUTE TX (Failure)
+    // --------------------------------------------------------------------------------------------
+    let data_store =
+        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+
+    let mut executor: TransactionExecutor<_, ()> =
+        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    executor.load_account(target_account_id).unwrap();
+
+    let block_ref = data_store.block_header.block_num();
+    let note_ids = data_store
+        .notes
+        .iter()
+        .map(|note| note.id())
+        .collect::<Vec<_>>();
+
+    let tx_script_code = include_str!("../../src/counter/tx_script.masm");
+    let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
+
+    let tx_script_target = executor
+        .compile_tx_script(
+            tx_script_ast.clone(),
+            vec![(target_pub_key, target_sk_pk_felt)],
+            vec![],
+        )
+        .unwrap();
+
+    let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
+
+    // Execute the transaction and get the witness
+    let _executed_transaction =
+        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
+
+    assert!(_executed_transaction.is_err());
 }

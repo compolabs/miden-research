@@ -2,26 +2,28 @@ use.miden::account
 use.miden::kernels::tx::memory
 use.std::sys
 use.miden::contracts::wallets::basic->wallet
+use.miden::note
 
-const.OWNER=0
+const.OWNER=0x800000000000001F
 
 proc.only_owner
-  push.222
-  debug.stack
+  push.OWNER
+  assert_eq
   drop
 end
 
 proc.set_value
   exec.only_owner
+
+  # if only_owner passes, continue logic flow...
 end
 
-
 export.check_caller
+  dropw
 
-  push.222
-  debug.stack
-  drop
+  exec.note::get_sender
 
   exec.only_owner
 
+  exec.sys::truncate_stack
 end

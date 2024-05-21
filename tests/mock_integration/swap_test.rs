@@ -16,9 +16,9 @@ use miden_vm::Assembler;
 use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use crate::utils::{
-    get_new_pk_and_authenticator, MockDataStore,
-    ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
+    get_new_pk_and_authenticator, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
+    ACCOUNT_ID_SENDER,
 };
 pub fn get_custom_account_code(
     account_id: AccountId,

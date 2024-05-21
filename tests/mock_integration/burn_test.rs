@@ -1,11 +1,9 @@
 use miden_lib::transaction::memory::FAUCET_STORAGE_DATA_SLOT;
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{
-        Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot,
-    },
+    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{ModuleAst, ProgramAst},
-    assets::{ AssetVault, FungibleAsset},
+    assets::{AssetVault, FungibleAsset},
     Felt, Word,
 };
 use miden_tx::TransactionExecutor;

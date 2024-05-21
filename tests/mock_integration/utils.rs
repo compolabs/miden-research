@@ -106,7 +106,7 @@ pub const fn account_id(account_type: AccountType, storage: AccountStorageType, 
 // CONSTANTS
 // --------------------------------------------------------------------------------------------
 
-/* pub const ACCOUNT_ID_OFF_CHAIN_SENDER: u64 = account_id(
+pub const ACCOUNT_ID_OFF_CHAIN_SENDER: u64 = account_id(
     AccountType::RegularAccountImmutableCode,
     AccountStorageType::OffChain,
     0b0010_1111,
@@ -131,7 +131,7 @@ pub const ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN_2: u64 = account_id
     AccountType::RegularAccountUpdatableCode,
     AccountStorageType::OnChain,
     0b0100_1111,
-); */
+);
 
 // FUNGIBLE TOKENS - OFF-CHAIN
 pub const ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN: u64 = account_id(
