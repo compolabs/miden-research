@@ -1,0 +1,27 @@
+use.miden::account
+use.miden::kernels::tx::memory
+use.std::sys
+use.miden::contracts::wallets::basic->wallet
+
+const.OWNER=0
+
+proc.only_owner
+  push.222
+  debug.stack
+  drop
+end
+
+proc.set_value
+  exec.only_owner
+end
+
+
+export.check_caller
+
+  push.222
+  debug.stack
+  drop
+
+  exec.only_owner
+
+end

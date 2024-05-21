@@ -13,3 +13,5 @@ mod burn_test;
 mod splitter_test;
 
 mod amm_swap_test;
+
+mod modifier_test;

@@ -1,11 +1,8 @@
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
-    accounts::{
-        account_id::testing::ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, Account, AccountCode,
-        AccountId, AccountStorage, SlotItem, StorageSlot,
-    },
+    accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
-    assets::{Asset, AssetVault, FungibleAsset},
+    assets::{Asset, AssetVault},
     crypto::rand::{FeltRng, RpoRandomCoin},
     notes::{
         Note, NoteAssets, NoteExecutionHint, NoteInputs, NoteMetadata, NoteRecipient, NoteScript,
@@ -20,26 +17,22 @@ use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
 use crate::utils::{
-    get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
+    get_new_key_pair_with_advice_map, MockDataStore,
     ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_SENDER,
 };
 
-const MASTS: [&str; 3] = [
-    "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
-    "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0xbfc82a0785cba42b125147f5716ef7df0c7c0b0e60a49dae71121310c6cca0dc", // swap assets proc
+const MASTS: [&str; 1] = [
+    "0x56da1c86b0484add0f88692809f35b01b61359b13d2259d66066a9b7d3c28ae8", // check caller
 ];
 
-pub fn account_code(assembler: &Assembler) -> AccountCode {
-    let account_code = include_str!("../../src/amm/pool_account.masm");
+const ACCOUNT_CODE: &str = include_str!("../../src/modifier/modifier_account.masm");
 
-    let account_module_ast = ModuleAst::parse(account_code).unwrap();
+pub fn account_code(assembler: &Assembler) -> AccountCode {
+    let account_module_ast = ModuleAst::parse(ACCOUNT_CODE).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
 
     let current = [
-        code.procedures()[0].to_hex(),
-        code.procedures()[1].to_hex(),
-        code.procedures()[2].to_hex(),
+        code.procedures()[0].to_hex()
     ];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
@@ -50,9 +43,9 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
 pub fn get_account_with_custom_proc(
     account_id: AccountId,
     public_key: Word,
-    assets: Vec<Asset>,
+    assets: Option<Asset>,
 ) -> Account {
-    let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
+    let assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let account_code = account_code(&assembler);
     let account_storage = AccountStorage::new(
@@ -64,7 +57,10 @@ pub fn get_account_with_custom_proc(
     )
     .unwrap();
 
-    let account_vault = AssetVault::new(&assets).unwrap();
+    let account_vault = match assets {
+        Some(asset) => AssetVault::new(&[asset]).unwrap(),
+        None => AssetVault::new(&[]).unwrap(),
+    };
 
     Account::new(
         account_id,
@@ -93,22 +89,23 @@ pub fn new_note_script(
     Ok((note_script, code_block))
 }
 
-fn create_amm_swap_note<R: FeltRng>(
+fn create_custom_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
-    token_in: Asset,
-    token_out: Asset,
+    assets: Vec<Asset>,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../../src/amm/amm_note.masm");
+    let note_script = include_str!("../../src/counter/note.masm");
+
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    let token_out_felt = Felt::new(token_out.faucet_id().into());
+    // add the inputs to the note
+    let input_a = Felt::new(123);
 
-    let inputs = NoteInputs::new(vec![token_out_felt, sender_account_id.into()])?;
+    let inputs = NoteInputs::new(vec![input_a, input_a])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -116,7 +113,7 @@ fn create_amm_swap_note<R: FeltRng>(
     let note_type = NoteType::OffChain;
     let metadata = NoteMetadata::new(sender_account_id, note_type, tag, aux)?;
 
-    let vault = NoteAssets::new(vec![token_in])?;
+    let vault = NoteAssets::new(assets)?;
 
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
@@ -127,59 +124,31 @@ fn create_amm_swap_note<R: FeltRng>(
 #[test]
 pub fn check_account_masts() {
     let assembler: Assembler = TransactionKernel::assembler().with_debug_mode(true);
-    let account_code = include_str!("../../src/amm/pool_account.masm");
 
-    let account_module_ast = ModuleAst::parse(account_code).unwrap();
+    let account_module_ast = ModuleAst::parse(ACCOUNT_CODE).unwrap();
     let code = AccountCode::new(account_module_ast, &assembler).unwrap();
 
     let current = [
-        code.procedures()[0].to_hex(),
-        code.procedures()[1].to_hex(),
-        code.procedures()[2].to_hex(),
+        code.procedures()[0].to_hex()
     ];
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]
-fn test_swap_asset_amm() {
-    // TOKEN A
-    let faucet_id_a = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let fungible_asset_amount_a: u64 = 10002;
-    let fungible_asset_a: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_a)
-        .unwrap()
-        .into();
-
-    // TOKEN B
-    let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
-    let fungible_asset_amount_b = 10005;
-    let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
-        .unwrap()
-        .into();
-
-    // Create user asset TOKEN A
-    let fungible_asset_amount_user: u64 = 101;
-    let fungible_asset_a_user: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_user)
-        .unwrap()
-        .into();
-
+fn test_modifier() {
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
-    // Create AMM SWAP contract account
+    // Create target account
     let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
-    let target_account = get_account_with_custom_proc(
-        target_account_id,
-        target_pub_key,
-        vec![fungible_asset_b, fungible_asset_a],
-    );
+    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
-    // Create the user AMM swap note (not SWAP note)
-    let note = create_amm_swap_note(
+    // Create the note
+    let note = create_custom_note(
         sender_account_id,
         target_account_id,
-        fungible_asset_a_user,
-        fungible_asset_b,
+        vec![],
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();
@@ -200,7 +169,7 @@ fn test_swap_asset_amm() {
         .map(|note| note.id())
         .collect::<Vec<_>>();
 
-    let tx_script_code = include_str!("../../src/amm/tx_script.masm");
+    let tx_script_code = include_str!("../../src/counter/tx_script.masm");
     let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
 
     let tx_script_target = executor
@@ -214,10 +183,8 @@ fn test_swap_asset_amm() {
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
 
     // Execute the transaction and get the witness
-    let _executed_transaction = executor
-        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
-        .expect("Transaction consuming swap note failed");
+    let _executed_transaction =
+        executor.execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target);
 
-    let created_note_0 = _executed_transaction.output_notes().get_note(0);
-    println!("Note 1 {:?}", created_note_0);
+    println!("{:?}", _executed_transaction.unwrap().account_delta());
 }

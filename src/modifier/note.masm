@@ -1,0 +1,14 @@
+use.miden::account
+use.miden::note
+use.miden::kernels::tx::memory
+use.miden::contracts::wallets::basic->wallet
+use.std::sys
+
+begin
+  push.111
+  debug.stack
+  drop
+
+
+  call.0x56da1c86b0484add0f88692809f35b01b61359b13d2259d66066a9b7d3c28ae8
+end
