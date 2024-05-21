@@ -15,3 +15,5 @@ mod splitter_test;
 mod amm_swap_test;
 
 mod modifier_test;
+
+mod note_creator_test;

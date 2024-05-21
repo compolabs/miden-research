@@ -1,0 +1,16 @@
+use.miden::account
+use.miden::note
+use.miden::kernels::tx::memory
+use.miden::contracts::wallets::basic->wallet
+use.std::sys
+
+begin
+  dropw
+
+  push.111
+  debug.stack
+  drop
+
+  # call create_note proc
+  call.0x14d28e77620a4297da95ba74862471d6446b2e644ee1556c8de40089f5d8b50c
+end

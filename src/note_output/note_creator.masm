@@ -1,0 +1,38 @@
+use.miden::account
+use.miden::kernels::tx::memory
+use.std::sys
+use.miden::contracts::wallets::basic->wallet
+use.miden::note
+use.miden::tx
+
+export.create_note
+  push.222
+  debug.stack
+  drop
+
+  # Creating Note
+
+  # RECIPIENT elements
+  push.4
+  push.3
+  push.2
+  push.1
+  push.4119543952112514064
+  push.4432574669748000899
+  push.13066228868997901875
+  push.760485582805108356
+  # push.0.0.0.0 # are zeros needed?
+
+  # note type
+  push.2
+
+  # tag
+  push.3221225472
+
+  debug.stack
+
+  # [tag, note_type, RECIPIENT]
+  exec.tx::create_note
+
+  exec.sys::truncate_stack
+end

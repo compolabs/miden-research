@@ -1,0 +1,14 @@
+use.miden::note
+use.std::sys
+
+begin
+
+  exec.note::get_inputs
+
+  push.30303
+  debug.stack
+  drop
+
+  exec.sys::truncate_stack
+  
+end
