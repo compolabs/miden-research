@@ -18,12 +18,17 @@ export.create_note
   # push.3
   # push.2
   # push.1
+  # push.8
 
   # recipient felts
-  push.2633024171294491465
-  push.406943396536628435
-  push.1206199701212760411
+  #push.2633024171294491465
+  #push.406943396536628435
+  #push.1206199701212760411
+  #push.16888067059762109583
   push.16888067059762109583
+  push.1206199701212760411
+  push.406943396536628435
+  push.2633024171294491465
   
   # note type
   push.2
@@ -43,6 +48,10 @@ export.create_note
 
   # [tag, note_type, RECIPIENT]
   exec.tx::create_note
+
+  push.333
+  debug.stack
+  drop
 
   exec.sys::truncate_stack
 end

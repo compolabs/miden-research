@@ -6,7 +6,7 @@ use miden_objects::{
     crypto::rand::{FeltRng, RpoRandomCoin},
     notes::{
         Note, NoteAssets, NoteDetails, NoteExecutionHint, NoteHeader, NoteInputs, NoteMetadata,
-        NoteRecipient, NoteScript, NoteTag, NoteType,
+        NoteRecipient, NoteScript, NoteTag, NoteType, NoteId
     },
     transaction::TransactionArgs,
     vm::CodeBlock,
@@ -23,7 +23,7 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 1] = [
-    "0x5635f49c45b6688d186ac0c1b2bbfd43c6beedd71116a80cdae04d5d01c41552", // create note
+    "0xead971e17b1f76955d9e500e59eb03c562dfd8dcc9f806ab7e0416f74ac9fcc1", // create note
 ];
 
 const ACCOUNT_CODE: &str = include_str!("../../src/note_output/note_creator.masm");
@@ -127,10 +127,9 @@ pub fn create_output_note() -> Result<Note, NoteError> {
     let target_account_id =
         AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
 
-    let note_script = include_str!("../../src/note_output/output_note.masm");
-
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
+    let note_script = include_str!("../../src/note_output/output_note.masm");
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
@@ -175,8 +174,6 @@ pub fn get_dynamic_note_recipient() {
     println!("{:?}", tag);
     println!("{:?}", note_type);
     println!("{:?}", recipient.digest());
-
-    // println!("{:?}", output_note.recipient());
 }
 
 #[test]
@@ -232,10 +229,15 @@ fn test_note_output() {
         .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
         .unwrap();
 
-    let tx_output_note_header: NoteHeader = executed_transaction.output_notes().get_note(0).into();
+    let tx_output_note = executed_transaction.output_notes().get_note(0);
 
-    let expected_output_note: Note = create_output_note().unwrap();
-    let expected_output_note_header: NoteHeader = expected_output_note.header().clone();
+    let expected_note = create_output_note().unwrap();
 
-    assert_eq!(expected_output_note_header, tx_output_note_header);
+    println!("{:?}", NoteHeader::from(tx_output_note));
+    println!("{:?}", NoteHeader::from(expected_note.clone()));
+
+    assert_eq!(NoteHeader::from(tx_output_note).metadata(), NoteHeader::from(expected_note.clone()).metadata());
+    assert_eq!(NoteHeader::from(tx_output_note), NoteHeader::from(expected_note.clone()));
+  
 }
+

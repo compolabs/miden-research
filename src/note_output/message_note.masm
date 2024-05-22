@@ -12,5 +12,5 @@ begin
   drop
 
   # call create_note proc
-  call.0x5635f49c45b6688d186ac0c1b2bbfd43c6beedd71116a80cdae04d5d01c41552
+  call.0xead971e17b1f76955d9e500e59eb03c562dfd8dcc9f806ab7e0416f74ac9fcc1
 end
