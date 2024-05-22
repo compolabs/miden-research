@@ -23,7 +23,7 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 1] = [
-    "0x14d28e77620a4297da95ba74862471d6446b2e644ee1556c8de40089f5d8b50c", // create note
+    "0x69a58857dd6bf37d31106355beeeb169c3596a972c713f316b13f148d6858b63", // create note
 ];
 
 const ACCOUNT_CODE: &str = include_str!("../../src/note_output/note_creator.masm");
@@ -137,7 +137,7 @@ pub fn create_output_note() -> Result<Note, NoteError> {
     // add the inputs to the note
     // let input_a = Felt::new(123);
 
-    let inputs = NoteInputs::new(vec![]).unwrap();
+    let inputs: NoteInputs = NoteInputs::new(vec![]).unwrap();
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local).unwrap();
     let serial_num = [Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)];
@@ -146,7 +146,7 @@ pub fn create_output_note() -> Result<Note, NoteError> {
     let metadata = NoteMetadata::new(sender_account_id, note_type, tag, aux).unwrap();
 
     // empty vault
-    let vault = NoteAssets::new(vec![]).unwrap();
+    let vault: NoteAssets = NoteAssets::new(vec![]).unwrap();
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
     Ok(Note::new(vault, metadata, recipient))
@@ -174,7 +174,7 @@ pub fn get_dynamic_note_recipient() {
 
     println!("{:?}", tag);
     println!("{:?}", note_type);
-    println!("{:?}", recipient.to_elements());
+    println!("{:?}", recipient.digest());
 
     // println!("{:?}", output_note.recipient());
 }
