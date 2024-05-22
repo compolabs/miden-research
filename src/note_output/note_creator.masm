@@ -13,21 +13,31 @@ export.create_note
   # Creating Note
 
   # RECIPIENT elements
-  push.4
-  push.3
-  push.2
-  push.1
+  # serial number
+  # push.4
+  # push.3
+  # push.2
+  # push.1
+
+  # recipient felts
   push.2633024171294491465
   push.406943396536628435
   push.1206199701212760411
   push.16888067059762109583
-  # push.0.0.0.0 # are zeros needed?
-
+  
   # note type
   push.2
 
   # tag
   push.3221225472
+
+#  Stack state before step 1653:
+# ├──  0: 3221225472
+# ├──  1: 2
+# ├──  2: 16888067059762109583
+# ├──  3: 1206199701212760411
+# ├──  4: 406943396536628435
+# ├──  5: 2633024171294491465
 
   debug.stack
 
