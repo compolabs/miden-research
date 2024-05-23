@@ -9,8 +9,20 @@ begin
 
   # create note A bool
   # 1 for note A, 0 for note B
-  push.1
+  # push.1
+
+  exec.note::get_inputs
+
+  drop
+  mem_load
+
+  push.101
+  debug.stack
+  drop
 
   # call create_note proc
-  call.0xf4ffc8209e4d41d615cb2f12aa40088065fb34fce501b8dd82ec93dde601fd60
+  call.0x1e3c3fc738ec66e45db871d25d8d5b952b7a13cca4c9d5c803681316aa711cf6
+
+  exec.sys::truncate_stack
+
 end

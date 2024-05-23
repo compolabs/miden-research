@@ -24,8 +24,10 @@ use crate::utils::{
     ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
 };
 
-const MASTS: [&str; 1] = [
-    "0xf4ffc8209e4d41d615cb2f12aa40088065fb34fce501b8dd82ec93dde601fd60", // create note
+const MASTS: [&str; 3] = [
+    "0x1e3c3fc738ec66e45db871d25d8d5b952b7a13cca4c9d5c803681316aa711cf6", // create note
+    "0x25781a9e6af348eeddd49e99e42dd169de60c061954bcb7a8e182f2a7ce9c8fe", // note_a_receiver
+    "0xea857a80b77ae53d702de6456eeb68de9eb9318a57e33e4747b199f48e58e285", // note_b_receiver
 ];
 
 const ACCOUNT_CODE: &str = include_str!("../../src/note_output/note_creator.masm");
@@ -34,7 +36,11 @@ pub fn account_code(assembler: &Assembler) -> AccountCode {
     let account_module_ast = ModuleAst::parse(ACCOUNT_CODE).unwrap();
     let code = AccountCode::new(account_module_ast, assembler).unwrap();
 
-    let current = [code.procedures()[0].to_hex()];
+    let current: [String; 3] = [
+        code.procedures()[0].to_hex(),
+        code.procedures()[1].to_hex(),
+        code.procedures()[2].to_hex(),
+    ];
 
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 
@@ -90,9 +96,10 @@ pub fn new_note_script(
     Ok((note_script, code_block))
 }
 
-fn create_custom_note<R: FeltRng>(
+fn create_initial_message_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
+    create_note_a: bool,
     mut rng: R,
 ) -> Result<Note, NoteError> {
     let note_script = include_str!("../../src/note_output/message_note.masm");
@@ -102,10 +109,12 @@ fn create_custom_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    // add the inputs to the note
-    // let input_a = Felt::new(123);
+    // create note a (1) or note b (0)
+    let create_note_a_u64: u64 = if create_note_a { 1 } else { 0 };
 
-    let inputs = NoteInputs::new(vec![])?;
+    println!("create_note_a_u64: {:?}", create_note_a_u64);
+
+    let inputs = NoteInputs::new(vec![Felt::new(create_note_a_u64)])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -131,11 +140,10 @@ pub fn create_output_note(note_input: Option<Felt>, use_note_a: bool) -> Result<
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
-
     let note_script_path = if use_note_a {
-        "../../src/note_output/output_note_a.masm"
+        "src/note_output/output_note_a.masm"
     } else {
-        "../../src/note_output/output_note_b.masm"
+        "src/note_output/output_note_b.masm"
     };
 
     let note_script = fs::read_to_string(Path::new(note_script_path))
@@ -165,7 +173,6 @@ pub fn create_output_note(note_input: Option<Felt>, use_note_a: bool) -> Result<
     Ok(Note::new(vault, metadata, recipient))
 }
 
-
 // Run this first to check MASTs are correct
 #[test]
 pub fn check_account_masts() {
@@ -174,13 +181,17 @@ pub fn check_account_masts() {
     let account_module_ast = ModuleAst::parse(ACCOUNT_CODE).unwrap();
     let code = AccountCode::new(account_module_ast, &assembler).unwrap();
 
-    let current = [code.procedures()[0].to_hex()];
+    let current: [String; 3] = [
+        code.procedures()[0].to_hex(),
+        code.procedures()[1].to_hex(),
+        code.procedures()[2].to_hex(),
+    ];
     assert!(current == MASTS, "UPDATE MAST ROOT: {:?};", current);
 }
 
 #[test]
 pub fn get_dynamic_note_recipient() {
-    let output_note = create_output_note(None, true).unwrap();
+    let output_note = create_output_note(None, false).unwrap();
 
     let tag = output_note.clone().metadata().tag();
     let note_type = output_note.clone().metadata().note_type();
@@ -202,10 +213,14 @@ fn test_note_output() {
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
+    // Create note a (1) or note b (0)
+    let create_note_a: bool = true;
+
     // Create the note
-    let note = create_custom_note(
+    let note = create_initial_message_note(
         sender_account_id,
         target_account_id,
+        create_note_a,
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();
@@ -248,7 +263,7 @@ fn test_note_output() {
     let tx_output_note = executed_transaction.output_notes().get_note(0);
 
     // Note expected to be outputted by the transaction
-    let expected_note = create_output_note(None, true).unwrap();
+    let expected_note = create_output_note(None, create_note_a).unwrap();
 
     // Check that the output note is the same as the expected note
     assert_eq!(

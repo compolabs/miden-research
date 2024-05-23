@@ -8,11 +8,15 @@ use.miden::tx
 # create note A
 proc.create_note_a
 
+  push.301
+  debug.stack
+  drop
+
   # recipient felts
-  push.16888067059762109583 
-  push.1206199701212760411
-  push.406943396536628435
-  push.2633024171294491465
+  push.11145187256699038453 
+  push.13516355362922671638
+  push.4770272340630846216
+  push.966344059415127099
   
   # note type
   push.2
@@ -35,15 +39,18 @@ proc.create_note_a
 
 end
 
-
 # create note B
 proc.create_note_b
 
+  push.302
+  debug.stack
+  drop
+
   # recipient felts
-  push.16888067059762109583 
-  push.1206199701212760411
-  push.406943396536628435
-  push.2633024171294491465
+  push.3585522988821758901 
+  push.19437762206329930
+  push.14201662485092624442
+  push.7387889746806034967
   
   # note type
   push.2
@@ -73,17 +80,27 @@ end
 export.create_note
   # Creating Note
 
+  push.201
+  debug.stack
+  drop
+
   if.true 
     exec.create_note_a
   else
     exec.create_note_b
   end
 
+  push.401
+  debug.stack
+  drop
+
+  dropw
+
   exec.sys::truncate_stack
 end
 
 # note A will call into this proc
-export.note_a_reciever
+export.note_a_receiver
 
   push.41.41
   debug.stack
@@ -92,7 +109,7 @@ export.note_a_reciever
 end
 
 # note B will call into this proc
-export.note_b_reciever
+export.note_b_receiver
 
   push.42.42
   debug.stack
