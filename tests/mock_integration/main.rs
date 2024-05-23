@@ -17,3 +17,5 @@ mod amm_swap_test;
 mod modifier_test;
 
 mod note_creator_test;
+
+mod rpo_hash_test;
