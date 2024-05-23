@@ -5,8 +5,8 @@ use miden_objects::{
     assets::{Asset, AssetVault},
     crypto::rand::{FeltRng, RpoRandomCoin},
     notes::{
-        Note, NoteAssets, NoteDetails, NoteExecutionHint, NoteHeader, NoteInputs, NoteMetadata,
-        NoteRecipient, NoteScript, NoteTag, NoteType, NoteId
+        Note, NoteAssets, NoteExecutionHint, NoteHeader, NoteInputs, NoteMetadata, NoteRecipient,
+        NoteScript, NoteTag, NoteType,
     },
     transaction::TransactionArgs,
     vm::CodeBlock,
@@ -17,9 +17,8 @@ use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
 use crate::utils::{
-    get_new_key_pair_with_advice_map, MockDataStore,
-    ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN,
-    ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_ON_CHAIN_2, ACCOUNT_ID_SENDER,
+    get_new_key_pair_with_advice_map, prove_and_verify_transaction, MockDataStore,
+    ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
 };
 
 const MASTS: [&str; 1] = [
@@ -217,7 +216,7 @@ fn test_note_output() {
     let tx_script_target = executor
         .compile_tx_script(
             tx_script_ast.clone(),
-            vec![(target_pub_key, target_sk_pk_felt)],
+            vec![(target_pub_key, target_sk_pk_felt.clone())],
             vec![],
         )
         .unwrap();
@@ -229,15 +228,21 @@ fn test_note_output() {
         .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
         .unwrap();
 
+    // Note outputted by the transaction
     let tx_output_note = executed_transaction.output_notes().get_note(0);
 
+    // Note expected to be outputted by the transaction
     let expected_note = create_output_note().unwrap();
 
-    println!("{:?}", NoteHeader::from(tx_output_note));
-    println!("{:?}", NoteHeader::from(expected_note.clone()));
+    // Check that the output note is the same as the expected note
+    assert_eq!(
+        NoteHeader::from(tx_output_note).metadata(),
+        NoteHeader::from(expected_note.clone()).metadata()
+    );
+    assert_eq!(
+        NoteHeader::from(tx_output_note),
+        NoteHeader::from(expected_note.clone())
+    );
 
-    assert_eq!(NoteHeader::from(tx_output_note).metadata(), NoteHeader::from(expected_note.clone()).metadata());
-    assert_eq!(NoteHeader::from(tx_output_note), NoteHeader::from(expected_note.clone()));
-  
+    assert!(prove_and_verify_transaction(executed_transaction.clone()).is_ok());
 }
-

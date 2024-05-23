@@ -1,6 +1,6 @@
 mod utils;
 
-mod basic_P2ID_test;
+mod basic_p2id_test;
 mod custom_proc_test;
 
 mod counter_test;

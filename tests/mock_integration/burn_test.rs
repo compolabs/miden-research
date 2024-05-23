@@ -9,8 +9,8 @@ use miden_objects::{
 use miden_tx::TransactionExecutor;
 
 use crate::utils::{
-    get_new_key_pair_with_advice_map, get_note_with_fungible_asset_and_script,
-    prove_and_verify_transaction, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN,
+    get_new_key_pair_with_advice_map, get_note_with_fungible_asset_and_script, MockDataStore,
+    ACCOUNT_ID_FUNGIBLE_FAUCET_OFF_CHAIN,
 };
 
 fn get_faucet_account_with_max_supply_and_total_issuance(
