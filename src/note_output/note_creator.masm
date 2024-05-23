@@ -5,10 +5,8 @@ use.miden::contracts::wallets::basic->wallet
 use.miden::note
 use.miden::tx
 
-export.create_note
-  # Creating Note
-
-  # RECIPIENT elements
+# create note A
+proc.create_note_a
 
   # recipient felts
   push.16888067059762109583 
@@ -35,5 +33,69 @@ export.create_note
   exec.tx::create_note
   # [note_ptr]
 
+end
+
+
+# create note B
+proc.create_note_b
+
+  # recipient felts
+  push.16888067059762109583 
+  push.1206199701212760411
+  push.406943396536628435
+  push.2633024171294491465
+  
+  # note type
+  push.2
+
+  # tag
+  push.3221225472
+
+  # ├──  0: tag           
+  # ├──  1: note_type
+  # ├──  2: recipient.digest() felt_3 
+  # ├──  3: recipient.digest() felt_2 
+  # ├──  4: recipient.digest() felt_1 
+  # ├──  5: recipient.digest() felt_0 
+
+  debug.stack
+
+  # [tag, note_type, RECIPIENT]
+  exec.tx::create_note
+  # [note_ptr]
+
+end
+
+# message note calls into this proc
+# with create_note_a bool
+
+# inputs: [create_note_a]
+export.create_note
+  # Creating Note
+
+  if.true 
+    exec.create_note_a
+  else
+    exec.create_note_b
+  end
+
   exec.sys::truncate_stack
+end
+
+# note A will call into this proc
+export.note_a_reciever
+
+  push.41.41
+  debug.stack
+  drop drop
+
+end
+
+# note B will call into this proc
+export.note_b_reciever
+
+  push.42.42
+  debug.stack
+  drop drop
+
 end

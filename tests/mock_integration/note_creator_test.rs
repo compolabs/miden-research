@@ -16,6 +16,9 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
+use std::fs;
+use std::path::Path;
+
 use crate::utils::{
     get_new_key_pair_with_advice_map, prove_and_verify_transaction, MockDataStore,
     ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
@@ -118,7 +121,7 @@ fn create_custom_note<R: FeltRng>(
     Ok(Note::new(vault, metadata, recipient))
 }
 
-pub fn create_output_note() -> Result<Note, NoteError> {
+pub fn create_output_note(note_input: Option<Felt>, use_note_a: bool) -> Result<Note, NoteError> {
     let sender_account_id: AccountId =
         AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
 
@@ -128,14 +131,26 @@ pub fn create_output_note() -> Result<Note, NoteError> {
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
-    let note_script = include_str!("../../src/note_output/output_note.masm");
+
+    let note_script_path = if use_note_a {
+        "../../src/note_output/output_note_a.masm"
+    } else {
+        "../../src/note_output/output_note_b.masm"
+    };
+
+    let note_script = fs::read_to_string(Path::new(note_script_path))
+        .expect("Failed to read the note script file");
+
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
     // add the inputs to the note
-    // let input_a = Felt::new(123);
+    let input_values = match note_input {
+        Some(value) => vec![value],
+        None => vec![],
+    };
 
-    let inputs: NoteInputs = NoteInputs::new(vec![]).unwrap();
+    let inputs: NoteInputs = NoteInputs::new(input_values).unwrap();
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local).unwrap();
     let serial_num = [Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)];
@@ -149,6 +164,7 @@ pub fn create_output_note() -> Result<Note, NoteError> {
 
     Ok(Note::new(vault, metadata, recipient))
 }
+
 
 // Run this first to check MASTs are correct
 #[test]
@@ -164,7 +180,7 @@ pub fn check_account_masts() {
 
 #[test]
 pub fn get_dynamic_note_recipient() {
-    let output_note = create_output_note().unwrap();
+    let output_note = create_output_note(None, true).unwrap();
 
     let tag = output_note.clone().metadata().tag();
     let note_type = output_note.clone().metadata().note_type();
@@ -232,7 +248,7 @@ fn test_note_output() {
     let tx_output_note = executed_transaction.output_notes().get_note(0);
 
     // Note expected to be outputted by the transaction
-    let expected_note = create_output_note().unwrap();
+    let expected_note = create_output_note(None, true).unwrap();
 
     // Check that the output note is the same as the expected note
     assert_eq!(

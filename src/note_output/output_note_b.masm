@@ -1,0 +1,26 @@
+use.miden::note
+use.std::sys
+
+proc.call_proc_b
+  # call proc b in note_creator
+
+  # place holder
+  push.2.3
+  add
+  drop
+
+end
+
+begin
+  exec.note::get_inputs
+
+  # A in ASCII
+  push.42
+  debug.stack
+  drop
+
+  exec.call_proc_b
+
+  exec.sys::truncate_stack
+
+end
