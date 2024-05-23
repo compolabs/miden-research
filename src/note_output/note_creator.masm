@@ -6,27 +6,12 @@ use.miden::note
 use.miden::tx
 
 export.create_note
-  push.222
-  debug.stack
-  drop
-
   # Creating Note
 
   # RECIPIENT elements
-  # serial number
-  # push.4
-  # push.3
-  # push.2
-  # push.1
-  # push.8
 
   # recipient felts
-  # push.2633024171294491465
-  # push.406943396536628435
-  # push.1206199701212760411
-  # push.16888067059762109583
-
-  push.16888067059762109583
+  push.16888067059762109583 
   push.1206199701212760411
   push.406943396536628435
   push.2633024171294491465
@@ -37,22 +22,18 @@ export.create_note
   # tag
   push.3221225472
 
-  #  Stack state before step 1653:
-  # ├──  0: 3221225472            # tag
-  # ├──  1: 2                     # note type
-  # ├──  2: 16888067059762109583  # recipient felt
-  # ├──  3: 1206199701212760411   # recipient felt
-  # ├──  4: 406943396536628435    # recipient felt
-  # ├──  5: 2633024171294491465   # recipient felt
+  # ├──  0: tag           
+  # ├──  1: note_type
+  # ├──  2: recipient.digest() felt_3 
+  # ├──  3: recipient.digest() felt_2 
+  # ├──  4: recipient.digest() felt_1 
+  # ├──  5: recipient.digest() felt_0 
 
   debug.stack
 
   # [tag, note_type, RECIPIENT]
   exec.tx::create_note
-
-  push.333
-  debug.stack
-  drop
+  # [note_ptr]
 
   exec.sys::truncate_stack
 end

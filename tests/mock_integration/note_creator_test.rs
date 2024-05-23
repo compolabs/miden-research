@@ -22,7 +22,7 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 1] = [
-    "0xead971e17b1f76955d9e500e59eb03c562dfd8dcc9f806ab7e0416f74ac9fcc1", // create note
+    "0xf4ffc8209e4d41d615cb2f12aa40088065fb34fce501b8dd82ec93dde601fd60", // create note
 ];
 
 const ACCOUNT_CODE: &str = include_str!("../../src/note_output/note_creator.masm");

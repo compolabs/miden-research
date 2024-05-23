@@ -2,7 +2,6 @@ use.miden::note
 use.std::sys
 
 begin
-
   exec.note::get_inputs
 
   push.30303
@@ -10,5 +9,5 @@ begin
   drop
 
   exec.sys::truncate_stack
-  
+
 end
