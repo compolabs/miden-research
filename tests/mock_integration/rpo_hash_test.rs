@@ -1,5 +1,9 @@
 use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
-
+use miden_objects::{
+  notes::
+      NoteInputs,
+  Felt, Hasher, Digest
+};
 #[test]
 fn test_rpo_hash() {
     // Instantiate the assembler
@@ -24,6 +28,15 @@ fn test_rpo_hash() {
 
     println!("Stack output:");
     println!("{:?}", outputs.stack());
+
+    let inputs = NoteInputs::new(vec![Felt::new(2)]).unwrap();
+
+    println!("Inputs Hash: {:?}", inputs.commitment());
+
+    let serial_num = [Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)];
+    let serial_num_hash = Hasher::merge(&[serial_num.into(), Digest::default()]);
+
+    println!("Serial Number Hash: {:?}", serial_num_hash);
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
     println!("Program run successfully");
