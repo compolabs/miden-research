@@ -25,7 +25,7 @@ pub fn new_note_script(
 }
 
 #[test]
-fn test_rpo_hash() {
+fn test__get_recipient_hash() {
     // Instantiate the assembler
     let assembler = Assembler::default().with_debug_mode(true);
 
@@ -77,4 +77,52 @@ fn test_rpo_hash() {
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
     println!("Program run successfully");
+}
+
+#[test]
+fn test_recipient_hash_proc() {
+    // Instantiate the assembler
+    let assembler = Assembler::default().with_debug_mode(true);
+
+    // Read the assembly program from a file
+    let assembly_code: &str = include_str!("../../src/hash/recipient_hash_proc.masm");
+
+    // Compile the program from the loaded assembly code
+    let program = assembler
+        .compile(assembly_code)
+        .expect("Failed to compile the assembly code");
+
+    let stack_inputs = StackInputs::try_from_ints([]).unwrap();
+    let cloned_inputs = stack_inputs.clone();
+
+    let host = DefaultHost::default();
+
+    // Execute the program and generate a STARK proof
+    let (outputs, proof) = prove(&program, stack_inputs, host, ProvingOptions::default())
+        .expect("Failed to execute the program and generate a proof");
+
+    let inputs = NoteInputs::new(vec![Felt::new(2)]).unwrap();
+
+    let serial_num = [Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)];
+    let serial_num_hash = Hasher::merge(&[serial_num.into(), Digest::default()]);
+
+    let note_script_code = include_str!("../../src/hash/basic_note.masm");
+    let note_script = new_note_script(ProgramAst::parse(note_script_code).unwrap(), &assembler)
+        .unwrap()
+        .0;
+
+    let note_script_hash: Digest = note_script.hash();
+
+    let serial_script_hash = Hasher::merge(&[serial_num_hash, note_script_hash]);
+
+    let recipient_1 = Hasher::merge(&[serial_script_hash, inputs.commitment()]);
+    
+    let recipient = NoteRecipient::new(serial_num, note_script, inputs);
+    
+    println!("Stack Output: {:?}", outputs.stack());
+    print!("Recipient: {:?}", recipient.digest());
+
+    assert_eq!(recipient_1, recipient.digest());
+
+    verify(program.into(), cloned_inputs, outputs, proof).unwrap();
 }

@@ -32,7 +32,6 @@ proc.get_serial_script_hash
   hmerge
 end
 
-
 # input [input_hash, serial_script_hash]
 proc.get_recipient_hash
   hmerge
@@ -62,7 +61,6 @@ begin
   mem_storew.1
   dropw
 
-
   # 3) get serial script hash
 
   # hash(hash(serial_num, [0; 4]), script_hash)
@@ -73,9 +71,7 @@ begin
   
   hmerge
 
-
   # 4) get recipient hash
-
   padw
   mem_loadw.0
 

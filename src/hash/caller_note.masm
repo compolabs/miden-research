@@ -1,0 +1,74 @@
+use.std::sys
+
+# @dev Demonstrating how to calculate the note RECIPIENT 
+# - for a note with a custom note script and dynamic inputs in MASM
+#
+# - RECIPIENT is the following:
+#   hash(hash(hash(serial_num, [0; 4]), script_hash), input_hash).
+# 
+# Currently, the script hash must be known and calculated in Rust
+
+begin
+  # drop word at begining of note
+  dropw
+
+  # Step 1) Get serial number hash
+  # hash(serial_num, [0; 4])
+  # push serial number to stack
+  push.1.2.3.4
+
+  call.0xc7660d558d21172ecd8363847013f894051c5171910a492c4106f8121180f510
+
+  # store serial_num_hash 
+  mem_storew.0
+  dropw
+
+  # Step 2) Get note input hash
+  # @dev currently this procedure can calculate the input hash
+  # of a single stack input
+  # - push input to stack, the number 2
+  push.2
+  call.0xcfc34d12c1f6699d7c6023226670b8c7b46fa8426017a2e66014c5f51daf149a 
+
+  debug.stack
+
+  # store input_hash
+  mem_storew.1
+  dropw
+
+  # Step 3) Get serial script hash
+  # hash(serial_num_hash, script_hash)
+
+  # get serial_num_hash
+  mem_loadw.0
+
+  # push script hash
+  # @dev src/hash/basic_output_note.masm script hash
+  push.13799721128743826064.14281978650466140603.7404188438034050434.15662386827927983615
+
+  call.0x6007d8696343ae9658460b5be9e3b285c3f11e4270ef3b96ca302f50aa315c6b
+
+  # store serial script hash
+  mem_storew.2
+  dropw
+
+  # Step 4) Get RECIPIENT hash
+  # hash(hash(hash(serial_num, [0; 4]), script_hash), input_hash)
+
+  # get serial script hash
+  mem_loadw.2
+  # [serial_script_hashw]
+
+  padw
+  mem_loadw.1
+  # [input_hashw, serial_script_hashw]
+
+  
+
+  # exec.sys::truncate_stack
+
+
+  dup
+  drop
+  # call.0xecc751ebaa9f5b828c3c57b3a95a5ce952681b61ec5acd64a54349b691f9d1b9
+end

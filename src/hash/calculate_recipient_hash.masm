@@ -1,0 +1,55 @@
+use.std::sys
+
+# @dev get serial number hash
+# @notice serial number is comprised of 4 felts
+# input: [serial_numw]
+# output: [serial_num_hashw]
+export.get_serial_number_hash
+
+  debug.stack
+
+  swapw
+
+  # hash(serial_num, [0; 4])
+  # stack state
+  #├──  0: 0
+  #├──  1: 0
+  #├──  2: 0
+  #├──  3: 0
+  #├──  4: serial_num felt 3
+  #├──  5: serial_num felt 2
+  #├──  6: serial_num felt 1
+  #├──  7: serial_num felt 0
+
+  hmerge
+
+end
+
+# @dev get input hash
+# @notice only single stack element input currently
+# input: [note_input]
+# output: [note_input_hashw]
+export.get_input_hash
+  swap.7
+  hmerge
+end
+
+
+# @dev get serial script hash
+# hash(hash(serial_num, [0; 4]), script_hash)
+# input: [script_hashw, serial_num_hashw]
+# ouput: [serial_script_hashw]
+export.get_serial_script_hash
+  hmerge
+end
+
+
+
+
+######
+# @dev get recipient hash
+# planned input: [script_hash, serial_number_word, input]
+export.get_recipient_hash_1
+  # in progress
+  add
+end

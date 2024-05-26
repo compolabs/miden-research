@@ -1,0 +1,15 @@
+use.miden::note
+
+# @dev this is a generic note used as a demostration
+begin
+
+  push.1.2
+  add
+
+  exec.note::get_inputs
+
+  add
+
+  # call.{some_proc}
+
+end
