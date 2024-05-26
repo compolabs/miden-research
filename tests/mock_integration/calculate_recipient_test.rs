@@ -1,5 +1,5 @@
 use miden_objects::{
-    assembly::{AssemblyContext, ModuleAst, ProgramAst},
+    assembly::{AssemblyContext, ProgramAst},
     notes::{NoteInputs, NoteRecipient, NoteScript},
     vm::CodeBlock,
     Digest, Felt, Hasher, NoteError,

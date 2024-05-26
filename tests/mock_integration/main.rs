@@ -18,6 +18,4 @@ mod modifier_test;
 
 mod note_creator_test;
 
-mod rpo_hash_test;
-
-mod calculate_note_hash_test;
+mod calculate_recipient_test;
