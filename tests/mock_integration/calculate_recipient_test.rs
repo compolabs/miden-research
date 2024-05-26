@@ -116,9 +116,9 @@ fn test_recipient_hash_proc() {
     let serial_script_hash = Hasher::merge(&[serial_num_hash, note_script_hash]);
 
     let recipient_1 = Hasher::merge(&[serial_script_hash, inputs.commitment()]);
-    
+
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
-    
+
     println!("Stack Output: {:?}", outputs.stack());
     print!("Recipient: {:?}", recipient.digest());
 
