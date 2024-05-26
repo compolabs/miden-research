@@ -25,7 +25,7 @@ pub fn new_note_script(
 }
 
 #[test]
-fn test__get_recipient_hash() {
+fn test_get_recipient_hash() {
     // Instantiate the assembler
     let assembler = Assembler::default().with_debug_mode(true);
 

@@ -1,5 +1,6 @@
 # @dev get recipient hash
-# input: [script_hash, serial_number_word, input]
+# input: [script_hash_word, serial_number_word, input]
+# output: [recipient_hash]
 proc.get_recipient_hash
 
   # Stack state
