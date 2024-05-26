@@ -42,9 +42,11 @@ begin
   # 1) get input hash
   exec.get_input_hash
 
-  debug.stack
-
+  # store input hash starting @ mem addr 0 
+  mem_storew.0
   dropw
+
+  debug.stack
 
   # push serial number
   push.1.2.3.4
@@ -52,10 +54,32 @@ begin
   # 2) get serial hash
   exec.get_serial_hash
 
+  # store serial hash starting @ mem addr 1
+  mem_storew.1
+  dropw
 
+
+  # 3) get serial script hash
+  # hash(hash(serial_num, [0; 4]), script_hash)
+
+  # note script hash
+  push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
+
+  padw
+
+  mem_loadw.1
+
+
+
+  # mem_loadw.0
+  # padw
+  # mem_loadw.1
+
+  debug.stack
 
   # prevent empty span err
-  dup.1
+  dup
+
   drop
 
 end
