@@ -116,13 +116,26 @@ fn test_recipient_hash_proc() {
     let serial_script_hash = Hasher::merge(&[serial_num_hash, note_script_hash]);
 
     let recipient_1 = Hasher::merge(&[serial_script_hash, inputs.commitment()]);
-
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
+
+    assert_eq!(recipient_1, recipient.digest());
 
     println!("Stack Output: {:?}", outputs.stack());
     print!("Recipient: {:?}", recipient.digest());
 
-    assert_eq!(recipient_1, recipient.digest());
+    let mut stack_output = outputs.stack().to_vec();
+    let recipient_hash = recipient.digest().as_slice().to_vec();
+
+    if stack_output.len() > 8 {
+        stack_output.truncate(stack_output.len() - 13);
+    }
+
+    stack_output.reverse();
+
+    // asserting that the stack output is equal to the recipient hash
+    // the value calculated in MASM proc equals what was calculated in Rust
+    assert_eq!(stack_output, recipient_hash);
+    println!("Stack Output: {:?}", stack_output);
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
 }
