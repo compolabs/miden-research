@@ -25,13 +25,17 @@ proc.get_serial_hash
 end
 
 # hash(hash(serial_num, [0; 4]), script_hash)
-# input [serial_num_hash, script_hash]
+
+# input [note_script_hash, serial_num_hash]
 proc.get_serial_script_hash
-
   debug.stack
-
   hmerge
+end
 
+
+# input [input_hash, serial_script_hash]
+proc.get_recipient_hash
+  hmerge
 end
 
 begin
@@ -60,26 +64,21 @@ begin
 
 
   # 3) get serial script hash
+
   # hash(hash(serial_num, [0; 4]), script_hash)
-
   # note script hash
-  push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
-
-  padw
-
   mem_loadw.1
 
+  push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
+  
+  hmerge
 
 
-  # mem_loadw.0
-  # padw
-  # mem_loadw.1
+  # 4) get recipient hash
 
-  debug.stack
+  padw
+  mem_loadw.0
 
-  # prevent empty span err
-  dup
-
-  drop
+  hmerge
 
 end

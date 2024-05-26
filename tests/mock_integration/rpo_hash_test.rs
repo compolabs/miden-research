@@ -68,11 +68,11 @@ fn test_rpo_hash() {
 
     let serial_script_hash = Hasher::merge(&[serial_num_hash, note_script_hash]);
 
-    let recipient_1 = Hasher::merge(&[serial_script_hash, inputs.commitment()]);
+    println!("Serial Script Hash: {:?}", serial_script_hash);
 
-    println!("recipient_1: {:?}", recipient_1);
+    // let recipient_1 = Hasher::merge(&[serial_script_hash, inputs.commitment()]);
+    // println!("recipient_1: {:?}", recipient_1);
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
-
     print!("Recipient: {:?}", recipient.digest());
 
     verify(program.into(), cloned_inputs, outputs, proof).unwrap();
