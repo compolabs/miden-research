@@ -1,0 +1,9 @@
+begin
+
+  debug.stack
+
+  dropw
+
+  call.0x4b30f189d675484fa4261e39d01db80cdc55b5966776e60371ec8bfa1634ca0e
+
+end

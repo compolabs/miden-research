@@ -1,0 +1,133 @@
+use.miden::note
+use.miden::tx
+# use.miden::memory
+use.miden::kernels::tx::memory
+use.std::sys
+
+# @dev get recipient hash
+# input: [script_hash_word, serial_number_word, input]
+# output: [recipient_hash]
+proc.get_recipient_hash
+
+  # Stack state
+  # ├──  0: script_hash felt 3 
+  # ├──  1: script_hash felt 2
+  # ├──  2: script_hash felt 1 
+  # ├──  3: script_hash felt 0 
+  # ├──  4: serial_num felt 3
+  # ├──  5: serial_num felt 2
+  # ├──  6: serial_num felt 1
+  # ├──  7: serial_num felt 0
+  # ├──  8: input felt
+
+  swapw
+  padw
+  hmerge
+
+  # Stack state 
+  # ├──  0: serial_num_hash felt 3
+  # ├──  1: serial_num_hash felt 2
+  # ├──  2: serial_num_hash felt 1
+  # ├──  3: serial_num_hash felt 0
+  # ├──  4: script_hash felt 3 
+  # ├──  5: script_hash felt 2
+  # ├──  6: script_hash felt 1 
+  # ├──  7: script_hash felt 0 
+  # ├──  8: input felt
+
+  swapw
+  hmerge
+
+  # Stack state
+  # ├──  0: serial_script_hash felt 3
+  # ├──  1: serial_script_hash felt 2
+  # ├──  2: serial_script_hash felt 1
+  # ├──  3: serial_script_hash felt 0
+  # ├──  8: input felt
+
+  swapw
+  swap.3
+  padw
+  hmerge
+
+  # Stack state 
+  # ├──  0: input_hash felt 3
+  # ├──  1: input_hash felt 2
+  # ├──  2: input_hash felt 1
+  # ├──  3: input_hash felt 0
+  # ├──  4: serial_script_hash felt 3
+  # ├──  5: serial_script_hash felt 2
+  # ├──  6: serial_script_hash felt 1
+  # ├──  7: serial_script_hash felt 0
+
+  hmerge
+
+  # Stack state 
+  # ├──  0: RECIPIENT felt 3
+  # ├──  1: RECIPIENT felt 2
+  # ├──  2: RECIPIENT felt 1
+  # ├──  3: RECIPIENT felt 0
+
+end
+
+# input [value]
+proc.do_calculation
+
+  push.2
+  mul
+  add.5
+  mul.4
+
+end
+
+
+
+export.do_calculation_output_note
+
+  push.2
+  exec.do_calculation
+  push.1.2.3.4
+  push.14593183145765097619.14527104962505966887.16602479900060765071.1288703964947962500
+  
+  exec.get_recipient_hash
+
+  # note type
+  push.2 
+  # tag
+  push.3221225472
+
+  exec.tx::create_note
+
+  push.111
+  debug.stack
+  drop
+
+  mem_store.0
+
+  push.31
+  push.2
+  push.3221225473
+  push.44
+
+  mem_load.0
+
+  push.222
+  debug.stack
+  
+
+  exec.memory::set_created_note_metadata
+
+  push.333
+  debug.stack
+  drop
+  
+  exec.sys::truncate_stack
+
+end
+
+
+
+
+export.consume_note
+  add
+end

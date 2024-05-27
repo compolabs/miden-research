@@ -19,3 +19,5 @@ mod modifier_test;
 mod note_creator_test;
 
 mod calculate_recipient_test;
+
+mod verifiable_computation_test;

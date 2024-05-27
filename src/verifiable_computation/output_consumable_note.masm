@@ -1,0 +1,7 @@
+use.miden::note
+
+begin
+
+  push.1.2
+
+end
