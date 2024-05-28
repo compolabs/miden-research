@@ -1,14 +1,18 @@
 use.miden::note
+use.std::sys
 
 begin
   dropw
   push.0 exec.note::get_inputs
 
+  mem_load
+
   push.101
   debug.stack
   drop
 
-  call.0x1bfe2bc6c8373448a3228db2c502f4fc75bdf2bc1e1f2a5740303c31dc672111
+  call.0xaa0fb75446cdb096001d0f6014daf07561d69e6f981b3abb73c79df38eaec398
 
-  push.1.2
+  exec.sys::truncate_stack
+
 end

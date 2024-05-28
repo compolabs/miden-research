@@ -1,6 +1,6 @@
 use.miden::note
 use.miden::tx
-# use.miden::memory
+use.miden::account
 use.miden::kernels::tx::memory
 use.std::sys
 
@@ -40,7 +40,7 @@ export.do_calculation_output_note
   push.2
   exec.do_calculation
 
-  push.16475924727366359731.11578358426321877161.13491274342472647871.8400702437897721107
+  push.15326631369336564074.11512957450296267631.16599536773728207403.11505490857533801142
   push.1.2.3.4
   
   push.111
@@ -67,8 +67,14 @@ end
 
 export.consume_note
   exec.note::get_sender
+  exec.account::get_id
+
+  # assert_eq
 
   push.202
   debug.stack
   drop
+
+  exec.sys::truncate_stack
+
 end
