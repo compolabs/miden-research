@@ -25,7 +25,7 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 2] = [
-    "0x4b30f189d675484fa4261e39d01db80cdc55b5966776e60371ec8bfa1634ca0e", // do_calculation_output_note
+    "0x23cd7e89a231fcd3fa7643ebd06df0db6fb3c8ffd02ee69a98ebf7dfe8955ad8", // do_calculation_output_note
     "0x63c2b2b5cf6abd6414fb93cc7af4ad22fed1c8d3182ea1a01d3aba005c453c57", // consume_note
 ];
 
@@ -261,7 +261,8 @@ fn test_note_output() {
     // Note expected to be outputted by the transaction
     // let expected_note = create_output_note(None, create_note_a).unwrap();
 
-    /*     // Check that the output note is the same as the expected note
+    /*     
+    // Check that the output note is the same as the expected note
     assert_eq!(
         NoteHeader::from(tx_output_note).metadata(),
         NoteHeader::from(expected_note.clone()).metadata()
@@ -269,7 +270,8 @@ fn test_note_output() {
     assert_eq!(
         NoteHeader::from(tx_output_note),
         NoteHeader::from(expected_note.clone())
-    ); */
+    ); 
+    */
 
     // assert!(prove_and_verify_transaction(executed_transaction.clone()).is_ok());
 }
