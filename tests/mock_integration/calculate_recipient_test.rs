@@ -117,7 +117,7 @@ fn test_recipient_hash_proc() {
 
     let recipient_1 = Hasher::merge(&[serial_script_hash, inputs.commitment()]);
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
-
+    
     assert_eq!(recipient_1, recipient.digest());
 
     println!("Stack Output: {:?}", outputs.stack());
@@ -133,7 +133,7 @@ fn test_recipient_hash_proc() {
     stack_output.reverse();
 
     // asserting that the stack output is equal to the recipient hash
-    // the value calculated in MASM proc equals what was calculated in Rust
+    // the calculated in MASM proc equals what was calculated in Rust
     assert_eq!(stack_output, recipient_hash);
     println!("Stack Output: {:?}", stack_output);
 

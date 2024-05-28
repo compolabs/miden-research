@@ -1,78 +1,33 @@
-# @dev get recipient hash
-# input: [script_hash_word, serial_number_word, input]
-# output: [recipient_hash]
-proc.get_recipient_hash
+#! Returns the RECIPIENT for a specified SERIAL_NUM, SCRIPT_HASH, and input
+#!
+#! Inputs: [SERIAL_NUM, SCRIPT_HASH, input]
+#! Outputs: [RECIPIENT]
+#!
+#! Only allows a single input currently   
+export.get_recipient_hash
+  padw hmerge
+  # => [SERIAL_NUM_HASH, SCRIPT_HASH, input] 
 
-  # Stack state
-  # ├──  0: script_hash felt 3 
-  # ├──  1: script_hash felt 2
-  # ├──  2: script_hash felt 1 
-  # ├──  3: script_hash felt 0 
-  # ├──  4: serial_num felt 3
-  # ├──  5: serial_num felt 2
-  # ├──  6: serial_num felt 1
-  # ├──  7: serial_num felt 0
-  # ├──  8: input felt
+  swapw hmerge
+  # => [SERIAL_SCRIPT_HASH, input] 
 
-  swapw
-  padw
-  hmerge
-
-  # Stack state 
-  # ├──  0: serial_num_hash felt 3
-  # ├──  1: serial_num_hash felt 2
-  # ├──  2: serial_num_hash felt 1
-  # ├──  3: serial_num_hash felt 0
-  # ├──  4: script_hash felt 3 
-  # ├──  5: script_hash felt 2
-  # ├──  6: script_hash felt 1 
-  # ├──  7: script_hash felt 0 
-  # ├──  8: input felt
-
-  swapw
-  hmerge
-
-  # Stack state
-  # ├──  0: serial_script_hash felt 3
-  # ├──  1: serial_script_hash felt 2
-  # ├──  2: serial_script_hash felt 1
-  # ├──  3: serial_script_hash felt 0
-  # ├──  8: input felt
-
-  swapw
-  swap.3
-  padw
-  hmerge
-
-  # Stack state 
-  # ├──  0: input_hash felt 3
-  # ├──  1: input_hash felt 2
-  # ├──  2: input_hash felt 1
-  # ├──  3: input_hash felt 0
-  # ├──  4: serial_script_hash felt 3
-  # ├──  5: serial_script_hash felt 2
-  # ├──  6: serial_script_hash felt 1
-  # ├──  7: serial_script_hash felt 0
+  # to add more inputs, this needs to be changed
+  swapw swap.3 padw hmerge
+  # => [INPUT_HASH, SERIAL_SCRIPT_HASH]
 
   hmerge
-
-  # Stack state 
-  # ├──  0: RECIPIENT felt 3
-  # ├──  1: RECIPIENT felt 2
-  # ├──  2: RECIPIENT felt 1
-  # ├──  3: RECIPIENT felt 0
-
+  # [RECIPIENT]
 end
 
 begin
 
   # push input
   push.2 
-  # serial num
-  push.1.2.3.4 
   # push script hash
   push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
-  
+  # serial num
+  push.1.2.3.4
+
   exec.get_recipient_hash
 
 end
