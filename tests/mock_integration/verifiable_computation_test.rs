@@ -4,6 +4,7 @@ use miden_objects::{
     assembly::{AssemblyContext, ModuleAst, ProgramAst},
     assets::{Asset, AssetVault},
     crypto::rand::{FeltRng, RpoRandomCoin},
+    crypto::hash::rpo::RpoDigest,
     notes::{
         Note, NoteAssets, NoteExecutionHint, NoteHeader, NoteInputs, NoteMetadata, NoteRecipient,
         NoteScript, NoteTag, NoteType,
@@ -25,8 +26,8 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 2] = [
-    "0x274fb08a1e8ec345beeca765ad44186a8b2bfcdfcdc2b08582ff6ef774789787", // do_calculation_output_note
-    "0x4916cf24b0739eb6ff870a88c8d3903ace255598d8647e105f280226fa1dcc64", // consume_note
+    "0x11411d8be55a6165a48fde9ed5ee4233155c99432c87f38f39d5a3949f042911", // do_calculation_output_note
+    "0x1bfe2bc6c8373448a3228db2c502f4fc75bdf2bc1e1f2a5740303c31dc672111", // consume_note
 ];
 
 const ACCOUNT_CODE: &str =
@@ -126,47 +127,49 @@ fn create_initial_message_note<R: FeltRng>(
     Ok(Note::new(vault, metadata, recipient))
 }
 
-pub fn create_output_note(note_input: Option<Felt>, use_note_a: bool) -> Result<Note, NoteError> {
-    let sender_account_id: AccountId =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+pub fn create_output_note(note_input: Option<Felt>, use_note_a: bool) -> Result<(Note, RpoDigest), NoteError> {
+  let sender_account_id: AccountId =
+      AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
 
-    // Create target smart contract
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+  // Create target smart contract
+  let target_account_id =
+      AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
 
-    let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
+  let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
-    let note_script_path = if use_note_a {
-        "src/verifiable_computation/output_consumable_note.masm"
-    } else {
-        "src/verifiable_computation/output_consumable_note.masm"
-    };
+  let note_script_path = if use_note_a {
+      "src/verifiable_computation/output_consumable_note.masm"
+  } else {
+      "src/verifiable_computation/output_consumable_note.masm"
+  };
 
-    let note_script = fs::read_to_string(Path::new(note_script_path))
-        .expect("Failed to read the note script file");
+  let note_script = fs::read_to_string(Path::new(note_script_path))
+      .expect("Failed to read the note script file");
 
-    let script_ast = ProgramAst::parse(&note_script).unwrap();
-    let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
+  let script_ast = ProgramAst::parse(&note_script).unwrap();
+  let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    // add the inputs to the note
-    let input_values = match note_input {
-        Some(value) => vec![value],
-        None => vec![],
-    };
+  // add the inputs to the note
+  let input_values = match note_input {
+      Some(value) => vec![value],
+      None => vec![],
+  };
 
-    let inputs: NoteInputs = NoteInputs::new(input_values).unwrap();
+  let inputs: NoteInputs = NoteInputs::new(input_values).unwrap();
 
-    let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local).unwrap();
-    let serial_num = [Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)];
-    let aux = ZERO;
-    let note_type = NoteType::OffChain;
-    let metadata = NoteMetadata::new(sender_account_id, note_type, tag, aux).unwrap();
+  let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local).unwrap();
+  let serial_num = [Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)];
+  let aux = ZERO;
+  let note_type = NoteType::OffChain;
+  let metadata = NoteMetadata::new(sender_account_id, note_type, tag, aux).unwrap();
 
-    // empty vault
-    let vault: NoteAssets = NoteAssets::new(vec![]).unwrap();
-    let recipient = NoteRecipient::new(serial_num, note_script, inputs);
+  // empty vault
+  let vault: NoteAssets = NoteAssets::new(vec![]).unwrap();
+  let recipient = NoteRecipient::new(serial_num, note_script.clone(), inputs);
 
-    Ok(Note::new(vault, metadata, recipient))
+  let note_script_hash = note_script.hash();
+
+  Ok((Note::new(vault, metadata, recipient), note_script_hash))
 }
 
 // Run this first to check MASTs are correct
@@ -183,16 +186,15 @@ pub fn check_account_masts() {
 }
 
 #[test]
-pub fn get_dynamic_note_recipient() {
-    let output_note = create_output_note(None, false).unwrap();
+pub fn get_note_script_hash() {
+    let (output_note, note_script_hash) = create_output_note(None, false).unwrap();
 
     let tag = output_note.clone().metadata().tag();
     let note_type = output_note.clone().metadata().note_type();
-    let recipient = output_note.recipient();
 
     println!("{:?}", tag);
     println!("{:?}", note_type);
-    println!("{:?}", recipient.digest());
+    println!("Note script hash: {:?}", note_script_hash);
 }
 
 #[test]
@@ -259,32 +261,41 @@ fn test_note_output() {
     // let stack_output = executed_transaction.clone().stack_output();
 
     // Note expected to be outputted by the transaction
-    // let expected_note = create_output_note(None, create_note_a).unwrap();
+    let (expected_note, note_script_hash) = create_output_note(Some(Felt::new(36)), create_note_a).unwrap();
          
     // Check that the output note is the same as the expected note
-/*     assert_eq!(
+     assert_eq!(
         NoteHeader::from(tx_output_note).metadata(),
         NoteHeader::from(expected_note.clone()).metadata()
     );
     assert_eq!(
         NoteHeader::from(tx_output_note),
         NoteHeader::from(expected_note.clone())
-    );  */
+    );  
     
     // assert!(prove_and_verify_transaction(executed_transaction.clone()).is_ok());
 
     // CONSTRUCT AND EXECUTE TX 2 (Success)
     // --------------------------------------------------------------------------------------------
-    let note_ids_1 = data_store
-    .notes
-    .iter()
-    .map(|tx_output_note| tx_output_note.id())
-    .collect::<Vec<_>>();
+    let data_store_1 =
+        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![expected_note.clone()]));
+
+    let mut executor: TransactionExecutor<_, ()> =
+        TransactionExecutor::new(data_store_1.clone(), None).with_debug_mode(true);
+    executor.load_account(target_account_id).unwrap();
+
+    let block_ref = data_store_1.block_header.block_num();
+    let note_ids_1 = data_store_1
+        .notes
+        .iter()
+        .map(|expected_note| expected_note.id())
+        .collect::<Vec<_>>();
 
 
     // Execute the transaction and get the witness
     let executed_transaction_1 = executor
-        .execute_transaction(target_account_id, block_ref, &note_ids_1, tx_args_target)
+        .execute_transaction(target_account_id, block_ref, &note_ids_1, tx_args_target.clone())
         .unwrap();
+
 
 }

@@ -4,11 +4,11 @@ begin
   dropw
   push.0 exec.note::get_inputs
 
-  push.111
+  push.101
   debug.stack
   drop
 
-  call.0x4916cf24b0739eb6ff870a88c8d3903ace255598d8647e105f280226fa1dcc64
+  call.0x1bfe2bc6c8373448a3228db2c502f4fc75bdf2bc1e1f2a5740303c31dc672111
 
   push.1.2
 end

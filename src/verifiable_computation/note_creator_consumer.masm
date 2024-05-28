@@ -40,9 +40,13 @@ export.do_calculation_output_note
   push.2
   exec.do_calculation
 
-  push.13452391947619181909.1316462843136396902.2708759736457122137.3694107041051423369
+  push.16475924727366359731.11578358426321877161.13491274342472647871.8400702437897721107
   push.1.2.3.4
   
+  push.111
+  debug.stack
+  drop
+
   exec.get_recipient_hash
 
   # note type
@@ -52,26 +56,7 @@ export.do_calculation_output_note
 
   exec.tx::create_note
 
-  push.111
-  debug.stack
-  drop
-
-  mem_store.0
-
-  push.31
-  push.2
-  push.3221225473
-  push.44
-
-  mem_load.0
-
   push.222
-  debug.stack
-  
-
-  exec.memory::set_created_note_metadata
-
-  push.333
   debug.stack
   drop
   
@@ -80,12 +65,10 @@ export.do_calculation_output_note
 end
 
 
-
-
 export.consume_note
-  
-  push.333
+  exec.note::get_sender
+
+  push.202
   debug.stack
   drop
-
 end
