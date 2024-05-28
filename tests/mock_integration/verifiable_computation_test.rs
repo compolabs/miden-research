@@ -25,8 +25,8 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 2] = [
-    "0x23cd7e89a231fcd3fa7643ebd06df0db6fb3c8ffd02ee69a98ebf7dfe8955ad8", // do_calculation_output_note
-    "0x63c2b2b5cf6abd6414fb93cc7af4ad22fed1c8d3182ea1a01d3aba005c453c57", // consume_note
+    "0x274fb08a1e8ec345beeca765ad44186a8b2bfcdfcdc2b08582ff6ef774789787", // do_calculation_output_note
+    "0x4916cf24b0739eb6ff870a88c8d3903ace255598d8647e105f280226fa1dcc64", // consume_note
 ];
 
 const ACCOUNT_CODE: &str =
@@ -249,7 +249,7 @@ fn test_note_output() {
 
     // Execute the transaction and get the witness
     let executed_transaction = executor
-        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
+        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target.clone())
         .unwrap();
 
     // Note outputted by the transaction
@@ -260,18 +260,31 @@ fn test_note_output() {
 
     // Note expected to be outputted by the transaction
     // let expected_note = create_output_note(None, create_note_a).unwrap();
-
-    /*     
+         
     // Check that the output note is the same as the expected note
-    assert_eq!(
+/*     assert_eq!(
         NoteHeader::from(tx_output_note).metadata(),
         NoteHeader::from(expected_note.clone()).metadata()
     );
     assert_eq!(
         NoteHeader::from(tx_output_note),
         NoteHeader::from(expected_note.clone())
-    ); 
-    */
-
+    );  */
+    
     // assert!(prove_and_verify_transaction(executed_transaction.clone()).is_ok());
+
+    // CONSTRUCT AND EXECUTE TX 2 (Success)
+    // --------------------------------------------------------------------------------------------
+    let note_ids_1 = data_store
+    .notes
+    .iter()
+    .map(|tx_output_note| tx_output_note.id())
+    .collect::<Vec<_>>();
+
+
+    // Execute the transaction and get the witness
+    let executed_transaction_1 = executor
+        .execute_transaction(target_account_id, block_ref, &note_ids_1, tx_args_target)
+        .unwrap();
+
 }

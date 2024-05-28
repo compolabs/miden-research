@@ -39,7 +39,8 @@ export.do_calculation_output_note
 
   push.2
   exec.do_calculation
-  push.14593183145765097619.14527104962505966887.16602479900060765071.1288703964947962500
+
+  push.13452391947619181909.1316462843136396902.2708759736457122137.3694107041051423369
   push.1.2.3.4
   
   exec.get_recipient_hash
@@ -82,5 +83,9 @@ end
 
 
 export.consume_note
-  add
+  
+  push.333
+  debug.stack
+  drop
+
 end
