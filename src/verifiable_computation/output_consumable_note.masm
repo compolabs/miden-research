@@ -11,7 +11,7 @@ begin
   debug.stack
   drop
 
-  call.0xaa0fb75446cdb096001d0f6014daf07561d69e6f981b3abb73c79df38eaec398
+  call.0xc1a32dd2b626f9e18ffa5e75c08ab9978571c91fed6dff087a2a2653d3fc24e1
 
   exec.sys::truncate_stack
 

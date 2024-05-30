@@ -40,7 +40,7 @@ export.do_calculation_output_note
   push.2
   exec.do_calculation
 
-  push.15326631369336564074.11512957450296267631.16599536773728207403.11505490857533801142
+  push.10899261555824512761.659602662498164710.4315164961157311398.17345841088042656224
   push.1.2.3.4
   
   push.111
@@ -68,6 +68,14 @@ end
 export.consume_note
   exec.note::get_sender
   exec.account::get_id
+
+  push.0
+  exec.note::get_inputs
+
+  debug.stack
+
+  drop
+  mem_load
 
   # assert_eq
 

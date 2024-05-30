@@ -26,8 +26,8 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 2] = [
-    "0xa69c36f209f7d83e40c402ee1061684ff2f60a15591b1c15dbef1fb8d2ef90e7", // do_calculation_output_note
-    "0xaa0fb75446cdb096001d0f6014daf07561d69e6f981b3abb73c79df38eaec398", // consume_note
+    "0x11759e92bee58b3b1d2ca1c86906702747737851677ec988bf1a779bd0f0c8ed", // do_calculation_output_note
+    "0xc1a32dd2b626f9e18ffa5e75c08ab9978571c91fed6dff087a2a2653d3fc24e1", // consume_note
 ];
 
 const ACCOUNT_CODE: &str =
