@@ -23,7 +23,7 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 2] = [
-    "0x7fb191dfd178544b8c45e61371105022625fa0e39cb53237b08cd72ee4613954", // do_calculation_output_note
+    "0xc2114e2bb4ad9e7183d376f34895bdae007e1e31e59084db3371e9ca9c4adf11", // do_calculation_output_note
     "0xbf8e006fdf47e206c6ab4fd9f6f8ba1e993981f0533993fdd6772b5c7797fd1a", // consume_note
 ];
 
@@ -193,7 +193,7 @@ fn test_verifiable_computation() {
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
     // message note input
-    let note_input: Felt = Felt::new(2);
+    let note_input: Felt = Felt::new(5);
 
     // Create the note
     let note = create_initial_message_note(
@@ -247,7 +247,7 @@ fn test_verifiable_computation() {
     let tx_output_note = executed_transaction.output_notes().get_note(0);
 
     // Note expected to be outputted by the transaction
-    let (expected_note, note_script_hash) = create_output_note(Some(Felt::new(36))).unwrap();
+    let (expected_note, note_script_hash) = create_output_note(Some(Felt::new(301))).unwrap();
 
     // Check that the output note is the same as the expected note
     assert_eq!(
