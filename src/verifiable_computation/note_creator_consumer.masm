@@ -43,25 +43,29 @@ export.do_calculation_output_note
   # [message_note_input]
 
   exec.do_calculation
+  # [computed_value]
 
-  push.6525444024988894638.13688867582656446673.8909265956159957235.10127591221367183952
+  push.13310334165435798105.17704527159432745453.13948713200779750900.13586240079106921094
   push.1.2.3.4
 
-  # log 1 
+  # log 1 tx 1
   push.111
   debug.stack
   drop
 
   exec.get_recipient_hash
+  # [RECIPIENT]
 
   # note type
   push.2 
   # tag
   push.3221225472
+  # [tag, note_type, RECIPIENT]
 
   exec.tx::create_note
+  # [note_ptr]
 
-  # log 2
+  # log 2 tx 1
   push.222
   debug.stack
   drop
@@ -87,8 +91,8 @@ export.consume_note
 
   # [verifiable_computation_output]
 
-  # log 3
-  push.303
+  # log 2 tx 2
+  push.202
   debug.stack
   drop
 

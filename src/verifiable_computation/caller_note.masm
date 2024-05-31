@@ -4,6 +4,6 @@ begin
   dropw
 
   # call.do_calculation_output_note
-  call.0x0689d8670e3ebfefdbdb053a402b7081fef4aecfc143c1383a49e08c9f368cdf
+  call.0x7fb191dfd178544b8c45e61371105022625fa0e39cb53237b08cd72ee4613954
 
 end

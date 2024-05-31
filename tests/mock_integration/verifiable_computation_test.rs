@@ -17,15 +17,14 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
-
 use crate::utils::{
     get_new_key_pair_with_advice_map, prove_and_verify_transaction, MockDataStore,
     ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
 };
 
 const MASTS: [&str; 2] = [
-    "0x0689d8670e3ebfefdbdb053a402b7081fef4aecfc143c1383a49e08c9f368cdf", // do_calculation_output_note
-    "0x1fb128c364eb75ccd03128b4676a6cce3e90206a2c8c2a0659103a199c34a3c4", // consume_note
+    "0x7fb191dfd178544b8c45e61371105022625fa0e39cb53237b08cd72ee4613954", // do_calculation_output_note
+    "0xbf8e006fdf47e206c6ab4fd9f6f8ba1e993981f0533993fdd6772b5c7797fd1a", // consume_note
 ];
 
 const ACCOUNT_CODE: &str =
@@ -119,9 +118,7 @@ fn create_initial_message_note<R: FeltRng>(
     Ok(Note::new(vault, metadata, recipient))
 }
 
-pub fn create_output_note(
-    note_input: Option<Felt>,
-) -> Result<(Note, RpoDigest), NoteError> {
+pub fn create_output_note(note_input: Option<Felt>) -> Result<(Note, RpoDigest), NoteError> {
     let sender_account_id: AccountId =
         AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
 
@@ -250,8 +247,7 @@ fn test_verifiable_computation() {
     let tx_output_note = executed_transaction.output_notes().get_note(0);
 
     // Note expected to be outputted by the transaction
-    let (expected_note, note_script_hash) =
-        create_output_note(Some(Felt::new(36))).unwrap();
+    let (expected_note, note_script_hash) = create_output_note(Some(Felt::new(36))).unwrap();
 
     // Check that the output note is the same as the expected note
     assert_eq!(
@@ -263,6 +259,7 @@ fn test_verifiable_computation() {
         NoteHeader::from(expected_note.clone())
     );
 
+    // comment out to speed up test
     // assert!(prove_and_verify_transaction(executed_transaction.clone()).is_ok());
 
     // CONSTRUCT AND EXECUTE TX 2 (Success)
@@ -292,4 +289,7 @@ fn test_verifiable_computation() {
             tx_args_target.clone(),
         )
         .unwrap();
+
+    // commented out to speed up test
+    // assert!(prove_and_verify_transaction(executed_transaction_1.clone()).is_ok());
 }
