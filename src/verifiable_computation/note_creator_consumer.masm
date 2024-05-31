@@ -35,14 +35,19 @@ proc.do_calculation
 
 end
 
+# Procedure 1
 export.do_calculation_output_note
 
-  push.2
+  exec.note::get_inputs
+  drop mem_load
+  # [message_note_input]
+
   exec.do_calculation
 
-  push.10899261555824512761.659602662498164710.4315164961157311398.17345841088042656224
+  push.6525444024988894638.13688867582656446673.8909265956159957235.10127591221367183952
   push.1.2.3.4
-  
+
+  # log 1 
   push.111
   debug.stack
   drop
@@ -56,6 +61,7 @@ export.do_calculation_output_note
 
   exec.tx::create_note
 
+  # log 2
   push.222
   debug.stack
   drop
@@ -64,22 +70,25 @@ export.do_calculation_output_note
 
 end
 
-
+# Procedure 2
 export.consume_note
+
+  # assert sender is this account
   exec.note::get_sender
   exec.account::get_id
+  assert_eq
 
-  push.0
+  # get note inputs
   exec.note::get_inputs
-
-  debug.stack
+  # [num_inputs, dest_ptr]
 
   drop
   mem_load
 
-  # assert_eq
+  # [verifiable_computation_output]
 
-  push.202
+  # log 3
+  push.303
   debug.stack
   drop
 

@@ -3,15 +3,13 @@ use.std::sys
 
 begin
   dropw
-  push.0 exec.note::get_inputs
-
-  mem_load
 
   push.101
   debug.stack
   drop
 
-  call.0xc1a32dd2b626f9e18ffa5e75c08ab9978571c91fed6dff087a2a2653d3fc24e1
+  # call.consume_note
+  call.0x1fb128c364eb75ccd03128b4676a6cce3e90206a2c8c2a0659103a199c34a3c4
 
   exec.sys::truncate_stack
 

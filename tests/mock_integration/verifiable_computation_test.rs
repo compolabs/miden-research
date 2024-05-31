@@ -17,8 +17,6 @@ use miden_processor::AdviceMap;
 use miden_tx::TransactionExecutor;
 use miden_vm::Assembler;
 
-use std::fs;
-use std::path::Path;
 
 use crate::utils::{
     get_new_key_pair_with_advice_map, prove_and_verify_transaction, MockDataStore,
@@ -26,8 +24,8 @@ use crate::utils::{
 };
 
 const MASTS: [&str; 2] = [
-    "0x11759e92bee58b3b1d2ca1c86906702747737851677ec988bf1a779bd0f0c8ed", // do_calculation_output_note
-    "0xc1a32dd2b626f9e18ffa5e75c08ab9978571c91fed6dff087a2a2653d3fc24e1", // consume_note
+    "0x0689d8670e3ebfefdbdb053a402b7081fef4aecfc143c1383a49e08c9f368cdf", // do_calculation_output_note
+    "0x1fb128c364eb75ccd03128b4676a6cce3e90206a2c8c2a0659103a199c34a3c4", // consume_note
 ];
 
 const ACCOUNT_CODE: &str =
@@ -96,22 +94,17 @@ pub fn new_note_script(
 fn create_initial_message_note<R: FeltRng>(
     sender_account_id: AccountId,
     target_account_id: AccountId,
-    create_note_a: bool,
+    note_input: Felt,
     mut rng: R,
 ) -> Result<Note, NoteError> {
-    let note_script = include_str!("../../src/verifiable_computation/message_note.masm");
+    let note_script = include_str!("../../src/verifiable_computation/caller_note.masm");
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    // create note a (1) or note b (0)
-    let create_note_a_u64: u64 = if create_note_a { 1 } else { 0 };
-
-    println!("create_note_a_u64: {:?}", create_note_a_u64);
-
-    let inputs = NoteInputs::new(vec![Felt::new(create_note_a_u64)])?;
+    let inputs = NoteInputs::new(vec![note_input])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -121,7 +114,6 @@ fn create_initial_message_note<R: FeltRng>(
 
     // empty vault
     let vault = NoteAssets::new(vec![])?;
-
     let recipient = NoteRecipient::new(serial_num, note_script, inputs);
 
     Ok(Note::new(vault, metadata, recipient))
@@ -129,7 +121,6 @@ fn create_initial_message_note<R: FeltRng>(
 
 pub fn create_output_note(
     note_input: Option<Felt>,
-    use_note_a: bool,
 ) -> Result<(Note, RpoDigest), NoteError> {
     let sender_account_id: AccountId =
         AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
@@ -140,14 +131,7 @@ pub fn create_output_note(
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
-    let note_script_path = if use_note_a {
-        "src/verifiable_computation/output_consumable_note.masm"
-    } else {
-        "src/verifiable_computation/output_consumable_note.masm"
-    };
-
-    let note_script = fs::read_to_string(Path::new(note_script_path))
-        .expect("Failed to read the note script file");
+    let note_script = include_str!("../../src/verifiable_computation/output_consumable_note.masm");
 
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
@@ -190,7 +174,7 @@ pub fn check_account_masts() {
 
 #[test]
 pub fn get_note_script_hash() {
-    let (output_note, note_script_hash) = create_output_note(None, false).unwrap();
+    let (output_note, note_script_hash) = create_output_note(None).unwrap();
 
     let tag = output_note.clone().metadata().tag();
     let note_type = output_note.clone().metadata().note_type();
@@ -201,7 +185,7 @@ pub fn get_note_script_hash() {
 }
 
 #[test]
-fn test_note_output() {
+fn test_verifiable_computation() {
     // Create note sender account
     let sender_account_id: AccountId = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
@@ -211,14 +195,14 @@ fn test_note_output() {
     let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
     let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
 
-    // Create note a (1) or note b (0)
-    let create_note_a: bool = true;
+    // message note input
+    let note_input: Felt = Felt::new(2);
 
     // Create the note
     let note = create_initial_message_note(
         sender_account_id,
         target_account_id,
-        create_note_a,
+        note_input,
         RpoRandomCoin::new([Felt::new(1), Felt::new(2), Felt::new(3), Felt::new(4)]),
     )
     .unwrap();
@@ -265,12 +249,9 @@ fn test_note_output() {
     // Note outputted by the transaction
     let tx_output_note = executed_transaction.output_notes().get_note(0);
 
-    println!("{:?}", tx_output_note.metadata());
-    // let stack_output = executed_transaction.clone().stack_output();
-
     // Note expected to be outputted by the transaction
     let (expected_note, note_script_hash) =
-        create_output_note(Some(Felt::new(36)), create_note_a).unwrap();
+        create_output_note(Some(Felt::new(36))).unwrap();
 
     // Check that the output note is the same as the expected note
     assert_eq!(
