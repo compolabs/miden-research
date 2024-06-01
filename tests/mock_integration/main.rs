@@ -21,3 +21,5 @@ mod note_creator_test;
 mod calculate_recipient_test;
 
 mod verifiable_computation_test;
+
+mod partial_swap_test;
