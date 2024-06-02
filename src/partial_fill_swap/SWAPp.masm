@@ -1,6 +1,6 @@
 use.miden::note
 use.miden::contracts::wallets::basic->wallet
-
+use.miden::tx
 # CONSTANTS
 # =================================================================================================
 
@@ -14,6 +14,23 @@ const.ERR_SWAP_WRONG_NUMBER_OF_INPUTS=0x00020007
 
 # SWAP script requires exactly one note asset
 const.ERR_SWAP_WRONG_NUMBER_OF_ASSETS=0x00020008
+
+
+proc.build_recipient_hash
+  padw hmerge
+  # => [SERIAL_NUM_HASH, SCRIPT_HASH, input] 
+
+# merge SERIAL_NUM_HASH and SCRIPT_HASH
+  swapw hmerge
+  # => [SERIAL_SCRIPT_HASH, input] 
+
+  # compute the INPUT_HASH. Note: only one input is allowed
+  swapw swap.3 padw hmerge
+  # => [INPUT_HASH, SERIAL_SCRIPT_HASH]
+
+  hmerge
+  # [RECIPIENT]
+end
 
 # Swap script: adds an asset from the note into consumers account and
 # creates a note consumable by note issuer containing requested ASSET.
@@ -44,9 +61,13 @@ begin
     # => [ptr]
 
     # logging 
+    
     mem_loadw
+    push.111
     debug.stack
-    dropw
+    drop
+
+
     push.3
 
     # load the asset and add it to the account
@@ -77,11 +98,33 @@ begin
     push.OFFCHAIN_NOTE movdn.5
     # => [ASSET, tag, note_type, RECIPIENT]
 
+    push.222
     debug.stack
+    drop
 
     # create a note using inputs
     call.wallet::send_asset
     # => [ptr, ZERO, ZERO, 0]
+
+    # push custom note test
+    push.13310334165435798105.17704527159432745453.13948713200779750900.13586240079106921094
+    push.1.2.3.4
+
+    # log 1 tx 1
+    push.111
+    debug.stack
+    drop
+
+    exec.build_recipient_hash 
+    # [RECIPIENT]
+
+    # note type
+    push.2 
+    # tag
+    push.3221225472
+    # [tag, note_type, RECIPIENT]
+
+    # exec.tx::create_note
 
     # clean stack
     dropw dropw drop drop

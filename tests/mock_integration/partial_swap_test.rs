@@ -17,8 +17,8 @@ use mock::mock::account::DEFAULT_AUTH_SCRIPT;
 
 use crate::utils::{
     get_new_pk_and_authenticator, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
-    ACCOUNT_ID_SENDER,
+    ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
+    ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
 };
 pub fn get_custom_account_code(
     account_id: AccountId,
@@ -52,15 +52,6 @@ pub fn get_custom_account_code(
         Felt::new(1),
     )
 }
-
-/* pub fn build_note_script(bytes: &[u8]) -> Result<NoteScript, NoteError> {
-  let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
-
-  let script_ast = ProgramAst::from_bytes(bytes).map_err(NoteError::NoteDeserializationError)?;
-  let (note_script, _) = NoteScript::new(script_ast, &note_assembler)?;
-
-  Ok(note_script)
-}  */
 
 pub fn new_note_script(code: ProgramAst, assembler: &Assembler) -> Result<NoteScript, NoteError> {
     // Compile the code in the context with phantom calls enabled
@@ -167,12 +158,17 @@ fn prove_swap_script() {
     let faucet_id = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
     let offered_asset: Asset = FungibleAsset::new(faucet_id, 100).unwrap().into();
 
-    let faucet_id_2 = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
+    let faucet_id_2 = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
+
+    /*
     let requested_asset: Asset = NonFungibleAsset::new(
         &NonFungibleAssetDetails::new(faucet_id_2, vec![1, 2, 3, 4]).unwrap(),
     )
     .unwrap()
     .into();
+    */
+
+    let requested_asset: Asset = FungibleAsset::new(faucet_id_2, 100).unwrap().into();
 
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();

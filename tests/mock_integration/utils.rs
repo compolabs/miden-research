@@ -145,11 +145,12 @@ pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN: u64 = account_id(
     AccountStorageType::OnChain,
     0b0001_1111,
 );
-/* pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
+pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1: u64 = account_id(
     AccountType::FungibleFaucet,
     AccountStorageType::OnChain,
     0b0010_1111,
 );
+/*
 pub const ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_2: u64 = account_id(
     AccountType::FungibleFaucet,
     AccountStorageType::OnChain,
