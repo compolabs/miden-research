@@ -1,6 +1,8 @@
 use.miden::note
 use.miden::contracts::wallets::basic->wallet
 use.miden::tx
+use.miden::account
+use.std::sys
 # CONSTANTS
 # =================================================================================================
 
@@ -60,16 +62,6 @@ begin
     push.3 exec.note::get_assets assert.err=ERR_SWAP_WRONG_NUMBER_OF_ASSETS
     # => [ptr]
 
-    # logging 
-    
-    mem_loadw
-    push.111
-    debug.stack
-    drop
-
-
-    push.3
-
     # load the asset and add it to the account
     mem_loadw call.wallet::receive_asset dropw
     # => []
@@ -98,35 +90,78 @@ begin
     push.OFFCHAIN_NOTE movdn.5
     # => [ASSET, tag, note_type, RECIPIENT]
 
-    push.222
-    debug.stack
-    drop
+    # save requested token to memory
+    dup mem_store.0
 
-    # create a note using inputs
-    call.wallet::send_asset
-    # => [ptr, ZERO, ZERO, 0]
+    # save requested token amount to memory
+    swap.3 mem_store.1 push.0 swap.3
 
-    # push custom note test
-    push.13310334165435798105.17704527159432745453.13948713200779750900.13586240079106921094
-    push.1.2.3.4
+    # call into account to get max bal
+    call.account::get_balance
 
-    # log 1 tx 1
-    push.111
-    debug.stack
-    drop
+    # store wallet balance
+    mem_store.2
 
-    exec.build_recipient_hash 
-    # [RECIPIENT]
+    # check if requested amount is gte wallet balance
+    mem_load.1
 
-    # note type
-    push.2 
-    # tag
-    push.3221225472
-    # [tag, note_type, RECIPIENT]
+    mem_load.2
+    # => [wallet_balance, requested_amount, ...]
 
-    # exec.tx::create_note
+    gte
+
+    # Call send_asset with wallet balance
+    # output new SWAPp note
+    if.true 
+
+      # load wallet balance
+      mem_load.2 swap.3 drop
+
+      # load requested token id
+      mem_load.0
+
+      push.1010
+      debug.stack
+      drop
+
+      # create a note using inputs
+      call.wallet::send_asset
+      # => [ptr, ZERO, ZERO, 0]
+
+      # Add remaining balance to SWAPp note (todo)
+
+      # push custom note test
+      push.13310334165435798105.17704527159432745453.13948713200779750900.13586240079106921094
+      push.1.2.3.4
+
+      exec.build_recipient_hash 
+      # [RECIPIENT]
+
+      # note type
+      push.2 
+      # tag
+      push.3221225472
+      # [tag, note_type, RECIPIENT]
+
+      call.tx::create_note
+
+
+    # call send_asset with requested amount
+    # do not ouput new SWAPp note
+    else  
+      # place holder
+      # dup drop
+      push.1111
+      debug.stack
+      drop 
+
+      call.wallet::send_asset
+
+    end
+
+    push.1
+    call.account::incr_nonce
 
     # clean stack
-    dropw dropw drop drop
-    # => []
+    exec.sys::truncate_stack
 end
