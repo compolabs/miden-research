@@ -1,5 +1,6 @@
 // use miden_vm::{prove, verify, Assembler, DefaultHost, ProvingOptions, StackInputs};
 
+use crate::common::*;
 use miden_lib::transaction::TransactionKernel;
 use miden_objects::{
     accounts::{Account, AccountId},
@@ -14,14 +15,9 @@ use miden_objects::{
     vm::CodeBlock,
     Felt, NoteError, ZERO,
 };
-use miden_tx::TransactionExecutor;
+use miden_processor::AdviceMap;
+use miden_tx::{testing::TransactionContextBuilder, TransactionExecutor};
 use miden_vm::Assembler;
-
-use crate::utils::{
-    get_account_with_default_account_code, get_new_pk_and_authenticator, MockDataStore,
-    ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN,
-    ACCOUNT_ID_SENDER,
-};
 
 pub fn new_note_script(
     code: ProgramAst,
@@ -78,13 +74,12 @@ fn prove_p2id_script() {
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN).unwrap();
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
     let (target_pub_key, falcon_auth) = get_new_pk_and_authenticator();
 
     let target_account =
         get_account_with_default_account_code(target_account_id, target_pub_key, None);
-
+    let (target_pub_key, target_falcon_auth) = get_new_pk_and_authenticator();
     // Create the note
     let note = create_p2id_note(
         sender_account_id,
@@ -97,27 +92,32 @@ fn prove_p2id_script() {
 
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store =
-        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    let tx_context = TransactionContextBuilder::new(target_account.clone())
+        .input_notes(vec![note.clone()])
+        .build();
 
-    let mut executor = TransactionExecutor::new(data_store.clone(), Some(falcon_auth.clone()));
+    let mut executor =
+        TransactionExecutor::new(tx_context.clone(), Some(target_falcon_auth.clone()))
+            .with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store.block_header.block_num();
-    let note_ids = data_store
-        .notes
+    let block_ref = tx_context.tx_inputs().block_header().block_num();
+    let note_ids = tx_context
+        .tx_inputs()
+        .input_notes()
         .iter()
         .map(|note| note.id())
         .collect::<Vec<_>>();
 
     let tx_script = include_str!("../../src/p2id/tx_script.masm");
-    let tx_script_code = ProgramAst::parse(tx_script).unwrap();
+    let tx_script_ast = ProgramAst::parse(tx_script).unwrap();
 
     let tx_script_target = executor
-        .compile_tx_script(tx_script_code.clone(), vec![], vec![])
+        .compile_tx_script(tx_script_ast.clone(), vec![], vec![])
         .unwrap();
-    let tx_args_target = TransactionArgs::with_tx_script(tx_script_target);
 
+    let tx_args_target: TransactionArgs =
+        TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
     // Execute the transaction and get the witness
     let executed_transaction = executor
         .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
@@ -127,7 +127,7 @@ fn prove_p2id_script() {
     // assert!(prove_and_verify_transaction(executed_transaction.clone()).is_ok());
 
     // vault delta
-    let target_account_after: Account = Account::new(
+    let target_account_after: Account = Account::from_parts(
         target_account.id(),
         AssetVault::new(&[fungible_asset]).unwrap(),
         target_account.storage().clone(),

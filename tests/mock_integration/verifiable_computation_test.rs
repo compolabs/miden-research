@@ -14,13 +14,12 @@ use miden_objects::{
     Felt, NoteError, Word, ZERO,
 };
 use miden_processor::AdviceMap;
-use miden_tx::TransactionExecutor;
+use miden_tx::{testing::TransactionContextBuilder, TransactionExecutor};
 use miden_vm::Assembler;
 
-use crate::utils::{
-    get_new_key_pair_with_advice_map, prove_and_verify_transaction, MockDataStore,
-    ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
-};
+use std::collections::BTreeMap;
+
+use crate::common::*;
 
 const MASTS: [&str; 2] = [
     "0xc2114e2bb4ad9e7183d376f34895bdae007e1e31e59084db3371e9ca9c4adf11", // do_calculation_output_note
@@ -54,7 +53,7 @@ pub fn get_account_with_custom_proc(
             index: 0,
             slot: StorageSlot::new_value(public_key),
         }],
-        vec![],
+        BTreeMap::new(),
     )
     .unwrap();
 
@@ -63,7 +62,7 @@ pub fn get_account_with_custom_proc(
         None => AssetVault::new(&[]).unwrap(),
     };
 
-    Account::new(
+    Account::from_parts(
         account_id,
         account_vault,
         account_storage,
@@ -119,12 +118,10 @@ fn create_initial_message_note<R: FeltRng>(
 }
 
 pub fn create_output_note(note_input: Option<Felt>) -> Result<(Note, RpoDigest), NoteError> {
-    let sender_account_id: AccountId =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+    let sender_account_id: AccountId = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     // Create target smart contract
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
@@ -187,11 +184,10 @@ fn test_verifiable_computation() {
     let sender_account_id: AccountId = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     // Create target smart contract
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
-    let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
-    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
+    let (target_pub_key, target_falcon_auth) = get_new_pk_and_authenticator();
 
+    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
     // message note input
     let note_input: Felt = Felt::new(5);
 
@@ -206,16 +202,19 @@ fn test_verifiable_computation() {
 
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store =
-        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    let tx_context = TransactionContextBuilder::new(target_account.clone())
+        .input_notes(vec![note.clone()])
+        .build();
 
-    let mut executor: TransactionExecutor<_, ()> =
-        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    let mut executor =
+        TransactionExecutor::new(tx_context.clone(), Some(target_falcon_auth.clone()))
+            .with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store.block_header.block_num();
-    let note_ids = data_store
-        .notes
+    let block_ref = tx_context.tx_inputs().block_header().block_num();
+    let note_ids = tx_context
+        .tx_inputs()
+        .input_notes()
         .iter()
         .map(|note| note.id())
         .collect::<Vec<_>>();
@@ -224,11 +223,7 @@ fn test_verifiable_computation() {
     let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
 
     let tx_script_target = executor
-        .compile_tx_script(
-            tx_script_ast.clone(),
-            vec![(target_pub_key, target_sk_pk_felt.clone())],
-            vec![],
-        )
+        .compile_tx_script(tx_script_ast.clone(), vec![], vec![])
         .unwrap();
 
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
@@ -264,31 +259,26 @@ fn test_verifiable_computation() {
 
     // CONSTRUCT AND EXECUTE TX 2 (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store_1 = MockDataStore::with_existing(
-        Some(target_account.clone()),
-        Some(vec![expected_note.clone()]),
-    );
+    let tx_context_1 = TransactionContextBuilder::new(target_account.clone())
+        .input_notes(vec![expected_note.clone()]);
 
-    let mut executor: TransactionExecutor<_, ()> =
-        TransactionExecutor::new(data_store_1.clone(), None).with_debug_mode(true);
+    let mut executor =
+        TransactionExecutor::new(tx_context.clone(), Some(target_falcon_auth.clone()))
+            .with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store_1.block_header.block_num();
-    let note_ids_1 = data_store_1
-        .notes
+    let block_ref = tx_context.tx_inputs().block_header().block_num();
+    let note_ids = tx_context
+        .tx_inputs()
+        .input_notes()
         .iter()
-        .map(|expected_note| expected_note.id())
+        .map(|note| note.id())
         .collect::<Vec<_>>();
 
     // Execute the transaction and get the witness
-    let executed_transaction_1 = executor
-        .execute_transaction(
-            target_account_id,
-            block_ref,
-            &note_ids_1,
-            tx_args_target.clone(),
-        )
-        .unwrap();
+    let _executed_transaction = executor
+        .execute_transaction(target_account_id, block_ref, &note_ids, tx_args_target)
+        .expect("Transaction consuming swap note failed");
 
     // commented out to speed up test
     // assert!(prove_and_verify_transaction(executed_transaction_1.clone()).is_ok());

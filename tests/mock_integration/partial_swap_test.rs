@@ -1,3 +1,4 @@
+use crate::common::*;
 use miden_lib::{notes::utils::build_p2id_recipient, transaction::TransactionKernel};
 use miden_objects::{
     accounts::{Account, AccountCode, AccountId, AccountStorage, SlotItem, StorageSlot},
@@ -11,15 +12,10 @@ use miden_objects::{
     transaction::TransactionArgs,
     Felt, NoteError, Word, ZERO,
 };
-use miden_tx::TransactionExecutor;
+use miden_tx::{testing::TransactionContextBuilder, TransactionExecutor};
 use miden_vm::Assembler;
-use mock::mock::account::DEFAULT_AUTH_SCRIPT;
+use std::collections::BTreeMap;
 
-use crate::utils::{
-    get_new_pk_and_authenticator, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1, ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN, ACCOUNT_ID_SENDER,
-};
 pub fn get_custom_account_code(
     account_id: AccountId,
     public_key: Word,
@@ -35,7 +31,7 @@ pub fn get_custom_account_code(
             index: 0,
             slot: StorageSlot::new_value(public_key),
         }],
-        vec![],
+        BTreeMap::new(),
     )
     .unwrap();
 
@@ -44,7 +40,7 @@ pub fn get_custom_account_code(
         None => AssetVault::new(&[]).unwrap(),
     };
 
-    Account::new(
+    Account::from_parts(
         account_id,
         account_vault,
         account_storage,
@@ -173,8 +169,7 @@ fn prove_swap_script() {
     // Create sender and target account
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_UPDATABLE_CODE_OFF_CHAIN).unwrap();
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
     let (target_pub_key, target_falcon_auth) = get_new_pk_and_authenticator();
     let target_account =
         get_custom_account_code(target_account_id, target_pub_key, Some(requested_asset));
@@ -191,24 +186,28 @@ fn prove_swap_script() {
 
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store =
-        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    let tx_context = TransactionContextBuilder::new(target_account.clone())
+        .input_notes(vec![note.clone()])
+        .build();
 
     let mut executor =
-        TransactionExecutor::new(data_store.clone(), Some(target_falcon_auth.clone()))
+        TransactionExecutor::new(tx_context.clone(), Some(target_falcon_auth.clone()))
             .with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store.block_header.block_num();
-    let note_ids = data_store
-        .notes
+    let block_ref = tx_context.tx_inputs().block_header().block_num();
+    let note_ids = tx_context
+        .tx_inputs()
+        .input_notes()
         .iter()
         .map(|note| note.id())
         .collect::<Vec<_>>();
 
-    let tx_script_code = ProgramAst::parse(DEFAULT_AUTH_SCRIPT).unwrap();
+    let tx_script_code = include_str!("../../src/auth/tx_script.masm");
+    let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
+
     let tx_script_target = executor
-        .compile_tx_script(tx_script_code.clone(), vec![], vec![])
+        .compile_tx_script(tx_script_ast.clone(), vec![], vec![])
         .unwrap();
     let tx_args_target = TransactionArgs::with_tx_script(tx_script_target);
 
@@ -217,7 +216,7 @@ fn prove_swap_script() {
         .expect("Transaction consuming swap note failed");
 
     // target account vault delta
-    let target_account_after: Account = Account::new(
+    let target_account_after: Account = Account::from_parts(
         target_account.id(),
         AssetVault::new(&[offered_asset]).unwrap(),
         target_account.storage().clone(),

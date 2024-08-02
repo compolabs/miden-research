@@ -13,16 +13,13 @@ use miden_objects::{
     Felt, NoteError, Word, ZERO,
 };
 use miden_processor::AdviceMap;
-use miden_tx::TransactionExecutor;
+use miden_tx::{testing::TransactionContextBuilder, TransactionExecutor};
 use miden_vm::Assembler;
-
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::Path;
 
-use crate::utils::{
-    get_new_key_pair_with_advice_map, prove_and_verify_transaction, MockDataStore,
-    ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN, ACCOUNT_ID_SENDER,
-};
+use crate::common::*;
 
 const MASTS: [&str; 3] = [
     "0x1e3c3fc738ec66e45db871d25d8d5b952b7a13cca4c9d5c803681316aa711cf6", // create note
@@ -60,7 +57,7 @@ pub fn get_account_with_custom_proc(
             index: 0,
             slot: StorageSlot::new_value(public_key),
         }],
-        vec![],
+        BTreeMap::new(),
     )
     .unwrap();
 
@@ -69,7 +66,7 @@ pub fn get_account_with_custom_proc(
         None => AssetVault::new(&[]).unwrap(),
     };
 
-    Account::new(
+    Account::from_parts(
         account_id,
         account_vault,
         account_storage,
@@ -131,12 +128,10 @@ fn create_initial_message_note<R: FeltRng>(
 }
 
 pub fn create_output_note(note_input: Option<Felt>, use_note_a: bool) -> Result<Note, NoteError> {
-    let sender_account_id: AccountId =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+    let sender_account_id: AccountId = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     // Create target smart contract
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
 
     let note_assembler = TransactionKernel::assembler().with_debug_mode(true);
 
@@ -208,11 +203,10 @@ fn test_note_output() {
     let sender_account_id: AccountId = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     // Create target smart contract
-    let target_account_id =
-        AccountId::try_from(ACCOUNT_ID_REGULAR_ACCOUNT_IMMUTABLE_CODE_ON_CHAIN).unwrap();
-    let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
-    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
+    let (target_pub_key, target_falcon_auth) = get_new_pk_and_authenticator();
 
+    let target_account = get_account_with_custom_proc(target_account_id, target_pub_key, None);
     // Create note a (1) or note b (0)
     let create_note_a: bool = true;
 
@@ -227,16 +221,19 @@ fn test_note_output() {
 
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store =
-        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    let tx_context = TransactionContextBuilder::new(target_account.clone())
+        .input_notes(vec![note.clone()])
+        .build();
 
-    let mut executor: TransactionExecutor<_, ()> =
-        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    let mut executor =
+        TransactionExecutor::new(tx_context.clone(), Some(target_falcon_auth.clone()))
+            .with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store.block_header.block_num();
-    let note_ids = data_store
-        .notes
+    let block_ref = tx_context.tx_inputs().block_header().block_num();
+    let note_ids = tx_context
+        .tx_inputs()
+        .input_notes()
         .iter()
         .map(|note| note.id())
         .collect::<Vec<_>>();
@@ -245,11 +242,7 @@ fn test_note_output() {
     let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
 
     let tx_script_target = executor
-        .compile_tx_script(
-            tx_script_ast.clone(),
-            vec![(target_pub_key, target_sk_pk_felt.clone())],
-            vec![],
-        )
+        .compile_tx_script(tx_script_ast.clone(), vec![], vec![])
         .unwrap();
 
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());

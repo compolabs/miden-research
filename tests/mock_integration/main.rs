@@ -1,14 +1,9 @@
-mod utils;
+mod common;
 
 mod basic_p2id_test;
 mod custom_proc_test;
 
 mod counter_test;
-mod create_asset_test;
-mod set_item_test;
-mod swap_test;
-
-mod burn_test;
 
 mod splitter_test;
 

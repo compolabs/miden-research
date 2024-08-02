@@ -16,13 +16,11 @@ use miden_objects::{
     Felt, NoteError, Word, ZERO,
 };
 use miden_processor::AdviceMap;
-use miden_tx::TransactionExecutor;
+use miden_tx::{testing::TransactionContextBuilder, TransactionExecutor};
 use miden_vm::Assembler;
+use std::collections::BTreeMap;
 
-use crate::utils::{
-    get_new_key_pair_with_advice_map, MockDataStore, ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN,
-    ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN, ACCOUNT_ID_SENDER,
-};
+use crate::common::*;
 
 const MASTS: [&str; 3] = [
     "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
@@ -60,13 +58,12 @@ pub fn get_account_with_custom_proc(
             index: 0,
             slot: StorageSlot::new_value(public_key),
         }],
-        vec![],
+        BTreeMap::new(),
     )
     .unwrap();
-
     let account_vault = AssetVault::new(&assets).unwrap();
 
-    Account::new(
+    Account::from_parts(
         account_id,
         account_vault,
         account_storage,
@@ -166,8 +163,9 @@ fn test_swap_asset_amm() {
     let sender_account_id = AccountId::try_from(ACCOUNT_ID_SENDER).unwrap();
 
     // Create AMM SWAP contract account
-    let target_account_id = AccountId::try_from(ACCOUNT_ID_NON_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let (target_pub_key, target_sk_pk_felt) = get_new_key_pair_with_advice_map();
+    let target_account_id = AccountId::try_from(ACCOUNT_ID_SENDER_1).unwrap();
+    let (target_pub_key, target_falcon_auth) = get_new_pk_and_authenticator();
+
     let target_account = get_account_with_custom_proc(
         target_account_id,
         target_pub_key,
@@ -186,16 +184,19 @@ fn test_swap_asset_amm() {
 
     // CONSTRUCT AND EXECUTE TX (Success)
     // --------------------------------------------------------------------------------------------
-    let data_store =
-        MockDataStore::with_existing(Some(target_account.clone()), Some(vec![note.clone()]));
+    let tx_context = TransactionContextBuilder::new(target_account.clone())
+        .input_notes(vec![note.clone()])
+        .build();
 
-    let mut executor: TransactionExecutor<_, ()> =
-        TransactionExecutor::new(data_store.clone(), None).with_debug_mode(true);
+    let mut executor =
+        TransactionExecutor::new(tx_context.clone(), Some(target_falcon_auth.clone()))
+            .with_debug_mode(true);
     executor.load_account(target_account_id).unwrap();
 
-    let block_ref = data_store.block_header.block_num();
-    let note_ids = data_store
-        .notes
+    let block_ref = tx_context.tx_inputs().block_header().block_num();
+    let note_ids = tx_context
+        .tx_inputs()
+        .input_notes()
         .iter()
         .map(|note| note.id())
         .collect::<Vec<_>>();
@@ -204,11 +205,7 @@ fn test_swap_asset_amm() {
     let tx_script_ast = ProgramAst::parse(tx_script_code).unwrap();
 
     let tx_script_target = executor
-        .compile_tx_script(
-            tx_script_ast.clone(),
-            vec![(target_pub_key, target_sk_pk_felt)],
-            vec![],
-        )
+        .compile_tx_script(tx_script_ast.clone(), vec![], vec![])
         .unwrap();
 
     let tx_args_target = TransactionArgs::new(Some(tx_script_target), None, AdviceMap::default());
