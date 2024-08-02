@@ -1,7 +1,7 @@
 use.miden::kernels::tx::prologue
 use.miden::asset
 
-begin 
+begin
     # prepare the transaction
     exec.prologue::prepare_transaction
 

@@ -7,23 +7,23 @@ use.miden::note
 const.OWNER=0x800000000000001F
 
 proc.only_owner
-  push.OWNER
-  assert_eq
-  drop
+    push.OWNER
+    assert_eq
+    drop
 end
 
 proc.set_value
-  exec.only_owner
+    exec.only_owner
 
-  # if only_owner passes, continue logic flow...
+    # if only_owner passes, continue logic flow...
 end
 
 export.check_caller
-  dropw
+    dropw
 
-  exec.note::get_sender
+    exec.note::get_sender
 
-  exec.only_owner
+    exec.only_owner
 
-  exec.sys::truncate_stack
+    exec.sys::truncate_stack
 end

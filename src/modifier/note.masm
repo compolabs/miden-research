@@ -5,12 +5,12 @@ use.miden::contracts::wallets::basic->wallet
 use.std::sys
 
 begin
-  dropw
+    dropw
 
-  push.111
-  debug.stack
-  drop
+    push.111
+    debug.stack
+    drop
 
-  # call check_caller proc
-  call.0x950a1895a6da04922b5b0ada414a3ac675eb37af16c02963e367e5c98880ed95
+    # call check_caller proc
+    call.0x950a1895a6da04922b5b0ada414a3ac675eb37af16c02963e367e5c98880ed95
 end

@@ -4,15 +4,15 @@ use.std::math::u64
 
 begin
 
-  dropw dropw dropw dropw
+    dropw dropw dropw dropw
 
-  # push the low limb then the high limb. b = 4294967296
-  push.4294967296.0
-  # push the low limb then the high limb. a = 4294967299
-  push.0.0
+    # push the low limb then the high limb. b = 4294967296
+    push.4294967296.0
+    # push the low limb then the high limb. a = 4294967299
+    push.0.0
 
-  debug.stack
+    debug.stack
 
-  exec.u64::overflowing_add
+    exec.u64::overflowing_add
 
 end

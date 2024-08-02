@@ -1,7 +1,7 @@
 use.test_import_a
 
-begin 
+begin
 
-  exec.test_import_a::func_one
+    exec.test_import_a::func_one
 
 end

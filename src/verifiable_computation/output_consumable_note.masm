@@ -2,16 +2,16 @@ use.miden::note
 use.std::sys
 
 begin
-  dropw
+    dropw
 
-  # log 1 tx 2
-  push.101
-  debug.stack
-  drop
+    # log 1 tx 2
+    push.101
+    debug.stack
+    drop
 
-  # call.consume_note
-  call.0xbf8e006fdf47e206c6ab4fd9f6f8ba1e993981f0533993fdd6772b5c7797fd1a
+    # call.consume_note
+    call.0xbf8e006fdf47e206c6ab4fd9f6f8ba1e993981f0533993fdd6772b5c7797fd1a
 
-  exec.sys::truncate_stack
+    exec.sys::truncate_stack
 
 end

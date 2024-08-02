@@ -5,24 +5,24 @@ use.miden::contracts::wallets::basic->wallet
 use.std::sys
 
 begin
-  dropw
+    dropw
 
-  # create note A bool
-  # 1 for note A, 0 for note B
-  # push.1
+    # create note A bool
+    # 1 for note A, 0 for note B
+    # push.1
 
-  exec.note::get_inputs
+    exec.note::get_inputs
 
-  drop
-  mem_load
+    drop
+    mem_load
 
-  push.101
-  debug.stack
-  drop
+    push.101
+    debug.stack
+    drop
 
-  # call create_note proc
-  call.0x1e3c3fc738ec66e45db871d25d8d5b952b7a13cca4c9d5c803681316aa711cf6
+    # call create_note proc
+    call.0x1e3c3fc738ec66e45db871d25d8d5b952b7a13cca4c9d5c803681316aa711cf6
 
-  exec.sys::truncate_stack
+    exec.sys::truncate_stack
 
 end

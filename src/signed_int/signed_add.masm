@@ -6,56 +6,56 @@ const.MAX_POSITIVE_INT=9223372034707292160
 const.MAX_VAL=18446744069414584320
 
 proc.to_negative
-  push.MAX_VAL
-  swap
-  sub
+    push.MAX_VAL
+    swap
+    sub
 end
 
 proc.from_negative
-  push.MAX_VAL
-  swap 
-  sub
+    push.MAX_VAL
+    swap
+    sub
 end
 
 # [b, a]
 proc.signed_add
 
-  # must check for overflow 
-  dup
-  # [b, b, a]
+    # must check for overflow
+    dup
+    # [b, b, a]
 
-  push.MAX_VAL
-  # [max_val, b, b, a]
-  
-  swap
-  # [b, max_val, b, a]
+    push.MAX_VAL
+    # [max_val, b, b, a]
 
-  sub
-  # [diff, b, a]
+    swap
+    # [b, max_val, b, a]
 
-  swap.2
-  # [a, b, diff]
+    sub
+    # [diff, b, a]
 
-  dup
-  # [a, a, b, diff]
+    swap.2
+    # [a, b, diff]
 
-  swap.2
-  # [b, a, a, diff]
+    dup
+    # [a, a, b, diff]
 
-  swap.3
-  # [diff, a, a, b]
+    swap.2
+    # [b, a, a, diff]
 
-  gt
-  #[overflow_bool, a, b]
+    swap.3
+    # [diff, a, a, b]
 
-  if.true
-    add
-    add.1
-  else
-    add
-  end
+    gt
+    #[overflow_bool, a, b]
+
+    if.true
+        add
+        add.1
+    else
+        add
+    end
 end
 
 begin
-  exec.signed_add
+    exec.signed_add
 end

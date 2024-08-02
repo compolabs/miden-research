@@ -9,95 +9,95 @@ use.std::sys
 #! Inputs: [SERIAL_NUM, SCRIPT_HASH, input]
 #! Outputs: [RECIPIENT]
 #!
-#! Only allows a single input currently   
+#! Only allows a single input currently
 proc.get_recipient_hash
-  padw hmerge
-  # => [SERIAL_NUM_HASH, SCRIPT_HASH, input] 
+    padw hmerge
+    # => [SERIAL_NUM_HASH, SCRIPT_HASH, input]
 
-  swapw hmerge
-  # => [SERIAL_SCRIPT_HASH, input] 
+    swapw hmerge
+    # => [SERIAL_SCRIPT_HASH, input]
 
-  # to add more inputs, this needs to be changed
-  swapw swap.3 padw hmerge
-  # => [INPUT_HASH, SERIAL_SCRIPT_HASH]
+    # to add more inputs, this needs to be changed
+    swapw swap.3 padw hmerge
+    # => [INPUT_HASH, SERIAL_SCRIPT_HASH]
 
-  hmerge
-  # [RECIPIENT]
+    hmerge
+    # [RECIPIENT]
 end
 
 # input [value]
 proc.do_calculation
 
-  push.2
-  mul
-  add.5
-  mul.4
-  mul.5
-  add.1
+    push.2
+    mul
+    add.5
+    mul.4
+    mul.5
+    add.1
 
 end
 
 # Procedure 1
 export.do_calculation_output_note
 
-  exec.note::get_inputs
-  drop mem_load
-  # [message_note_input]
+    exec.note::get_inputs
+    drop mem_load
+    # [message_note_input]
 
-  exec.do_calculation
-  # [computed_value]
+    exec.do_calculation
+    # [computed_value]
 
-  push.13310334165435798105.17704527159432745453.13948713200779750900.13586240079106921094
-  push.1.2.3.4
+    push.13310334165435798105.17704527159432745453.13948713200779750900.13586240079106921094
+    push.1.2.3.4
 
-  # log 1 tx 1
-  push.111
-  debug.stack
-  drop
+    # log 1 tx 1
+    push.111
+    debug.stack
+    drop
 
-  exec.get_recipient_hash
-  # [RECIPIENT]
+    exec.get_recipient_hash
+    # [RECIPIENT]
 
-  # note type
-  push.2 
-  # tag
-  push.3221225472
-  # [tag, note_type, RECIPIENT]
+    # note type
+    push.2
+    # tag
+    push.3221225472
+    # [tag, note_type, RECIPIENT]
 
-  exec.tx::create_note
-  # [note_ptr]
+    exec.tx::create_note
+    # [note_ptr]
 
-  # log 2 tx 1
-  push.222
-  debug.stack
-  drop
-  
-  exec.sys::truncate_stack
+    # log 2 tx 1
+    push.222
+    debug.stack
+    drop
+
+    exec.sys::truncate_stack
 
 end
 
 # Procedure 2
 export.consume_note
 
-  # assert sender is this account
-  exec.note::get_sender
-  exec.account::get_id
-  assert_eq
+    # assert sender is this account
+    exec.note::get_sender
+    exec.account::get_id
+    assert_eq
 
-  # get note inputs
-  exec.note::get_inputs
-  # [num_inputs, dest_ptr]
+    # get note inputs
+    exec.note::get_inputs
+    # [num_inputs, dest_ptr]
 
-  drop
-  mem_load
+    drop
+    mem_load
 
-  # [verifiable_computation_output]
+    # [verifiable_computation_output]
 
-  # log 2 tx 2
-  push.202
-  debug.stack
-  drop
+    # log 2 tx 2
+    push.202
+    debug.stack
+    drop
 
-  exec.sys::truncate_stack
+    exec.sys::truncate_stack
 
 end

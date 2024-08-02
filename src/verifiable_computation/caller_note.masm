@@ -1,9 +1,9 @@
 # Message Note
 begin
 
-  dropw
+    dropw
 
-  # call.do_calculation_output_note
-  call.0xc2114e2bb4ad9e7183d376f34895bdae007e1e31e59084db3371e9ca9c4adf11
+    # call.do_calculation_output_note
+    call.0xc2114e2bb4ad9e7183d376f34895bdae007e1e31e59084db3371e9ca9c4adf11
 
 end

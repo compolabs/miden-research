@@ -7,131 +7,131 @@ export.wallet::receive_asset
 
 # acc proc 1
 export.get_assets
-  push.1
-  add
-  debug.stack
-  drop
+    push.1
+    add
+    debug.stack
+    drop
 end
 
 # internal procedure
 # [tokenBalX, tokenBalY, tokenAmountInX]
 # [x, y, dx]
 proc.calculate_amount_y_out
-  dup.2
-  # [dx, x, y, dx]
-  
-  movup.2
-  # [y, dx, x, dx]
+    dup.2
+    # [dx, x, y, dx]
 
-  mul
-  div.1000000
-  # [dx * y, x, dx]
+    movup.2
+    # [y, dx, x, dx]
 
-  swap.2
-  # [dx, x, dx * y]
+    mul
+    div.1000000
+    # [dx * y, x, dx]
 
-  add
-  # [dx + x, dx * y]
+    swap.2
+    # [dx, x, dx * y]
 
-  # divide by 1e3 to have some floating point
-  div.1000
+    add
+    # [dx + x, dx * y]
 
-  # note when dividing...
-  # a / b
-  # [b, a]
-  u32div
+    # divide by 1e3 to have some floating point
+    div.1000
+
+    # note when dividing...
+    # a / b
+    # [b, a]
+    u32div
 
 end
-            
+
 # acct proc 2
 
 # [tokenIn, ZERO, ZERO, amountIn, tokenOut, recipient, maxSlippage]
 export.swap
-  push.11111
-  debug.stack
-  drop
+    push.11111
+    debug.stack
+    drop
 
-  # store tokenIn, tokenOut @ memory address 0, 1
-  mem_store.0
+    # store tokenIn, tokenOut @ memory address 0, 1
+    mem_store.0
 
-  swap.4
+    swap.4
 
-  mem_store.1
+    mem_store.1
 
-  # store recipient @ memory address 5
-  swap.2
-  mem_store.5 
-  swap
+    # store recipient @ memory address 5
+    swap.2
+    mem_store.5
+    swap
 
-  # store amountIn X @ memory address 2
-  swap
-  mem_store.2
+    # store amountIn X @ memory address 2
+    swap
+    mem_store.2
 
-  # tokenIn, tokenOut balance @ memory address 3, 4
-  mem_load.0
-  exec.account::get_balance
-  mem_store.3
+    # tokenIn, tokenOut balance @ memory address 3, 4
+    mem_load.0
+    exec.account::get_balance
+    mem_store.3
 
-  mem_load.1
-  exec.account::get_balance
-  mem_store.4
+    mem_load.1
+    exec.account::get_balance
+    mem_store.4
 
-  mem_load.2
-  push.0.0
-  mem_load.0
-  
-  exec.wallet::receive_asset
-  dropw
+    mem_load.2
+    push.0.0
+    mem_load.0
 
-  mem_load.3
-  mem_load.4
+    exec.wallet::receive_asset
+    dropw
 
-  # stack 
-  # ├──  0: tokenB balance
-  # ├──  1: tokenA balance
+    mem_load.3
+    mem_load.4
 
-  mul.1000
-  swap
-  mul.1000
-  swap
+    # stack
+    # ├──  0: tokenB balance
+    # ├──  1: tokenA balance
 
-  # stack
-  # ├──  0: tokenB balance scaled 1e3
-  # ├──  1: tokenA balance scaled 1e3
+    mul.1000
+    swap
+    mul.1000
+    swap
 
-  # load amount in X
-  mem_load.2
-  mul.1000
-  swap.2
+    # stack
+    # ├──  0: tokenB balance scaled 1e3
+    # ├──  1: tokenA balance scaled 1e3
 
-  exec.calculate_amount_y_out
+    # load amount in X
+    mem_load.2
+    mul.1000
+    swap.2
 
-  mem_store.3 # overwrite tokenInAmount
+    exec.calculate_amount_y_out
 
-  mem_load.5      # recipient (sender)
-  push.2          # note type offchain  
-  push.3758096384 # tag
-  mem_load.3      # token amount  
-  push.0.0        # zero zero
-  mem_load.1      # tokenOut 
+    mem_store.3 # overwrite tokenInAmount
 
-  push.22222
-  debug.stack
-  drop
+    mem_load.5      # recipient (sender)
+    push.2          # note type offchain
+    push.3758096384 # tag
+    mem_load.3      # token amount
+    push.0.0        # zero zero
+    mem_load.1      # tokenOut
 
-  # ├──  0: 2305843009213693999 # tokenOut
-  # ├──  1: 0                   # ZERO
-  # ├──  2: 0                   # ZERO
-  # ├──  3: 91                  # amountOut
-  # ├──  4: 3758096384          # tag
-  # ├──  5: 2                   # noteType
-  # ├──  6: 9223372036854775839 # recipient
+    push.22222
+    debug.stack
+    drop
 
-  exec.wallet::send_asset
-  drop
+    # ├──  0: 2305843009213693999 # tokenOut
+    # ├──  1: 0                   # ZERO
+    # ├──  2: 0                   # ZERO
+    # ├──  3: 91                  # amountOut
+    # ├──  4: 3758096384          # tag
+    # ├──  5: 2                   # noteType
+    # ├──  6: 9223372036854775839 # recipient
 
-  push.1
-  exec.account::incr_nonce
-  exec.sys::truncate_stack
+    exec.wallet::send_asset
+    drop
+
+    push.1
+    exec.account::incr_nonce
+    exec.sys::truncate_stack
 
 end

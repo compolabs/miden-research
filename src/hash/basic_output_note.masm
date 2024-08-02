@@ -3,13 +3,13 @@ use.miden::note
 # @dev this is a generic note used as a demostration
 begin
 
-  push.1.2
-  add
+    push.1.2
+    add
 
-  exec.note::get_inputs
+    exec.note::get_inputs
 
-  add
+    add
 
-  # call.{some_proc}
+    # call.{some_proc}
 
 end

@@ -1,6 +1,6 @@
 
 begin
-  debug.stack
-  push.1
-  drop
+    debug.stack
+    push.1
+    drop
 end

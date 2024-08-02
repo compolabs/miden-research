@@ -11,8 +11,8 @@ begin
     push.0 exec.note::get_inputs
 
     mem_loadw.0
-    
-    push.0 exec.note::get_inputs 
+
+    push.0 exec.note::get_inputs
     push.0 exec.note::get_assets drop mem_loadw
 
     call.0xb0e5ccb898ddb81bb2d9d7ada76d0a51307d634156d5dfae18ba5da8eb2543c4

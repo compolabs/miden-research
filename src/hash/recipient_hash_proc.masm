@@ -3,31 +3,31 @@
 #! Inputs: [SERIAL_NUM, SCRIPT_HASH, input]
 #! Outputs: [RECIPIENT]
 #!
-#! Only allows a single input currently   
+#! Only allows a single input currently
 export.get_recipient_hash
-  padw hmerge
-  # => [SERIAL_NUM_HASH, SCRIPT_HASH, input] 
+    padw hmerge
+    # => [SERIAL_NUM_HASH, SCRIPT_HASH, input]
 
-  swapw hmerge
-  # => [SERIAL_SCRIPT_HASH, input] 
+    swapw hmerge
+    # => [SERIAL_SCRIPT_HASH, input]
 
-  # to add more inputs, this needs to be changed
-  swapw swap.3 padw hmerge
-  # => [INPUT_HASH, SERIAL_SCRIPT_HASH]
+    # to add more inputs, this needs to be changed
+    swapw swap.3 padw hmerge
+    # => [INPUT_HASH, SERIAL_SCRIPT_HASH]
 
-  hmerge
-  # [RECIPIENT]
+    hmerge
+    # [RECIPIENT]
 end
 
 begin
 
-  # push input
-  push.2 
-  # push script hash
-  push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
-  # serial num
-  push.1.2.3.4
+    # push input
+    push.2
+    # push script hash
+    push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
+    # serial num
+    push.1.2.3.4
 
-  exec.get_recipient_hash
+    exec.get_recipient_hash
 
 end

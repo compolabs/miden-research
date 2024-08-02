@@ -12,9 +12,9 @@ end
 
 begin
     # All scripts start with the NOTE_SCRIPT_ROOT, you can drop it
-    dropw 
+    dropw
 
-    push.0 exec.note::get_inputs 
+    push.0 exec.note::get_inputs
     # => [num_inputs, des_pointer, ...]
 
     # logging note input
@@ -27,13 +27,13 @@ begin
     # exec.get_block_number
 
     # All account and note procedures
-    # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures 
+    # https://0xpolygonmiden.github.io/miden-base/transactions/transaction-procedures.html#transaction-procedures
 
     push.0 exec.note::get_assets drop mem_loadw
     # => [ASSET, ...]
 
     debug.stack
-    
+
     # load the asset and add it to the account
     call.wallet::receive_asset
     # => [...]

@@ -1,5 +1,4 @@
 
-
 use.miden::account
 use.miden::note
 use.miden::kernels::tx::memory
@@ -17,8 +16,8 @@ begin
     push.1111
     debug.stack
     drop
-    
-    push.0 exec.note::get_inputs 
+
+    push.0 exec.note::get_inputs
     push.0 exec.note::get_assets drop mem_loadw
 
     push.22222

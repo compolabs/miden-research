@@ -4,15 +4,15 @@ use.miden::contracts::wallets::basic->wallet
 use.miden::tx
 
 begin
-    dropw 
-    push.0 exec.note::get_inputs 
+    dropw
+    push.0 exec.note::get_inputs
     push.0 exec.note::get_assets drop mem_loadw
     call.wallet::receive_asset
     dropw
 
     # acct proc 2
     call.0xf2ac6dcdfca0edd0e569a8151fd22455ccded87ce1112e2571b31865056e03ff
-    
+
     push.99999999
     debug.stack
 

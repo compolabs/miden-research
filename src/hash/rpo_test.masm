@@ -1,26 +1,26 @@
 
 # input: [input]
 proc.get_input_hash
-  swap.7
-  hmerge
+    swap.7
+    hmerge
 end
 
 # inputs [serial_num]
 proc.get_serial_hash
-  swapw
-  debug.stack
-  # hash(serial_num, [0; 4])
-  # stack state
-  #├──  0: 0
-  #├──  1: 0
-  #├──  2: 0
-  #├──  3: 0
-  #├──  4: serial_num felt 3
-  #├──  5: serial_num felt 2
-  #├──  6: serial_num felt 1
-  #├──  7: serial_num felt 0
+    swapw
+    debug.stack
+    # hash(serial_num, [0; 4])
+    # stack state
+    #├──  0: 0
+    #├──  1: 0
+    #├──  2: 0
+    #├──  3: 0
+    #├──  4: serial_num felt 3
+    #├──  5: serial_num felt 2
+    #├──  6: serial_num felt 1
+    #├──  7: serial_num felt 0
 
-  hmerge
+    hmerge
 
 end
 
@@ -28,53 +28,53 @@ end
 
 # input [note_script_hash, serial_num_hash]
 proc.get_serial_script_hash
-  debug.stack
-  hmerge
+    debug.stack
+    hmerge
 end
 
 # input [input_hash, serial_script_hash]
 proc.get_recipient_hash
-  hmerge
+    hmerge
 end
 
 begin
 
-  # input to note (currently a single value)
-  push.2
+    # input to note (currently a single value)
+    push.2
 
-  # 1) get input hash
-  exec.get_input_hash
+    # 1) get input hash
+    exec.get_input_hash
 
-  # store input hash starting @ mem addr 0 
-  mem_storew.0
-  dropw
+    # store input hash starting @ mem addr 0
+    mem_storew.0
+    dropw
 
-  debug.stack
+    debug.stack
 
-  # push serial number
-  push.1.2.3.4
+    # push serial number
+    push.1.2.3.4
 
-  # 2) get serial hash
-  exec.get_serial_hash
+    # 2) get serial hash
+    exec.get_serial_hash
 
-  # store serial hash starting @ mem addr 1
-  mem_storew.1
-  dropw
+    # store serial hash starting @ mem addr 1
+    mem_storew.1
+    dropw
 
-  # 3) get serial script hash
+    # 3) get serial script hash
 
-  # hash(hash(serial_num, [0; 4]), script_hash)
-  # note script hash
-  mem_loadw.1
+    # hash(hash(serial_num, [0; 4]), script_hash)
+    # note script hash
+    mem_loadw.1
 
-  push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
-  
-  hmerge
+    push.2759471287707961087.16916719151911714604.9981200281211272705.14248949638383279509
 
-  # 4) get recipient hash
-  padw
-  mem_loadw.0
+    hmerge
 
-  hmerge
+    # 4) get recipient hash
+    padw
+    mem_loadw.0
+
+    hmerge
 
 end

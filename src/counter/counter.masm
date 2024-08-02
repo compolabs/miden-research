@@ -5,7 +5,7 @@ use.miden::contracts::wallets::basic->wallet
 
 # acct proc 0
 export.wallet::receive_asset
-            
+
 # acct proc 1
 export.account::incr_nonce
 # export.basic_eoa::auth_tx_rpo_falcon512
@@ -14,39 +14,39 @@ export.account::incr_nonce
 # [] => count
 export.get_counter
 
-  # Get Count
-  push.3 # index
-  exec.account::get_item
+    # Get Count
+    push.3 # index
+    exec.account::get_item
 
-  # log 4
-  push.4000
-  debug.stack
-  drop
+    # log 4
+    push.4000
+    debug.stack
+    drop
 
-  # truncate stack to 16
-  exec.sys::truncate_stack
+    # truncate stack to 16
+    exec.sys::truncate_stack
 end
 
 # acct proc 3
 # [] => [count]
 export.increment_counter
-  # Get count
-  push.3 # index
-  exec.account::get_item
+    # Get count
+    push.3 # index
+    exec.account::get_item
 
-  # Increment count
-  push.1
-  add
+    # Increment count
+    push.1
+    add
 
-  # log 2
-  push.2000
-  debug.stack
-  drop
+    # log 2
+    push.2000
+    debug.stack
+    drop
 
-  # Set count
-  push.3 # index
-  exec.account::set_item
+    # Set count
+    push.3 # index
+    exec.account::set_item
 
-  # truncate stack to 16
-  exec.sys::truncate_stack
+    # truncate stack to 16
+    exec.sys::truncate_stack
 end

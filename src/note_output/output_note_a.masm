@@ -2,25 +2,25 @@ use.miden::note
 use.std::sys
 
 proc.call_proc_a
-  # call proc a in note_creator
+    # call proc a in note_creator
 
-  # place holder
-  push.1.2
-  add
-  drop
+    # place holder
+    push.1.2
+    add
+    drop
 
 end
 
 begin
-  exec.note::get_inputs
+    exec.note::get_inputs
 
-  # A in ASCII
-  push.41
-  debug.stack
-  drop
+    # A in ASCII
+    push.41
+    debug.stack
+    drop
 
-  exec.call_proc_a
+    exec.call_proc_a
 
-  exec.sys::truncate_stack
+    exec.sys::truncate_stack
 
 end

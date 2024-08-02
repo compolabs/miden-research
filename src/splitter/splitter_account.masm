@@ -6,149 +6,149 @@ use.miden::contracts::wallets::basic->wallet
 
 # acct proc 0
 export.wallet::receive_asset
-            
+
 # export.basic_eoa::auth_tx_rpo_falcon512
 
 # [value]
 proc.calculate_half
-  push.2
-  u32div
+    push.2
+    u32div
 end
 
 proc.create_split_note
-  add
+    add
 end
 
 # account proc 1
 # [faucet_id]
 export.split_note
 
-  # store faucet_id @ memory address 0
-  mem_store.0
-  mem_load.0
+    # store faucet_id @ memory address 0
+    mem_store.0
+    mem_load.0
 
-  push.33333
-  debug.stack
-  drop
+    push.33333
+    debug.stack
+    drop
 
-  exec.wallet::receive_asset
+    exec.wallet::receive_asset
 
-  dropw
+    dropw
 
-  push.44444
-  debug.stack
-  drop
+    push.44444
+    debug.stack
+    drop
 
-  # store user addresses at memory addresses 5 & 6
-  mem_store.5 
-  mem_store.6
+    # store user addresses at memory addresses 5 & 6
+    mem_store.5
+    mem_store.6
 
-  push.55555
-  debug.stack
-  drop
+    push.55555
+    debug.stack
+    drop
 
-  mem_load.0
-  exec.account::get_balance
+    mem_load.0
+    exec.account::get_balance
 
-  push.66666
-  debug.stack
-  drop
+    push.66666
+    debug.stack
+    drop
 
-  # [balance]
-  exec.calculate_half
+    # [balance]
+    exec.calculate_half
 
-  push.77777
-  debug.stack
-  drop
+    push.77777
+    debug.stack
+    drop
 
-  mem_store.1 # store half amount @ mem addr 1
+    mem_store.1 # store half amount @ mem addr 1
 
-  # Creating Note #1
-  # recipient_id
-  # push.13811048127276320074 # felt
-  mem_load.5
-  push.0 # push.14363880661162107679 # felt 
-  push.0 #push.17767783389258379986 # felt
-  push.0 # push.6030920770376313201 # felt
-  
-  # note type
-  push.2 # offchain note?
+    # Creating Note #1
+    # recipient_id
+    # push.13811048127276320074 # felt
+    mem_load.5
+    push.0 # push.14363880661162107679 # felt
+    push.0 #push.17767783389258379986 # felt
+    push.0 # push.6030920770376313201 # felt
 
-  # tag
-  push.3758096384 # note tag
+    # note type
+    push.2 # offchain note?
 
-  # value
-  mem_load.1 # value from calculate_half proc
+    # tag
+    push.3758096384 # note tag
 
-  push.0.0 # push ZERO ZERO
+    # value
+    mem_load.1 # value from calculate_half proc
 
-  # asset_id
-  mem_load.0 # load asset_id from mem addr 0
+    push.0.0 # push ZERO ZERO
 
-  # stack at this point: 
-  #├──  1: 2305843009213693983  # account_id
-  #├──  2: 0                    # ZERO 
-  #├──  3: 0                    # ZERO
-  #├──  4: 101                  # token amount
-  #├──  5: 536870912            # tag
-  #├──  6: 2                    # note type
-  #├──  7: 6030920770376313201  # recipient_id FELT
-  #├──  8: 17767783389258379986 # recipient_id FELT
-  #├──  9: 14363880661162107679 # recipient_id FELT
-  #├── 10: 13811048127276320074 # recipient_id FELT
+    # asset_id
+    mem_load.0 # load asset_id from mem addr 0
 
-  push.77777
-  debug.stack
-  drop
+    # stack at this point:
+    #├──  1: 2305843009213693983  # account_id
+    #├──  2: 0                    # ZERO
+    #├──  3: 0                    # ZERO
+    #├──  4: 101                  # token amount
+    #├──  5: 536870912            # tag
+    #├──  6: 2                    # note type
+    #├──  7: 6030920770376313201  # recipient_id FELT
+    #├──  8: 17767783389258379986 # recipient_id FELT
+    #├──  9: 14363880661162107679 # recipient_id FELT
+    #├── 10: 13811048127276320074 # recipient_id FELT
 
-  exec.wallet::send_asset
-  # [note_ptr]
-  drop
+    push.77777
+    debug.stack
+    drop
 
-  # NOTE 2
-  mem_load.6
-  push.0 # push.14363880661162107679 # felt 
-  push.0 #push.17767783389258379986 # felt
-  push.0 # push.6030920770376313201 # felt
-  
-  # note type
-  push.2 # offchain note?
+    exec.wallet::send_asset
+    # [note_ptr]
+    drop
 
-  # tag
-  push.3758096384 # note tag
+    # NOTE 2
+    mem_load.6
+    push.0 # push.14363880661162107679 # felt
+    push.0 #push.17767783389258379986 # felt
+    push.0 # push.6030920770376313201 # felt
 
-  # value
-  mem_load.1 # value from calculate_half proc
+    # note type
+    push.2 # offchain note?
 
-  push.0.0 # push ZERO ZERO
+    # tag
+    push.3758096384 # note tag
 
-  # asset_id
-  mem_load.0 # load asset_id from mem addr 0
+    # value
+    mem_load.1 # value from calculate_half proc
 
-  # stack at this point: 
-  #├──  1: 2305843009213693983  # account_id
-  #├──  2: 0                    # ZERO 
-  #├──  3: 0                    # ZERO
-  #├──  4: 101                  # token amount
-  #├──  5: 536870912            # tag
-  #├──  6: 2                    # note type
-  #├──  7: 6030920770376313201  # recipient_id FELT
-  #├──  8: 17767783389258379986 # recipient_id FELT
-  #├──  9: 14363880661162107679 # recipient_id FELT
-  #├── 10: 13811048127276320074 # recipient_id FELT
+    push.0.0 # push ZERO ZERO
 
-  push.88888
-  debug.stack
-  drop
+    # asset_id
+    mem_load.0 # load asset_id from mem addr 0
 
-  exec.wallet::send_asset
+    # stack at this point:
+    #├──  1: 2305843009213693983  # account_id
+    #├──  2: 0                    # ZERO
+    #├──  3: 0                    # ZERO
+    #├──  4: 101                  # token amount
+    #├──  5: 536870912            # tag
+    #├──  6: 2                    # note type
+    #├──  7: 6030920770376313201  # recipient_id FELT
+    #├──  8: 17767783389258379986 # recipient_id FELT
+    #├──  9: 14363880661162107679 # recipient_id FELT
+    #├── 10: 13811048127276320074 # recipient_id FELT
 
-  mem_load.0
-  exec.account::get_balance
+    push.88888
+    debug.stack
+    drop
 
-  dropw
+    exec.wallet::send_asset
 
-  # push.2
-  # exec.account::incr_nonce
-  exec.sys::truncate_stack
+    mem_load.0
+    exec.account::get_balance
+
+    dropw
+
+    # push.2
+    # exec.account::incr_nonce
+    exec.sys::truncate_stack
 end

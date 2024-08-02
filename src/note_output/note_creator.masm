@@ -8,68 +8,68 @@ use.miden::tx
 # create note A
 proc.create_note_a
 
-  push.301
-  debug.stack
-  drop
+    push.301
+    debug.stack
+    drop
 
-  # recipient felts
-  push.11145187256699038453 
-  push.13516355362922671638
-  push.4770272340630846216
-  push.966344059415127099
-  
-  # note type
-  push.2
+    # recipient felts
+    push.11145187256699038453
+    push.13516355362922671638
+    push.4770272340630846216
+    push.966344059415127099
 
-  # tag
-  push.3221225472
+    # note type
+    push.2
 
-  # ├──  0: tag           
-  # ├──  1: note_type
-  # ├──  2: recipient.digest() felt_3 
-  # ├──  3: recipient.digest() felt_2 
-  # ├──  4: recipient.digest() felt_1 
-  # ├──  5: recipient.digest() felt_0 
+    # tag
+    push.3221225472
 
-  debug.stack
+    # ├──  0: tag
+    # ├──  1: note_type
+    # ├──  2: recipient.digest() felt_3
+    # ├──  3: recipient.digest() felt_2
+    # ├──  4: recipient.digest() felt_1
+    # ├──  5: recipient.digest() felt_0
 
-  # [tag, note_type, RECIPIENT]
-  exec.tx::create_note
-  # [note_ptr]
+    debug.stack
+
+    # [tag, note_type, RECIPIENT]
+    exec.tx::create_note
+    # [note_ptr]
 
 end
 
 # create note B
 proc.create_note_b
 
-  push.302
-  debug.stack
-  drop
+    push.302
+    debug.stack
+    drop
 
-  # recipient felts
-  push.3585522988821758901 
-  push.19437762206329930
-  push.14201662485092624442
-  push.7387889746806034967
-  
-  # note type
-  push.2
+    # recipient felts
+    push.3585522988821758901
+    push.19437762206329930
+    push.14201662485092624442
+    push.7387889746806034967
 
-  # tag
-  push.3221225472
+    # note type
+    push.2
 
-  # ├──  0: tag           
-  # ├──  1: note_type
-  # ├──  2: recipient.digest() felt_3 
-  # ├──  3: recipient.digest() felt_2 
-  # ├──  4: recipient.digest() felt_1 
-  # ├──  5: recipient.digest() felt_0 
+    # tag
+    push.3221225472
 
-  debug.stack
+    # ├──  0: tag
+    # ├──  1: note_type
+    # ├──  2: recipient.digest() felt_3
+    # ├──  3: recipient.digest() felt_2
+    # ├──  4: recipient.digest() felt_1
+    # ├──  5: recipient.digest() felt_0
 
-  # [tag, note_type, RECIPIENT]
-  exec.tx::create_note
-  # [note_ptr]
+    debug.stack
+
+    # [tag, note_type, RECIPIENT]
+    exec.tx::create_note
+    # [note_ptr]
 
 end
 
@@ -78,41 +78,41 @@ end
 
 # inputs: [create_note_a]
 export.create_note
-  # Creating Note
+    # Creating Note
 
-  push.201
-  debug.stack
-  drop
+    push.201
+    debug.stack
+    drop
 
-  if.true 
-    exec.create_note_a
-  else
-    exec.create_note_b
-  end
+    if.true
+        exec.create_note_a
+    else
+        exec.create_note_b
+    end
 
-  push.401
-  debug.stack
-  drop
+    push.401
+    debug.stack
+    drop
 
-  dropw
+    dropw
 
-  exec.sys::truncate_stack
+    exec.sys::truncate_stack
 end
 
 # note A will call into this proc
 export.note_a_receiver
 
-  push.41.41
-  debug.stack
-  drop drop
+    push.41.41
+    debug.stack
+    drop drop
 
 end
 
 # note B will call into this proc
 export.note_b_receiver
 
-  push.42.42
-  debug.stack
-  drop drop
+    push.42.42
+    debug.stack
+    drop drop
 
 end

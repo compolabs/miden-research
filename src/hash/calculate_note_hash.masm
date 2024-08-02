@@ -1,28 +1,28 @@
 # planned input: [serial_number_word, note_script_hash, input_hash]
-# input: [] 
+# input: []
 export.get_note_hash
 
-  # push word 0
-  push.1.0.0.0
+    # push word 0
+    push.1.0.0.0
 
-  # push word 1
-  push.0.0.0.0
+    # push word 1
+    push.0.0.0.0
 
-  # push word 2
-  push.0.0.0.0
+    # push word 2
+    push.0.0.0.0
 
-  debug.stack
+    debug.stack
 
-  hmerge
+    hmerge
 
-  debug.stack
+    debug.stack
 
 end
 
 export.get_input_hash
-  
-  push.0.0.0.0
 
-  hperm
+    push.0.0.0.0
+
+    hperm
 
 end

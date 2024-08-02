@@ -7,80 +7,79 @@
 # amountOutY = (amountInX * balY) / (amountInX + balX)
 
 proc.calculate_amount_y_out
-  # [x, y, dx]
-  # [5e6, 10e6, 9e6]
-  
-  dup.2
-  # [dx, x, y, dx]
-  # [9e6, 5e6, 10e6, 9e6]
-  
-  movup.2
-  # [y, dx, x, dx]
-  # [10e6, 9e6, 5e6, 9e6]
+    # [x, y, dx]
+    # [5e6, 10e6, 9e6]
 
-  mul
-  div.1000000
-  # [dx * y, x, dx]
-  # [90e6, 5e6, 9e6]
+    dup.2
+    # [dx, x, y, dx]
+    # [9e6, 5e6, 10e6, 9e6]
 
-  swap.2
-  # [dx, x, dx * y]
-  # [9e6, 5e6, 90e6]
+    movup.2
+    # [y, dx, x, dx]
+    # [10e6, 9e6, 5e6, 9e6]
 
-  add
-  # [dx + x, dx * y]
-  # [14e6, 90e6]
+    mul
+    div.1000000
+    # [dx * y, x, dx]
+    # [90e6, 5e6, 9e6]
 
-  debug.stack
-  # divide by 1e3 to have some floating point
-  div.1000
-  # [14e3, 90e6]
+    swap.2
+    # [dx, x, dx * y]
+    # [9e6, 5e6, 90e6]
 
-  debug.stack
-  # note when dividing...
-  # a / b
-  # [b, a]
-  # 90e6 / 16e6
-  # u32div
-  # swap
-  # div
-  u32div
-  debug.stack
+    add
+    # [dx + x, dx * y]
+    # [14e6, 90e6]
 
-  # scale back up by 1e3
-  mul.1000
-  # [1.666e6]
-  
+    debug.stack
+    # divide by 1e3 to have some floating point
+    div.1000
+    # [14e3, 90e6]
+
+    debug.stack
+    # note when dividing...
+    # a / b
+    # [b, a]
+    # 90e6 / 16e6
+    # u32div
+    # swap
+    # div
+    u32div
+    debug.stack
+
+    # scale back up by 1e3
+    mul.1000
+    # [1.666e6]
+
 end
-
 
 # mimic token call
 proc.get_token_amounts
 
-  # balX 5e6
-  push.5000000
-  mem_store.0
+    # balX 5e6
+    push.5000000
+    mem_store.0
 
-  # balY 10e6
-  push.10000000
-  mem_store.1
+    # balY 10e6
+    push.10000000
+    mem_store.1
 
-  mem_load.1
-  mem_load.0
+    mem_load.1
+    mem_load.0
 
-  # balance token0 @ addr 0
-  # balance token1 @ addr 1
+    # balance token0 @ addr 0
+    # balance token1 @ addr 1
 end
 
 # user provides amount_in_x via operand stack
 # example 1e6
 begin
-  # mimic token call
-  exec.get_token_amounts
-  # [tokenX, tokenY, amount_in_x]
-  
-  exec.calculate_amount_y_out
-  # [amount_out_y]
-  # [1.666e6]
+    # mimic token call
+    exec.get_token_amounts
+    # [tokenX, tokenY, amount_in_x]
+
+    exec.calculate_amount_y_out
+    # [amount_out_y]
+    # [1.666e6]
 
 end
