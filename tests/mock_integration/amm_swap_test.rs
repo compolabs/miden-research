@@ -23,9 +23,9 @@ use std::collections::BTreeMap;
 use crate::common::*;
 
 const MASTS: [&str; 3] = [
-    "0x74de7e94e5afc71e608f590c139ac51f446fc694da83f93d968b019d1d2b7306", // receive_asset proc
+    "0xbb58a032a1c1989079dcc73c279d69dcdf41dd7ee923d99dc3f86011663ec167", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0xbfc82a0785cba42b125147f5716ef7df0c7c0b0e60a49dae71121310c6cca0dc", // swap assets proc
+    "0xb0e5ccb898ddb81bb2d9d7ada76d0a51307d634156d5dfae18ba5da8eb2543c4", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
