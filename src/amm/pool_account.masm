@@ -2,6 +2,11 @@ use.miden::account
 use.std::sys
 use.miden::contracts::wallets::basic->wallet
 
+const.ASSET_IN=0
+const.ASSET_OUT=1
+const.ACCOUNT_ID_OUT=2
+const.MAX_SLIPPAGE=3
+
 # acct proc 0
 export.wallet::receive_asset
 
@@ -14,8 +19,8 @@ export.get_assets
 end
 
 # internal procedure
-# [tokenBalX, tokenBalY, tokenAmountInX]
-# [x, y, dx]
+# inputs: [tokenBalX, tokenBalY, tokenAmountInX]
+# outputs: [tokenAmountOutY]
 proc.calculate_amount_y_out
     dup.2
     # [dx, x, y, dx]
@@ -45,46 +50,46 @@ end
 
 # acct proc 2
 
-# [tokenIn, ZERO, ZERO, amountIn, tokenOut, recipient, maxSlippage]
+# [ASSET_IN, asset_id_out, account_id_out]
 export.swap
-    push.11111
+    push.111 debug.stack drop
+
+    mem_storew.ASSET_IN dropw
+    # => [asset_id_out, account_id_out]
+
     debug.stack
-    drop
 
-    # store tokenIn, tokenOut @ memory address 0, 1
-    mem_store.0
+    push.0.0.0 mem_storew.ASSET_OUT dropw
+    # => [account_id_out]
 
-    swap.4
+    mem_store.ACCOUNT_ID_OUT
+    # => []
 
-    mem_store.1
+    mem_load.ASSET_IN
+    # => [amt_in_x]
 
-    # store recipient @ memory address 5
-    swap.2
-    mem_store.5
-    swap
+    mem_loadw.ASSET_OUT drop drop drop
+    # => [faucet_id_Y, amt_in_x]
 
-    # store amountIn X @ memory address 2
-    swap
-    mem_store.2
+    debug.stack
 
-    # tokenIn, tokenOut balance @ memory address 3, 4
-    mem_load.0
     exec.account::get_balance
-    mem_store.3
+    # => [amt_Y, amt_in_x]
 
-    mem_load.1
+    debug.stack debug.mem
+
+    mem_loadw.ASSET_IN drop drop drop
+    # => [faucet_id_X, amt_Y, amt_in_x]
+
     exec.account::get_balance
-    mem_store.4
+    # => [amt_X, amt_Y, amt_in_x]
 
-    mem_load.2
-    push.0.0
-    mem_load.0
+    mem_loadw.ASSET_IN
+    # [ASSET_IN, amt_X, amt_Y, amt_in_x]
 
-    exec.wallet::receive_asset
-    dropw
+    exec.wallet::receive_asset dropw
 
-    mem_load.3
-    mem_load.4
+    debug.stack
 
     # stack
     # ├──  0: tokenB balance

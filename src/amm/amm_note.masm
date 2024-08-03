@@ -8,14 +8,17 @@ begin
     # drop note root
     dropw
 
-    push.0 exec.note::get_inputs
+    push.0 exec.note::get_inputs drop drop
+    mem_load.1 mem_load.0 padw
+    # => [0,0,0,0, account_id_recipient, token_out_id]
 
-    mem_loadw.0
+    debug.stack 
+    push.2 exec.note::get_assets drop drop mem_loadw.2
+    # => [ASSET_IN, account_id_recipient, token_out_id]
 
-    push.0 exec.note::get_inputs
-    push.0 exec.note::get_assets drop mem_loadw
+    push.101 debug.stack drop
 
-    call.0xb0e5ccb898ddb81bb2d9d7ada76d0a51307d634156d5dfae18ba5da8eb2543c4
+    call.0x9536eb5d4557bab720bfd5b1d2ce9d590c799bcbf39515d019d8c890abe7b985
 
     exec.sys::truncate_stack
 end

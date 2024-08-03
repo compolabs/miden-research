@@ -25,7 +25,7 @@ use crate::common::*;
 const MASTS: [&str; 3] = [
     "0xbb58a032a1c1989079dcc73c279d69dcdf41dd7ee923d99dc3f86011663ec167", // receive_asset proc
     "0x30ab7cac0307a30747591be84f78a6d0c511b0f2154a8e22b6d7869207bc50c2", // get assets proc
-    "0xb0e5ccb898ddb81bb2d9d7ada76d0a51307d634156d5dfae18ba5da8eb2543c4", // swap assets proc
+    "0x9536eb5d4557bab720bfd5b1d2ce9d590c799bcbf39515d019d8c890abe7b985", // swap assets proc
 ];
 
 pub fn account_code(assembler: &Assembler) -> AccountCode {
@@ -103,9 +103,12 @@ fn create_amm_swap_note<R: FeltRng>(
     let script_ast = ProgramAst::parse(&note_script).unwrap();
     let (note_script, _) = new_note_script(script_ast, &note_assembler).unwrap();
 
-    let token_out_felt = Felt::new(token_out.faucet_id().into());
-
-    let inputs = NoteInputs::new(vec![token_out_felt, sender_account_id.into()])?;
+    let inputs = NoteInputs::new(vec![
+        token_out.faucet_id().into(),
+        Felt::new(0),
+        Felt::new(0),
+        Felt::new(0), 
+        sender_account_id.into()])?;
 
     let tag = NoteTag::from_account_id(target_account_id, NoteExecutionHint::Local)?;
     let serial_num = rng.draw_word();
@@ -141,20 +144,20 @@ pub fn check_account_masts() {
 fn test_swap_asset_amm() {
     // TOKEN A
     let faucet_id_a = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN).unwrap();
-    let fungible_asset_amount_a: u64 = 10002;
+    let fungible_asset_amount_a: u64 = 100000000;
     let fungible_asset_a: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_a)
         .unwrap()
         .into();
 
     // TOKEN B
     let faucet_id_b = AccountId::try_from(ACCOUNT_ID_FUNGIBLE_FAUCET_ON_CHAIN_1).unwrap();
-    let fungible_asset_amount_b = 10005;
+    let fungible_asset_amount_b = 100000001;
     let fungible_asset_b: Asset = FungibleAsset::new(faucet_id_b, fungible_asset_amount_b)
         .unwrap()
         .into();
 
     // Create user asset TOKEN A
-    let fungible_asset_amount_user: u64 = 101;
+    let fungible_asset_amount_user: u64 = 10000000;
     let fungible_asset_a_user: Asset = FungibleAsset::new(faucet_id_a, fungible_asset_amount_user)
         .unwrap()
         .into();
