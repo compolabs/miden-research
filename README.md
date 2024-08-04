@@ -2,6 +2,8 @@
 
 This repository is dedicated to exploring, experimenting, and learning more about how to use Miden and Miden Assembly.
 
+Disclaimer: Currently this repository is in progress of being updated from Miden v0.3 to v0.4. Not all tests are currently working.
+
 ### Running Tests:
 
 Simple AMM test:
